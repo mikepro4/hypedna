@@ -6,7 +6,6 @@ const AssetsPlugin = require("assets-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
 const assets = require("./webpack-assets.json");
-// const HashOutput = require("webpack-plugin-hash-output");
 
 const assetsPluginInstance = new AssetsPlugin({
 	includeManifest: "manifest",

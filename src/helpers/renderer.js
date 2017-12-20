@@ -55,7 +55,7 @@ export default (
       <head>
         ${helmetInstance.title.toString()}
         ${helmetInstance.meta.toString()}
-				<link rel="stylesheet" href=${buildAssets.bundle.css}>
+				<link rel="stylesheet" href="${buildAssets.bundle.css}">
       </head>
       <body>
         <div id="app">${content}</div>

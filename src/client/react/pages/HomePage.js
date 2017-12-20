@@ -2,6 +2,9 @@ import React, { Component } from "react";
 import { Helmet } from "react-helmet";
 
 class HomePage extends Component {
+	componentDidMount() {
+		console.log("test");
+	}
 	renderHead = () => (
 		<Helmet>
 			<title>Hello</title>
