@@ -20,9 +20,7 @@ app.use(
 	PROXY_ROUTE,
 	proxy(BASE_API_URL, {
 		proxyReqOptDecorator: opts => {
-			/* eslint-disable */
 			opts.headers["x-forwarded-host"] = HOST;
-			/* eslint-enable */
 			return opts;
 		}
 	})
@@ -37,7 +35,6 @@ app.get("*", (request, response) => {
 	});
 
 	const store = createStore({}, reducer, axiosInstance);
-	/* eslint-disable */
 
 	const reactRouterConfigLoadDataPromises = matchRoutes(Router, request.path)
 		.map(({ route }) => (route.loadData ? route.loadData(store) : null))
@@ -49,9 +46,7 @@ app.get("*", (request, response) => {
 						})
 					: null
 		);
-	/* eslint-enable */
 
-	/* eslint-disable */
 	Promise.all(reactRouterConfigLoadDataPromises).then(() => {
 		const staticRouterContext = {};
 		const html = renderer(request, store, buildAssets, staticRouterContext);
@@ -60,7 +55,6 @@ app.get("*", (request, response) => {
 		if (staticRouterContext.notFound) response.status(404);
 		response.send(html);
 	});
-	/* eslint-enable */
 });
 
 app.listen(PORT, () => {

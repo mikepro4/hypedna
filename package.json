@@ -54,6 +54,7 @@
 		"css-loader": "^0.28.7",
 		"express": "^4.16.2",
 		"express-http-proxy": "^1.0.7",
+		"material-ui": "^1.0.0-beta.24",
 		"react": "^16.0.0",
 		"react-dom": "^16.0.0",
 		"react-helmet": "^5.2.0",
