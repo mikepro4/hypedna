@@ -7,6 +7,15 @@ import { Helmet } from "react-helmet";
 import serialize from "serialize-javascript";
 import Router from "../client/router";
 
+// JSS and MUI Setup
+import { SheetsRegistry } from "react-jss/lib/jss";
+import JssProvider from "react-jss/lib/JssProvider";
+import { create } from "jss";
+import preset from "jss-preset-default";
+import { MuiThemeProvider, createMuiTheme } from "material-ui/styles";
+import createGenerateClassName from "material-ui/styles/createGenerateClassName";
+import { green, red } from "material-ui/colors";
+
 export default (
 	expressRequest,
 	reduxStore,
@@ -40,15 +49,37 @@ export default (
 			}, "");
 	};
 
+	// Create a sheetsRegistry instance.
+	const sheetsRegistry = new SheetsRegistry();
+
+	// Create a theme instance.
+	const theme = createMuiTheme({
+		palette: {
+			primary: green,
+			accent: red,
+			type: "light"
+		}
+	});
+
+	// Configure JSS
+	const jss = create(preset());
+	jss.options.createGenerateClassName = createGenerateClassName;
+
 	const content = renderToString(
-		<Provider store={reduxStore}>
-			<StaticRouter location={expressRequest.path} context={routerContext}>
-				<div>{renderRoutes(Router)}</div>
-			</StaticRouter>
-		</Provider>
+		<JssProvider registry={sheetsRegistry} jss={jss}>
+			<MuiThemeProvider theme={theme} sheetsManager={new Map()}>
+				<Provider store={reduxStore}>
+					<StaticRouter location={expressRequest.path} context={routerContext}>
+						<div>{renderRoutes(Router)}</div>
+					</StaticRouter>
+				</Provider>
+			</MuiThemeProvider>
+		</JssProvider>
 	);
 
 	const helmetInstance = Helmet.renderStatic();
+
+	const css = sheetsRegistry.toString();
 
 	const html = `
     <html>
@@ -56,6 +87,8 @@ export default (
         ${helmetInstance.title.toString()}
         ${helmetInstance.meta.toString()}
 				<link rel="stylesheet" href="${buildAssets.bundle.css}">
+				<style id="jss-server-side">${css}</style>
+				<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
       </head>
       <body>
         <div id="app">${content}</div>
