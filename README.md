@@ -1,3 +1,3 @@
 # hypedna
 
-Hello World 2
+Hello World
