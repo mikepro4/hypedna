@@ -14,7 +14,11 @@ module.exports = {
 					fallback: "style-loader",
 					use: ["css-loader", "sass-loader"]
 				})
-			}
+			},
+			{ test: /\.json$/, loader: "json-loader" },
+			{ test: /\.(woff2?|svg)$/, loader: "url-loader?limit=10000" },
+			{ test: /\.(ttf|eot)$/, loader: "file-loader" },
+			{ test: /\.png$/, loader: "url-loader?mimetype=image/png" }
 		]
 	}
 };

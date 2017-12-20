@@ -1,4 +1,5 @@
 import express from "express";
+import path from "path";
 import { matchRoutes } from "react-router-config";
 import proxy from "express-http-proxy";
 import axios from "axios";
@@ -13,6 +14,7 @@ const BASE_API_URL = "https://jsonplaceholder.typicode.com";
 const HOST = process.env.HOST || `localhost:${PORT}`;
 const PROXY_ROUTE = "/api";
 const PUBLIC_DIR = "public";
+const STATIC_DIR = "static";
 
 const app = express();
 
@@ -26,6 +28,7 @@ app.use(
 	})
 );
 
+app.use(express.static(STATIC_DIR));
 app.use(express.static(PUBLIC_DIR));
 
 app.get("*", (request, response) => {
