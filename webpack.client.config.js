@@ -5,7 +5,8 @@ const webpack = require("webpack");
 const AssetsPlugin = require("assets-webpack-plugin");
 const CleanWebpackPlugin = require("clean-webpack-plugin");
 const ExtractTextPlugin = require("extract-text-webpack-plugin");
-// const assets = require("./webpack-assets.json");
+const assets = require("./webpack-assets.json");
+// const HashOutput = require("webpack-plugin-hash-output");
 
 const assetsPluginInstance = new AssetsPlugin({
 	includeManifest: "manifest",
@@ -31,15 +32,14 @@ const config = {
 	},
 	output: {
 		path: path.resolve(__dirname, "public"),
-		filename: "[name].[chunkhash].js"
+		filename: "[name].[hash:8].js"
 	},
 	plugins: [
-		/*   */
 		new webpack.optimize.CommonsChunkPlugin({
 			names: ["vendor", "manifest"],
 			minChunks: Infinity
 		}),
-		new ExtractTextPlugin("style.[chunkhash].css", { allChunks: true }),
+		new ExtractTextPlugin("style.[contenthash:8].css"),
 		assetsPluginInstance
 	]
 };
@@ -58,8 +58,7 @@ if (process.env.NODE_ENV === "production") {
 				compress: {
 					warnings: false
 				}
-			}),
-			new ExtractTextPlugin("style.[chunkhash].css", { allChunks: true })
+			})
 		]
 	};
 	mergedConfig = merge(mergedConfig, prod);
