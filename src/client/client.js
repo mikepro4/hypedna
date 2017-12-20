@@ -11,7 +11,7 @@ import { configure as configureStore } from "./redux/store";
 import { MuiThemeProvider, createMuiTheme } from "material-ui/styles";
 import { green, red } from "material-ui/colors";
 
-import "./styles.scss";
+import "./styles/main.scss";
 
 const PROXY_ROUTE = "/api";
 const axiosInstance = axios.create({

@@ -1,0 +1,88 @@
+$headerHeight: 64px;
+$navigationWidth: 74px;
+
+//imports
+@import "./imports/colors";
+@import "./imports/reset";
+@import "./imports/scrollbars";
+
+//components
+@import "../react/components/header/Header";
+
+//pages
+
+body {
+	margin: 0;
+	padding: 0;
+	background: $bgColor;
+	font-family: "Roboto", sans-serif;
+	font-weight: 300;
+	-webkit-font-smoothing: subpixel-antialiased;
+	color: $black;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: "Roboto", sans-serif;
+	font-weight: 500;
+}
+
+* {
+	box-sizing: border-box;
+}
+
+a {
+	// color: $blue2;
+	text-decoration: none;
+	transition: color 0.15s ease-in-out;
+}
+
+a:hover {
+	// color: $blue4;
+	text-decoration: none;
+}
+
+a:active {
+	// color: $blue5;
+	text-decoration: none;
+}
+
+.app-container {
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1;
+	overflow: hidden;
+}
+
+.navigation-container {
+	position: absolute;
+	top: $headerHeight;
+	left: 0;
+	bottom: 0;
+	width: $navigationWidth;
+	overflow: hidden;
+}
+
+.route-container {
+	position: absolute;
+	top: $headerHeight;
+	left: 96px;
+	bottom: 0;
+	right: 0;
+	overflow-y: scroll;
+	@include webkit-scrollbar-light();
+}
+
+// remove
+.center-align {
+	display: block;
+	height: 3000px;
+}
