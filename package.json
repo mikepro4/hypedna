@@ -5,7 +5,15 @@
 	"main": "index.js",
 	"repository": "https://github.com/mikepro4/hypedna_frontend",
 	"author": "Mikhail Proniushkin",
-	"scripts": {},
+	"scripts": {
+		"dev:build-client": "webpack -w --config webpack.client.config.js",
+		"dev:build-server": "webpack -w --config webpack.server.config.js",
+		"dev:server": "nodemon --watch build --exec \"node build/bundle.js\" ",
+		"dev": "NODE_ENV=development HOST=localhost:3000 npm-run-all --parallel dev:* ",
+		"build": "NODE_ENV=production webpack --config webpack.client.config.js -p && webpack --config webpack.server.config.js -p",
+		"heroku-postbuild": "npm install && npm run build",
+		"start": "node build/bundle.js"
+	},
 	"engines": {
 		"node": "8.7.0"
 	},
@@ -28,6 +36,8 @@
 		"eslint-plugin-import": "^2.8.0",
 		"eslint-plugin-jsx-a11y": "^6.0.2",
 		"eslint-plugin-react": "^7.4.0",
+		"extract-text-webpack-plugin": "^3.0.2",
+		"node-sass": "^4.7.2",
 		"nodemon": "^1.12.1",
 		"npm-run-all": "^4.1.1",
 		"webpack": "^3.8.1",
@@ -39,6 +49,7 @@
 	"dependencies": {
 		"axios": "^0.17.0",
 		"babel-runtime": "^6.26.0",
+		"css-loader": "^0.28.7",
 		"express": "^4.16.2",
 		"express-http-proxy": "^1.0.7",
 		"react": "^16.0.0",
@@ -49,6 +60,8 @@
 		"react-router-dom": "^4.2.2",
 		"redux": "^3.7.2",
 		"redux-thunk": "^2.2.0",
-		"serialize-javascript": "^1.4.0"
+		"sass-loader": "^6.0.6",
+		"serialize-javascript": "^1.4.0",
+		"style-loader": "^0.19.1"
 	}
 }
