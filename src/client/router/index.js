@@ -10,6 +10,7 @@ export default [
 				...HomePage,
 				path: "/",
 				exact: true,
+				indexRoute: true,
 				params: {
 					name: "home"
 				}

@@ -27,17 +27,15 @@ const styles = theme => ({
 
 class NavigationSidebar extends Component {
 	render() {
-		console.log(this.props);
 		return (
 			<div className="navigation-sidebar">
 				<ul className="sidebar-links">
 					<li className="single-sidebar-link">
 						<IconButton
 							className={
-								this.props.match.params.name === "home" &&
-								this.props.match.params.isExact
-									? this.props.classes.linkItem
-									: this.props.classes.linkItemActive
+								this.props.location.pathname == "/"
+									? this.props.classes.linkItemActive
+									: this.props.classes.linkItem
 							}
 							aria-label="Home"
 							component={Link}
@@ -50,7 +48,11 @@ class NavigationSidebar extends Component {
 
 					<li className="single-sidebar-link">
 						<IconButton
-							className={this.props.classes.linkItem}
+							className={
+								this.props.location.pathname == "/search"
+									? this.props.classes.linkItemActive
+									: this.props.classes.linkItem
+							}
 							aria-label="Search"
 							component={Link}
 							to="/search"
@@ -62,7 +64,11 @@ class NavigationSidebar extends Component {
 
 					<li className="single-sidebar-link">
 						<IconButton
-							className={this.props.classes.linkItem}
+							className={
+								this.props.location.pathname == "/tags"
+									? this.props.classes.linkItemActive
+									: this.props.classes.linkItem
+							}
 							aria-label="Tags"
 							component={Link}
 							to="/tags"

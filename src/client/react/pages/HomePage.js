@@ -12,6 +12,7 @@ class HomePage extends Component {
 		</Helmet>
 	);
 	render() {
+		// console.log(this.props);
 		return (
 			<div className="route-content">
 				{this.renderHead()}
