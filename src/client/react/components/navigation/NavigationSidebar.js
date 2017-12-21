@@ -6,19 +6,17 @@ import HomeIcon from "material-ui-icons/Home";
 import SearchIcon from "material-ui-icons/Search";
 import LabelIcon from "material-ui-icons/Label";
 import { Link } from "react-router-dom";
+import * as _ from "lodash";
+
+let sharedLinkStyle = {
+	"& > span": {
+		flexDirection: "column"
+	}
+};
 
 const styles = theme => ({
-	linkItem: {
-		"& > span": {
-			flexDirection: "column"
-		}
-	},
-	linkItemActive: {
-		color: "#ff2017",
-		"& > span": {
-			flexDirection: "column"
-		}
-	},
+	linkItem: _.assign({ "&:hover": { color: "#000000" } }, sharedLinkStyle),
+	linkItemActive: _.assign({ color: "#ff2017" }, sharedLinkStyle),
 	linkLabel: {
 		fontSize: "10px",
 		fontWeight: 400
