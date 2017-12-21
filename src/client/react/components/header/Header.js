@@ -20,6 +20,18 @@ class Header extends Component {
 		});
 	};
 
+	renderAuthButton() {
+		return this.props.auth ? (
+			<a href="/api/logout">
+				<Button>Logout</Button>
+			</a>
+		) : (
+			<a href="/api/auth/google">
+				<Button>Login with Google</Button>
+			</a>
+		);
+	}
+
 	render() {
 		return (
 			<header className="app-header">
@@ -77,17 +89,15 @@ class Header extends Component {
 				</div>
 
 				<div className="header-right">
-					<div className="menu">
-						<a href="/api/auth/google">
-							<Button>Login with Google</Button>
-						</a>
-					</div>
+					<div className="menu">{this.renderAuthButton()}</div>
 				</div>
 			</header>
 		);
 	}
 }
 
-const mapStateToProps = () => ({});
+function mapStateToProps({ auth }) {
+	return { auth };
+}
 
 export default connect(mapStateToProps)(withStyles(styles)(Header));
