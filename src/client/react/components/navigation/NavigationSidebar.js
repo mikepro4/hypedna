@@ -5,10 +5,13 @@ import { withStyles } from "material-ui/styles";
 import HomeIcon from "material-ui-icons/Home";
 import SearchIcon from "material-ui-icons/Search";
 import LabelIcon from "material-ui-icons/Label";
+import PersonIcon from "material-ui-icons/Person";
+import SubscriptionsIcon from "material-ui-icons/Subscriptions";
 import { Link } from "react-router-dom";
 import * as _ from "lodash";
 
 let sharedLinkStyle = {
+	width: 55,
 	"& > span": {
 		flexDirection: "column"
 	}
@@ -73,6 +76,38 @@ class NavigationSidebar extends Component {
 						>
 							<LabelIcon />
 							<div className={this.props.classes.linkLabel}>Tags</div>
+						</IconButton>
+					</li>
+
+					<li className="single-sidebar-link">
+						<IconButton
+							className={
+								this.props.location.pathname == "/collections"
+									? this.props.classes.linkItemActive
+									: this.props.classes.linkItem
+							}
+							aria-label="Tags"
+							component={Link}
+							to="/collections"
+						>
+							<SubscriptionsIcon />
+							<div className={this.props.classes.linkLabel}>Collections</div>
+						</IconButton>
+					</li>
+
+					<li className="single-sidebar-link">
+						<IconButton
+							className={
+								this.props.location.pathname == "/profile"
+									? this.props.classes.linkItemActive
+									: this.props.classes.linkItem
+							}
+							aria-label="Tags"
+							component={Link}
+							to="/profile"
+						>
+							<PersonIcon />
+							<div className={this.props.classes.linkLabel}>My Profile</div>
 						</IconButton>
 					</li>
 				</ul>

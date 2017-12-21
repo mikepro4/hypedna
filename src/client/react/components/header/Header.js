@@ -78,7 +78,9 @@ class Header extends Component {
 
 				<div className="header-right">
 					<div className="menu">
-						<Button>Login with Google</Button>
+						<a href="/api/auth/google">
+							<Button>Login with Google</Button>
+						</a>
 					</div>
 				</div>
 			</header>
