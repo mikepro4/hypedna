@@ -10,7 +10,7 @@ class App extends Component {
 				<Header />
 
 				<div className="navigation-container">
-					<NavigationSidebar />
+					<NavigationSidebar {...this.props} />
 				</div>
 
 				<div className="route-container">

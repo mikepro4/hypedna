@@ -9,7 +9,10 @@ export default [
 			{
 				...HomePage,
 				path: "/",
-				exact: true
+				exact: true,
+				params: {
+					name: "home"
+				}
 			}
 		]
 	}
