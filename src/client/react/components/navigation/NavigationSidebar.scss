@@ -1,0 +1,15 @@
+@import "../../../styles/imports/colors";
+
+.navigation-sidebar {
+	margin: 20px 0 0 0;
+}
+
+ul.sidebar-links {
+	.single-sidebar-link {
+		width: 74px;
+		height: 60px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+}

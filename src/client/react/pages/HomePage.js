@@ -13,9 +13,10 @@ class HomePage extends Component {
 	);
 	render() {
 		return (
-			<div className="center-align">
+			<div className="route-content">
 				{this.renderHead()}
-				home page
+
+				<div className="route-page">home page</div>
 			</div>
 		);
 	}

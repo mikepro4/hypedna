@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import Icon from "material-ui/Icon";
 import IconButton from "material-ui/IconButton";
 import MenuIcon from "material-ui-icons/Menu";
+import Button from "../common/button/Button";
 
 class Header extends Component {
 	render() {
@@ -45,12 +46,14 @@ class Header extends Component {
 							/>
 						</svg>
 					</div>
+
+					<div className="search-placeholder" />
 				</div>
 
-				<div className="header-center">center</div>
-
 				<div className="header-right">
-					<div className="menu">some menu</div>
+					<div className="menu">
+						<Button>Login with Google</Button>
+					</div>
 				</div>
 			</header>
 		);

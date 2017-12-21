@@ -15,6 +15,7 @@ import preset from "jss-preset-default";
 import { MuiThemeProvider, createMuiTheme } from "material-ui/styles";
 import createGenerateClassName from "material-ui/styles/createGenerateClassName";
 import { green, red } from "material-ui/colors";
+import jssExpand from "jss-expand";
 
 export default (
 	expressRequest,
@@ -64,6 +65,7 @@ export default (
 	// Configure JSS
 	const jss = create(preset());
 	jss.options.createGenerateClassName = createGenerateClassName;
+	jss.use(jssExpand());
 
 	const content = renderToString(
 		<JssProvider registry={sheetsRegistry} jss={jss}>
