@@ -2,18 +2,44 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import Icon from "material-ui/Icon";
 import IconButton from "material-ui/IconButton";
+import Drawer from "material-ui/Drawer";
 import MenuIcon from "material-ui-icons/Menu";
 import Button from "../common/button/Button";
+import { withStyles } from "material-ui/styles";
+
+const styles = theme => ({});
 
 class Header extends Component {
+	state = {
+		left: false
+	};
+
+	toggleDrawer = open => () => {
+		this.setState({
+			left: open
+		});
+	};
+
 	render() {
 		return (
 			<header className="app-header">
 				<div className="header-left">
 					<div className="app-menu">
-						<IconButton aria-label="Menu">
+						<IconButton aria-label="Menu" onClick={this.toggleDrawer(true)}>
 							<MenuIcon />
 						</IconButton>
+
+						<Drawer open={this.state.left} onClose={this.toggleDrawer(false)}>
+							<div
+								tabIndex={0}
+								role="button"
+								onClick={this.toggleDrawer(false)}
+								onKeyDown={this.toggleDrawer(false)}
+								style={{ width: "300px" }}
+							>
+								something here
+							</div>
+						</Drawer>
 					</div>
 					<div className="app-logo">
 						<svg
@@ -62,4 +88,4 @@ class Header extends Component {
 
 const mapStateToProps = () => ({});
 
-export default connect(mapStateToProps)(Header);
+export default connect(mapStateToProps)(withStyles(styles)(Header));

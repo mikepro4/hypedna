@@ -16,7 +16,7 @@ let sharedLinkStyle = {
 
 const styles = theme => ({
 	linkItem: _.assign({ "&:hover": { color: "#000000" } }, sharedLinkStyle),
-	linkItemActive: _.assign({ color: "#ff2017" }, sharedLinkStyle),
+	linkItemActive: _.assign({ color: "#ff2018" }, sharedLinkStyle),
 	linkLabel: {
 		fontSize: "10px",
 		fontWeight: 400
