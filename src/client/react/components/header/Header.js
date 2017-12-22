@@ -6,12 +6,44 @@ import Drawer from "material-ui/Drawer";
 import MenuIcon from "material-ui-icons/Menu";
 import Button from "../common/button/Button";
 import { withStyles } from "material-ui/styles";
+import Avatar from "material-ui/Avatar";
+import Menu, { MenuItem, MenuList } from "material-ui/Menu";
+import Popover from "material-ui/Popover";
+import ButtonBase from "material-ui/ButtonBase";
+import Tooltip from "material-ui/Tooltip";
 
-const styles = theme => ({});
+const styles = theme => ({
+	avatar: {
+		borderRadius: "50px",
+		padding: 0,
+		boxShadow: theme.shadows[0],
+		transition: "all .15s",
+
+		"&:hover": {
+			boxShadow: theme.shadows[5]
+		}
+	},
+
+	menu: {
+		"&:hover": {
+			color: "#000000"
+		}
+	}
+});
 
 class Header extends Component {
 	state = {
-		left: false
+		left: false,
+		anchorEl: null,
+		userMenuOpen: false
+	};
+
+	handleUserMenuOpen = event => {
+		this.setState({ userMenuOpen: true, anchorEl: event.currentTarget });
+	};
+
+	handlUserMenuClose = () => {
+		this.setState({ userMenuOpen: false });
 	};
 
 	toggleDrawer = open => () => {
@@ -20,11 +52,44 @@ class Header extends Component {
 		});
 	};
 
+	handleLogout = () => {
+		this.handlUserMenuClose();
+		window.location = "/api/logout";
+	};
+
 	renderAuthButton() {
 		return this.props.auth ? (
-			<a href="/api/logout">
-				<Button>Logout</Button>
-			</a>
+			<div>
+				<Tooltip id="tooltip-usermenu" title="User Menu" placement="bottom">
+					<ButtonBase
+						focusRipple
+						aria-haspopup="true"
+						onClick={this.handleUserMenuOpen}
+						className={this.props.classes.avatar}
+					>
+						<Avatar
+							alt={this.props.auth.profile.displayName}
+							src={this.props.auth.profile.photos[0].value}
+						/>
+					</ButtonBase>
+				</Tooltip>
+
+				<Popover
+					open={this.state.userMenuOpen}
+					anchorEl={this.state.anchorEl}
+					onClose={this.handlUserMenuClose}
+					anchorOrigin={{
+						vertical: "bottom",
+						horizontal: "center"
+					}}
+				>
+					<MenuList>
+						<MenuItem onClick={this.handlUserMenuClose}>Menu Item 1</MenuItem>
+						<MenuItem onClick={this.handlUserMenuClose}>Menu Item 2</MenuItem>
+						<MenuItem onClick={this.handleLogout}>Logout</MenuItem>
+					</MenuList>
+				</Popover>
+			</div>
 		) : (
 			<a href="/api/auth/google">
 				<Button>Login with Google</Button>
@@ -38,7 +103,7 @@ class Header extends Component {
 				<div className="header-left">
 					<div className="app-menu">
 						<IconButton aria-label="Menu" onClick={this.toggleDrawer(true)}>
-							<MenuIcon />
+							<MenuIcon className={this.props.classes.menu} />
 						</IconButton>
 
 						<Drawer open={this.state.left} onClose={this.toggleDrawer(false)}>
