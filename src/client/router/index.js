@@ -4,6 +4,8 @@ import HomePage from "../react/pages/HomePage";
 import SearchPage from "../react/pages/SearchPage";
 import TagsPage from "../react/pages/TagsPage";
 
+import AddVideo from "../react/pages/AddVideo";
+
 export default [
 	{
 		...App,
@@ -30,6 +32,14 @@ export default [
 				exact: true,
 				params: {
 					name: "search"
+				}
+			},
+			{
+				...AddVideo,
+				path: "/add_video",
+				exact: true,
+				params: {
+					name: "add_video"
 				}
 			}
 		]

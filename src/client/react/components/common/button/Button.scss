@@ -1,0 +1,15 @@
+@import "../../../../styles/imports/colors";
+
+.base-button {
+	padding: 12px 20px;
+	border-radius: 50px;
+	background: $black;
+	color: $white;
+	font-size: 14px;
+	transition: all 0.1s;
+
+	&:hover {
+		background: $yellow;
+		color: $black;
+	}
+}

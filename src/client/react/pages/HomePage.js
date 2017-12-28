@@ -3,7 +3,7 @@ import { Helmet } from "react-helmet";
 
 class HomePage extends Component {
 	componentDidMount() {
-		console.log("test");
+		console.log("render home page");
 	}
 	renderHead = () => (
 		<Helmet>

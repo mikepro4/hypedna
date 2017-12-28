@@ -4,6 +4,9 @@ import Icon from "material-ui/Icon";
 import IconButton from "material-ui/IconButton";
 import Drawer from "material-ui/Drawer";
 import MenuIcon from "material-ui-icons/Menu";
+import VideoIcon from "material-ui-icons/Videocam";
+import LabelIcon from "material-ui-icons/Label";
+import SubscriptionsIcon from "material-ui-icons/Subscriptions";
 import Button from "../common/button/Button";
 import { withStyles } from "material-ui/styles";
 import Avatar from "material-ui/Avatar";
@@ -11,6 +14,10 @@ import Menu, { MenuItem, MenuList } from "material-ui/Menu";
 import Popover from "material-ui/Popover";
 import ButtonBase from "material-ui/ButtonBase";
 import Tooltip from "material-ui/Tooltip";
+import NotificationsIcon from "material-ui-icons/Notifications";
+import AddCircleIcon from "material-ui-icons/AddCircle";
+import { withRouter } from "react-router-dom";
+import { ListItemIcon, ListItemText } from "material-ui/List";
 
 const styles = theme => ({
 	avatar: {
@@ -28,21 +35,36 @@ const styles = theme => ({
 		"&:hover": {
 			color: "#000000"
 		}
-	}
+	},
+
+	icon: {
+		margin: 0
+	},
+
+	menuText: {}
 });
 
 class Header extends Component {
 	state = {
 		left: false,
 		anchorEl: null,
-		userMenuOpen: false
+		userMenuOpen: false,
+		createOpen: false
 	};
 
 	handleUserMenuOpen = event => {
 		this.setState({ userMenuOpen: true, anchorEl: event.currentTarget });
 	};
 
-	handlUserMenuClose = () => {
+	handleCreateOpen = event => {
+		this.setState({ createOpen: true, anchorEl: event.currentTarget });
+	};
+
+	handleCreateClose = () => {
+		this.setState({ createOpen: false });
+	};
+
+	handleUserMenuClose = () => {
 		this.setState({ userMenuOpen: false });
 	};
 
@@ -52,47 +74,129 @@ class Header extends Component {
 		});
 	};
 
+	handleCreateVideo = () => {
+		this.handleCreateClose();
+		this.props.history.push("/add_video");
+	};
+
+	handleCreateTag = () => {
+		this.handleCreateClose();
+		this.props.history.push("/add_tag");
+	};
+
+	handleCreateCollection = () => {
+		this.handleCreateClose();
+		this.props.history.push("/add_collection");
+	};
+
 	handleLogout = () => {
-		this.handlUserMenuClose();
+		this.handleUserMenuClose();
 		window.location = "/api/logout";
 	};
 
 	renderAuthButton() {
 		return this.props.auth ? (
-			<div>
-				<Tooltip id="tooltip-usermenu" title="User Menu" placement="bottom">
-					<ButtonBase
-						focusRipple
-						aria-haspopup="true"
-						onClick={this.handleUserMenuOpen}
-						className={this.props.classes.avatar}
+			<ul className="header-actions">
+				<li>
+					<Popover
+						open={this.state.createOpen}
+						anchorEl={this.state.anchorEl}
+						onClose={this.handleCreateClose}
+						anchorOrigin={{
+							vertical: "bottom",
+							horizontal: "left"
+						}}
 					>
-						<Avatar
-							alt={this.props.auth.profile.displayName}
-							src={this.props.auth.profile.photos[0].value}
-						/>
-					</ButtonBase>
-				</Tooltip>
+						<MenuList>
+							<MenuItem onClick={this.handleCreateVideo}>
+								<ListItemIcon className={this.props.classes.icon}>
+									<VideoIcon />
+								</ListItemIcon>
+								<ListItemText
+									classes={{ text: this.props.classes.menuText }}
+									inset
+									primary="Video"
+								/>
+							</MenuItem>
+							<MenuItem onClick={this.handleCreateTag}>
+								<ListItemIcon className={this.props.classes.icon}>
+									<LabelIcon />
+								</ListItemIcon>
+								<ListItemText
+									classes={{ text: this.props.classes.menuText }}
+									inset
+									primary="Tag"
+								/>
+							</MenuItem>
+							<MenuItem onClick={this.handleCreateCollection}>
+								<ListItemIcon className={this.props.classes.icon}>
+									<SubscriptionsIcon />
+								</ListItemIcon>
+								<ListItemText
+									classes={{ text: this.props.classes.menuText }}
+									inset
+									primary="Collection"
+								/>
+							</MenuItem>
+						</MenuList>
+					</Popover>
 
-				<Popover
-					open={this.state.userMenuOpen}
-					anchorEl={this.state.anchorEl}
-					onClose={this.handlUserMenuClose}
-					anchorOrigin={{
-						vertical: "bottom",
-						horizontal: "center"
-					}}
-				>
-					<MenuList>
-						<MenuItem onClick={this.handlUserMenuClose}>Menu Item 1</MenuItem>
-						<MenuItem onClick={this.handlUserMenuClose}>Menu Item 2</MenuItem>
-						<MenuItem onClick={this.handleLogout}>Logout</MenuItem>
-					</MenuList>
-				</Popover>
-			</div>
+					<Button onClick={this.handleCreateOpen} buttonGrey buttonLeftIcon>
+						<AddCircleIcon />
+						Create
+					</Button>
+				</li>
+				<li>
+					<Button buttonGrey buttonIcon>
+						<NotificationsIcon />
+					</Button>
+				</li>
+				<li>
+					<Button buttonBlack>
+						{this.props.auth.credits} Credit{this.props.auth.credits > 1
+							? "s"
+							: ""}
+					</Button>
+				</li>
+				<li>
+					<Tooltip id="tooltip-usermenu" title="User Menu" placement="bottom">
+						<ButtonBase
+							focusRipple
+							aria-haspopup="true"
+							onClick={this.handleUserMenuOpen}
+							className={this.props.classes.avatar}
+						>
+							<Avatar
+								alt={this.props.auth.profile.displayName}
+								src={this.props.auth.profile.photos[0].value}
+							/>
+						</ButtonBase>
+					</Tooltip>
+
+					<Popover
+						open={this.state.userMenuOpen}
+						anchorEl={this.state.anchorEl}
+						onClose={this.handleUserMenuClose}
+						anchorOrigin={{
+							vertical: "bottom",
+							horizontal: "center"
+						}}
+					>
+						<MenuList>
+							<MenuItem onClick={this.handleUserMenuClose}>
+								Menu Item 1
+							</MenuItem>
+							<MenuItem onClick={this.handleUserMenuClose}>
+								Menu Item 2
+							</MenuItem>
+							<MenuItem onClick={this.handleLogout}>Logout</MenuItem>
+						</MenuList>
+					</Popover>
+				</li>
+			</ul>
 		) : (
 			<a href="/api/auth/google">
-				<Button>Login with Google</Button>
+				<Button buttonBlack>Login with Google</Button>
 			</a>
 		);
 	}
@@ -165,4 +269,4 @@ function mapStateToProps({ auth }) {
 	return { auth };
 }
 
-export default connect(mapStateToProps)(withStyles(styles)(Header));
+export default connect(mapStateToProps)(withStyles(styles)(withRouter(Header)));

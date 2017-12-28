@@ -52,6 +52,7 @@
 		"autoprefixer": "^7.2.3",
 		"axios": "^0.17.0",
 		"babel-runtime": "^6.26.0",
+		"classnames": "^2.2.5",
 		"css-loader": "^0.28.7",
 		"express": "^4.16.2",
 		"express-http-proxy": "^1.0.7",
