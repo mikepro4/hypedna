@@ -4,7 +4,8 @@ import HomePage from "../react/pages/HomePage";
 import SearchPage from "../react/pages/SearchPage";
 import TagsPage from "../react/pages/TagsPage";
 
-import AddVideo from "../react/pages/AddVideo";
+import CreatePage from "../react/pages/create";
+import CreateVideoPage from "../react/pages/create/video";
 
 export default [
 	{
@@ -35,12 +36,21 @@ export default [
 				}
 			},
 			{
-				...AddVideo,
-				path: "/add_video",
-				exact: true,
+				...CreatePage,
+				path: "/create",
 				params: {
-					name: "add_video"
-				}
+					name: "create_content"
+				},
+
+				routes: [
+					{
+						...CreateVideoPage,
+						path: "/create/video",
+						params: {
+							name: "create_content_video"
+						}
+					}
+				]
 			}
 		]
 	}

@@ -76,7 +76,7 @@ class Header extends Component {
 
 	handleCreateVideo = () => {
 		this.handleCreateClose();
-		this.props.history.push("/add_video");
+		this.props.history.push("/create/video");
 	};
 
 	handleCreateTag = () => {

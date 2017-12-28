@@ -44,7 +44,7 @@ export default (
 				return 1;
 			})
 			.reduce((accumulatorString, currentElement) => {
-				accumulatorString += `<script src='${currentElement[1].js}'></script>`;
+				accumulatorString += `<script src='/${currentElement[1].js}'></script>`;
 
 				return accumulatorString;
 			}, "");
@@ -88,7 +88,7 @@ export default (
       <head>
         ${helmetInstance.title.toString()}
         ${helmetInstance.meta.toString()}
-				<link rel="stylesheet" href="${buildAssets.bundle.css}">
+				<link rel="stylesheet" href="/${buildAssets.bundle.css}">
 				<style id="jss-server-side">${css}</style>
 				<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
 				<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
