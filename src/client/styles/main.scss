@@ -1,6 +1,8 @@
 $headerHeight: 64px;
 $navigationWidth: 74px;
 
+$break1: 1100px;
+
 //imports
 @import "./imports/colors";
 @import "./imports/reset";
@@ -80,7 +82,7 @@ a:active {
 	bottom: 0;
 	right: 0;
 	overflow-y: scroll;
-	@include webkit-scrollbar-light();
+	// @include webkit-scrollbar-light();
 }
 
 .route-content {
@@ -93,15 +95,57 @@ a:active {
 	align-items: stretch;
 	justify-content: space-between;
 
+	@media (max-width: $break1) {
+		flex-direction: column;
+	}
+
 	.small-sidebar {
 		width: 340px;
 		flex-grow: 0;
 		box-shadow: inset -1px 0 0 0 rgba($black, 0.12);
 		padding: 30px 1px 0 0;
+
+		.sidebar-title {
+			font-size: 26px;
+			font-weight: 600;
+		}
+
+		.sidebar-subtitle {
+			font-size: 14px;
+			margin: 4px 0 15px 0;
+			opacity: 0.4;
+
+			@media (max-width: $break1) {
+				display: none;
+				margin-bottom: 5px;
+			}
+		}
+
+		@media (max-width: $break1) {
+			width: 100%;
+			padding-top: 22px;
+		}
+
+		.sidebar-content {
+			@media (max-width: $break1) {
+				box-shadow: inset 0 -1px 0 0 rgba($black, 0.12);
+				display: flex;
+				justify-content: space-between;
+			}
+		}
 	}
 
 	.content-area {
 		flex-grow: 1;
+		overflow-y: scroll;
 		@include webkit-scrollbar-light();
+	}
+}
+
+.route-content-container {
+	margin: 30px 0 0 30px;
+
+	@media (max-width: $break1) {
+		margin-left: 0;
 	}
 }

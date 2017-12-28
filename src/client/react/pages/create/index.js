@@ -13,10 +13,32 @@ import classnames from "classnames";
 import { IndexLink } from "react-router";
 
 const styles = theme => ({
+	root: {},
+
 	selected: {
 		"&, &:hover, &:active, &:focus": {
 			color: "#ff2018",
 			background: "#F7F7F7"
+		}
+	},
+
+	"@media (max-width: 1100px)": {
+		root: {
+			float: "left",
+			padding: "15px 0",
+			margin: "0 30px 0 0",
+
+			"&:hover": {
+				background: "transparent",
+				boxShadow: "inset 0 -1px 0 0 #000000"
+			}
+		},
+
+		selected: {
+			"&, &:hover, &:active, &:focus": {
+				background: "transparent",
+				boxShadow: "inset 0 -1px 0 0 #FF2019"
+			}
 		}
 	},
 
@@ -43,62 +65,66 @@ class CreatePage extends Component {
 		return (
 			<div className="route-content">
 				<div className="small-sidebar">
-					<h3
-						style={{
-							fontSize: "24px",
-							fontWeight: 600
-						}}
-					>
-						Create Content
-					</h3>
-					<p
-						style={{
-							fontSize: "14px",
-							margin: "4px 0 15px 0",
-							opacity: "0.4"
-						}}
-					>
-						Select what kind of content you want to add
-					</p>
-					<MenuList>
-						<MenuItem
-							classes={{
-								selected: this.props.classes.selected
-							}}
-							selected={pathname == CREATE_VIDEO_URL}
-							onClick={() => {
-								history.push(CREATE_VIDEO_URL);
-							}}
-						>
-							<VideoIcon />
-							<span className={classes.menuItemLabel}>Video</span>
-						</MenuItem>
+					<div className="sidebar-content">
+						<div className="sidebar-description">
+							<h3 className="sidebar-title">Create Content</h3>
+							<p className="sidebar-subtitle">
+								Select what type of content you want to add
+							</p>
+						</div>
 
-						<MenuItem
-							classes={{
-								selected: this.props.classes.selected
-							}}
-							selected={pathname == CREATE_TAG_URL}
-							onClick={() => {
-								history.push(CREATE_TAG_URL);
-							}}
-						>
-							<LabelIcon /> <span className={classes.menuItemLabel}>Tag</span>
-						</MenuItem>
+						<div className="sidebar-navigation">
+							<MenuList
+								style={{
+									padding: 0
+								}}
+							>
+								<MenuItem
+									classes={{
+										root: this.props.classes.root,
+										selected: this.props.classes.selected
+									}}
+									selected={pathname == CREATE_VIDEO_URL}
+									onClick={() => {
+										history.push(CREATE_VIDEO_URL);
+									}}
+								>
+									<VideoIcon />
+									<span className={classes.menuItemLabel}>
+										Video Annotation
+									</span>
+								</MenuItem>
 
-						<MenuItem
-							classes={{
-								selected: this.props.classes.selected
-							}}
-							selected={pathname == CREATE_PERSON_URL}
-							onClick={() => {
-								history.push(CREATE_PERSON_URL);
-							}}
-						>
-							<PersonIcon />
-							<span className={classes.menuItemLabel}>Person</span>
-						</MenuItem>
-					</MenuList>
+								<MenuItem
+									classes={{
+										root: this.props.classes.root,
+										selected: this.props.classes.selected
+									}}
+									selected={pathname == CREATE_TAG_URL}
+									onClick={() => {
+										history.push(CREATE_TAG_URL);
+									}}
+								>
+									<LabelIcon />{" "}
+									<span className={classes.menuItemLabel}>Tag</span>
+								</MenuItem>
+
+								<MenuItem
+									classes={{
+										root: this.props.classes.root,
+										selected: this.props.classes.selected
+									}}
+									selected={pathname == CREATE_PERSON_URL}
+									onClick={() => {
+										history.push(CREATE_PERSON_URL);
+									}}
+								>
+									<PersonIcon />
+									<span className={classes.menuItemLabel}>Person</span>
+								</MenuItem>
+							</MenuList>
+						</div>
+					</div>
 				</div>
 				<div className="content-area">
 					{renderRoutes(this.props.route.routes)}

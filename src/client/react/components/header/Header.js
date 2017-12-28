@@ -6,7 +6,7 @@ import Drawer from "material-ui/Drawer";
 import MenuIcon from "material-ui-icons/Menu";
 import VideoIcon from "material-ui-icons/Videocam";
 import LabelIcon from "material-ui-icons/Label";
-import SubscriptionsIcon from "material-ui-icons/Subscriptions";
+import PersonIcon from "material-ui-icons/Person";
 import Button from "../common/button/Button";
 import { withStyles } from "material-ui/styles";
 import Avatar from "material-ui/Avatar";
@@ -81,12 +81,12 @@ class Header extends Component {
 
 	handleCreateTag = () => {
 		this.handleCreateClose();
-		this.props.history.push("/add_tag");
+		this.props.history.push("/create/tag");
 	};
 
-	handleCreateCollection = () => {
+	handleCreatePerson = () => {
 		this.handleCreateClose();
-		this.props.history.push("/add_collection");
+		this.props.history.push("/create/person");
 	};
 
 	handleLogout = () => {
@@ -115,7 +115,7 @@ class Header extends Component {
 								<ListItemText
 									classes={{ text: this.props.classes.menuText }}
 									inset
-									primary="Video"
+									primary="Video Annotation"
 								/>
 							</MenuItem>
 							<MenuItem onClick={this.handleCreateTag}>
@@ -128,14 +128,14 @@ class Header extends Component {
 									primary="Tag"
 								/>
 							</MenuItem>
-							<MenuItem onClick={this.handleCreateCollection}>
+							<MenuItem onClick={this.handleCreatePerson}>
 								<ListItemIcon className={this.props.classes.icon}>
-									<SubscriptionsIcon />
+									<PersonIcon />
 								</ListItemIcon>
 								<ListItemText
 									classes={{ text: this.props.classes.menuText }}
 									inset
-									primary="Collection"
+									primary="Person"
 								/>
 							</MenuItem>
 						</MenuList>
