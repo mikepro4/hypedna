@@ -84,9 +84,24 @@ a:active {
 }
 
 .route-content {
-	display: block;
-	.route-page {
-		margin: 20px 10px 0 0;
-		min-height: 3000px; //Remove
+	display: flex;
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	align-items: stretch;
+	justify-content: space-between;
+
+	.small-sidebar {
+		width: 340px;
+		flex-grow: 0;
+		box-shadow: inset -1px 0 0 0 rgba($black, 0.12);
+		padding: 30px 1px 0 0;
+	}
+
+	.content-area {
+		flex-grow: 1;
+		@include webkit-scrollbar-light();
 	}
 }
