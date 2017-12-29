@@ -2,6 +2,7 @@ import React, { PropTypes } from "react";
 import { Field, reduxForm } from "redux-form";
 import classnames from "classnames";
 import TextField from "material-ui/TextField";
+import { youtubeUrlParser } from "../../../../utils/youtube";
 
 class VideoAddFormComponent extends React.Component {
 	render() {
@@ -17,12 +18,16 @@ class VideoAddFormComponent extends React.Component {
 				<Field
 					name="url"
 					component={renderTextField}
-					label="Вставить ссылку на Youtube видео..."
+					placeholder="For example https://www.youtube.com/watch?v=SSjmM9WF720"
+					label="Paste Youtube video URL here…"
 					ref="url"
 				/>
 				<button
 					action="submit"
 					className="pt-button pt-intent-primary button_submit"
+					style={{
+						display: "none"
+					}}
 				>
 					Add
 				</button>
@@ -31,22 +36,18 @@ class VideoAddFormComponent extends React.Component {
 	}
 }
 
-function youtube_parser(url) {
-	if (url) {
-		const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
-		const match = url.match(regExp);
-		return match && match[7].length == 11 ? match[7] : false;
-	}
-}
-
 const renderTextField = ({
 	input,
 	label,
+	placeholder,
 	meta: { touched, error },
 	...custom
 }) => (
 	<TextField
-		placeholder={label}
+		placeholder={placeholder}
+		style={{
+			width: "100%"
+		}}
 		label={label}
 		error={touched && error && error.length > 0}
 		helperText={touched && error}
@@ -59,11 +60,11 @@ const validate = values => {
 	const errors = {};
 
 	if (!values.url) {
-		errors.url = "Введи ";
+		errors.url = "Enter url ";
 	}
 
-	if (!youtube_parser(values.url)) {
-		errors.url = "Неправильная адрес видоса ";
+	if (!youtubeUrlParser(values.url)) {
+		errors.url = "Wrong youtube url";
 	}
 
 	return errors;
