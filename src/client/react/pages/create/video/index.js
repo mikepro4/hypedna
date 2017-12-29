@@ -7,6 +7,9 @@ import { withRouter } from "react-router-dom";
 import VideoAddForm from "./Video_add_form";
 import { youtubeUrlParser } from "../../../../utils/youtube";
 import { loadYoutubeVideoDetails } from "../../../../redux/actions";
+import { updatePlayerVideo } from "../../../../redux/actions/player";
+import YoutubePlayer from "../../../components/common/player/Player";
+import moment from "moment";
 
 const styles = theme => ({
 	menuText: {}
@@ -14,7 +17,15 @@ const styles = theme => ({
 
 class CreateVideoPage extends Component {
 	handleFormSubmit = ({ url }) => {
-		this.props.loadYoutubeVideoDetails(youtubeUrlParser(url), history);
+		this.props.loadYoutubeVideoDetails(youtubeUrlParser(url), history, () => {
+			console.log("success");
+			// this.props.updatePlayerVideo(
+			// 	this.props.video.singleVideo.id,
+			// 	moment
+			// 		.duration(this.props.video.singleVideo.contentDetails.duration)
+			// 		.asSeconds()
+			// );
+		});
 	};
 
 	render() {
@@ -41,9 +52,25 @@ class CreateVideoPage extends Component {
 					/>
 				</div>
 
-				<div className="loaded-video-container" style={{ display: "none" }}>
-					<div className="loaded-video-player-area">player area</div>
-					<div className="loaded-video-info-area">content area</div>
+				<div className="loaded-video-container">
+					{this.props.player.playingVideoId ? (
+						<div className="loaded-video-container">
+							<div className="loaded-video-player-area">
+								<YoutubePlayer
+									width="680"
+									height="380"
+									videoId={this.props.player.playingVideoId}
+								/>
+								<div className="video-description">
+									<h2 className="video-title">
+										{this.props.video.snippet.title}
+									</h2>
+								</div>
+							</div>
+						</div>
+					) : (
+						""
+					)}
 				</div>
 			</div>
 		);
@@ -51,11 +78,15 @@ class CreateVideoPage extends Component {
 }
 
 function mapStateToProps(state) {
-	return { form: state.form };
+	return {
+		form: state.form,
+		video: state.video.singleVideo,
+		player: state.player
+	};
 }
 
 export default {
-	component: connect(mapStateToProps, { loadYoutubeVideoDetails })(
-		withStyles(styles)(withRouter(CreateVideoPage))
-	)
+	component: connect(mapStateToProps, {
+		loadYoutubeVideoDetails
+	})(withStyles(styles)(withRouter(CreateVideoPage)))
 };

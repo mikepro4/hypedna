@@ -1,7 +1,10 @@
 import { FETCH_AUTH } from "./types";
+import { updatePlayerVideo } from "./player";
+import moment from "moment";
 import {
 	LOAD_YOUTUBE_VIDEO_DETAILS,
-	LOAD_YOUTUBE_VIDEO_DETAILS_SUCCESS
+	LOAD_YOUTUBE_VIDEO_DETAILS_SUCCESS,
+	UPDATE_PLAYER_VIDEO_ID
 } from "./types";
 
 export const fetchCurrentUser = () => async (dispatch, getState, api) => {
@@ -13,20 +16,53 @@ export const fetchCurrentUser = () => async (dispatch, getState, api) => {
 	});
 };
 
-export const loadYoutubeVideoDetails = (url, history) => async (
-	dispatch,
-	getState,
-	api
-) => {
-	console.log("values ", url);
-	console.log("history ", history);
-	const res = await api.post("/youtube_video_details", {
-		url: url
-	});
+export function loadYoutubeVideoDetails(url) {
+	return (dispatch, getState, api) => {
+		dispatch({
+			type: LOAD_YOUTUBE_VIDEO_DETAILS
+		});
+		return api
+			.post("/youtube_video_details", {
+				url: url
+			})
+			.then(response => {
+				dispatch({
+					type: LOAD_YOUTUBE_VIDEO_DETAILS_SUCCESS,
+					payload: response.data.items[0]
+				});
+				dispatch({
+					type: UPDATE_PLAYER_VIDEO_ID,
+					playingVideoId: response.data.items[0].id,
+					duration: moment
+						.duration(response.data.items[0].contentDetails.duration)
+						.asSeconds()
+				});
+			})
+			.catch(error => console.log(error));
+	};
+}
 
-	// history.push("/surveys");
-	dispatch({
-		type: LOAD_YOUTUBE_VIDEO_DETAILS_SUCCESS,
-		payload: res.data.items[0]
-	});
-};
+// export const loadYoutubeVideoDetails = (url, history) => (
+// 	dispatch,
+// 	getState,
+// 	api
+// ) => {
+// 	dispatch({
+// 		type: LOAD_YOUTUBE_VIDEO_DETAILS
+// 	});
+// 	try {
+// 		return api
+// 			.post("/youtube_video_details", {
+// 				url: url
+// 			})
+// 			.then(response => {
+// 				dispatch({
+// 					type: LOAD_YOUTUBE_VIDEO_DETAILS_SUCCESS,
+// 					payload: response.data.items[0]
+// 				});
+// 			})
+// 			.catch(error => console.log(error));
+// 	} catch (err) {
+// 		console.log("Error", err);
+// 	}
+// };
