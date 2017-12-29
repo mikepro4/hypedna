@@ -42,6 +42,19 @@ export function loadYoutubeVideoDetails(url) {
 	};
 }
 
+export function addYoutubeVideo(url) {
+	return (dispatch, getState, api) => {
+		return api
+			.post("/youtube_video_add", {
+				url: url
+			})
+			.then(response => {
+				console.log("added video");
+			})
+			.catch(error => console.log(error));
+	};
+}
+
 // export const loadYoutubeVideoDetails = (url, history) => (
 // 	dispatch,
 // 	getState,

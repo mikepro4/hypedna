@@ -6,7 +6,10 @@ import { withStyles } from "material-ui/styles";
 import { withRouter } from "react-router-dom";
 import VideoAddForm from "./Video_add_form";
 import { youtubeUrlParser } from "../../../../utils/youtube";
-import { loadYoutubeVideoDetails } from "../../../../redux/actions";
+import {
+	loadYoutubeVideoDetails,
+	addYoutubeVideo
+} from "../../../../redux/actions";
 import { updatePlayerVideo } from "../../../../redux/actions/player";
 import YoutubePlayer from "../../../components/common/player/Player";
 import moment from "moment";
@@ -26,6 +29,10 @@ class CreateVideoPage extends Component {
 			// 		.asSeconds()
 			// );
 		});
+	};
+
+	handleAddVideo = () => {
+		this.props.addYoutubeVideo(this.props.player.playingVideoId);
 	};
 
 	render() {
@@ -67,6 +74,7 @@ class CreateVideoPage extends Component {
 									</h2>
 								</div>
 							</div>
+							<button onClick={this.handleAddVideo}>add video</button>
 						</div>
 					) : (
 						""
@@ -87,6 +95,7 @@ function mapStateToProps(state) {
 
 export default {
 	component: connect(mapStateToProps, {
-		loadYoutubeVideoDetails
+		loadYoutubeVideoDetails,
+		addYoutubeVideo
 	})(withStyles(styles)(withRouter(CreateVideoPage)))
 };
