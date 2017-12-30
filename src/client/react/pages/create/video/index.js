@@ -32,7 +32,13 @@ class CreateVideoPage extends Component {
 	};
 
 	handleAddVideo = () => {
-		this.props.addYoutubeVideo(this.props.player.playingVideoId);
+		this.props.addYoutubeVideo(
+			this.props.player.playingVideoId,
+			this.props.history,
+			() => {
+				console.log("callback");
+			}
+		);
 	};
 
 	render() {

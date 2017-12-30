@@ -42,7 +42,7 @@ export function loadYoutubeVideoDetails(url) {
 	};
 }
 
-export function addYoutubeVideo(url) {
+export function addYoutubeVideo(url, history, success) {
 	return (dispatch, getState, api) => {
 		return api
 			.post("/youtube_video_add", {
@@ -50,6 +50,8 @@ export function addYoutubeVideo(url) {
 			})
 			.then(response => {
 				console.log("added video");
+				history.push(`/video/${response.data.videoId}`);
+				success();
 			})
 			.catch(error => console.log(error));
 	};
