@@ -20,15 +20,7 @@ const styles = theme => ({
 
 class CreateVideoPage extends Component {
 	handleFormSubmit = ({ url }) => {
-		this.props.loadYoutubeVideoDetails(youtubeUrlParser(url), history, () => {
-			console.log("success");
-			// this.props.updatePlayerVideo(
-			// 	this.props.video.singleVideo.id,
-			// 	moment
-			// 		.duration(this.props.video.singleVideo.contentDetails.duration)
-			// 		.asSeconds()
-			// );
-		});
+		this.props.loadYoutubeVideoDetails(youtubeUrlParser(url), history);
 	};
 
 	handleAddVideo = () => {

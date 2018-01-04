@@ -16,68 +16,42 @@ export const fetchCurrentUser = () => async (dispatch, getState, api) => {
 	});
 };
 
-export function loadYoutubeVideoDetails(url) {
-	return (dispatch, getState, api) => {
-		dispatch({
-			type: LOAD_YOUTUBE_VIDEO_DETAILS
-		});
-		return api
-			.post("/youtube_video_details", {
-				url: url
-			})
-			.then(response => {
-				dispatch({
-					type: LOAD_YOUTUBE_VIDEO_DETAILS_SUCCESS,
-					payload: response.data.items[0]
-				});
-				dispatch({
-					type: UPDATE_PLAYER_VIDEO_ID,
-					playingVideoId: response.data.items[0].id,
-					duration: moment
-						.duration(response.data.items[0].contentDetails.duration)
-						.asSeconds()
-				});
-			})
-			.catch(error => console.log(error));
-	};
-}
+export const loadYoutubeVideoDetails = url => async (
+	dispatch,
+	getState,
+	api
+) => {
+	dispatch({
+		type: LOAD_YOUTUBE_VIDEO_DETAILS
+	});
+	const response = await api.post("/youtube_video_details", {
+		url: url
+	});
+	dispatch({
+		type: LOAD_YOUTUBE_VIDEO_DETAILS_SUCCESS,
+		payload: response.data.items[0]
+	});
+	dispatch({
+		type: UPDATE_PLAYER_VIDEO_ID,
+		playingVideoId: response.data.items[0].id,
+		duration: moment
+			.duration(response.data.items[0].contentDetails.duration)
+			.asSeconds()
+	});
+};
 
-export function addYoutubeVideo(url, history, success) {
-	return (dispatch, getState, api) => {
-		return api
-			.post("/youtube_video_add", {
-				url: url
-			})
-			.then(response => {
-				console.log("added video");
-				history.push(`/video/${response.data.videoId}`);
-				success();
-			})
-			.catch(error => console.log(error));
-	};
-}
+export const addYoutubeVideo = (url, history, success) => async (
+	dispatch,
+	getState,
+	api
+) => {
+	const response = await api.post("/youtube_video_add", {
+		url: url
+	});
+	handleAddedVideo(response, history, success);
+};
 
-// export const loadYoutubeVideoDetails = (url, history) => (
-// 	dispatch,
-// 	getState,
-// 	api
-// ) => {
-// 	dispatch({
-// 		type: LOAD_YOUTUBE_VIDEO_DETAILS
-// 	});
-// 	try {
-// 		return api
-// 			.post("/youtube_video_details", {
-// 				url: url
-// 			})
-// 			.then(response => {
-// 				dispatch({
-// 					type: LOAD_YOUTUBE_VIDEO_DETAILS_SUCCESS,
-// 					payload: response.data.items[0]
-// 				});
-// 			})
-// 			.catch(error => console.log(error));
-// 	} catch (err) {
-// 		console.log("Error", err);
-// 	}
-// };
+function handleAddedVideo(response, history, success) {
+	history.push(`/video/${response.data.videoId}`);
+	success();
+}
