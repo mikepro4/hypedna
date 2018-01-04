@@ -8,33 +8,33 @@ import VideoAddForm from "./Video_add_form";
 import { youtubeUrlParser } from "../../../../utils/youtube";
 import {
 	loadYoutubeVideoDetails,
-	addYoutubeVideo
-} from "../../../../redux/actions";
+	addYoutubeVideo,
+	clearLoadedYoutubeVideo
+} from "../../../../redux/actions/youtubeVideoSearch";
 import { updatePlayerVideo } from "../../../../redux/actions/player";
 import YoutubePlayer from "../../../components/common/player/Player";
 import moment from "moment";
 
-const styles = theme => ({
-	menuText: {}
-});
+const styles = theme => ({});
 
 class CreateVideoPage extends Component {
 	handleFormSubmit = ({ url }) => {
-		this.props.loadYoutubeVideoDetails(youtubeUrlParser(url), history);
+		if (youtubeUrlParser(url)) {
+			this.props.loadYoutubeVideoDetails(youtubeUrlParser(url), history);
+		}
 	};
 
 	handleAddVideo = () => {
-		this.props.addYoutubeVideo(
-			this.props.player.playingVideoId,
-			this.props.history,
-			() => {
-				console.log("callback");
-			}
-		);
+		this.props.addYoutubeVideo(this.props.video, this.props.history, () => {
+			console.log("callback");
+		});
 	};
 
 	render() {
-		console.log(this.props);
+		if (!this.props.form.addvideo && this.props.video) {
+			this.props.clearLoadedYoutubeVideo();
+		}
+
 		return (
 			<div className="route-content-container">
 				<h3
@@ -50,34 +50,40 @@ class CreateVideoPage extends Component {
 						onSubmit={this.handleFormSubmit.bind(this)}
 						onChange={values => {
 							if (youtubeUrlParser(values.url)) {
+								this.props.clearLoadedYoutubeVideo();
 								this.handleFormSubmit({ url: values.url });
 							} else {
+								this.props.clearLoadedYoutubeVideo();
 							}
 						}}
 					/>
 				</div>
 
-				<div className="loaded-video-container">
-					{this.props.player.playingVideoId ? (
-						<div className="loaded-video-container">
-							<div className="loaded-video-player-area">
-								<YoutubePlayer
-									width="680"
-									height="380"
-									videoId={this.props.player.playingVideoId}
-								/>
-								<div className="video-description">
-									<h2 className="video-title">
-										{this.props.video.snippet.title}
-									</h2>
+				{this.props.isFetching ? (
+					<div>Loading...</div>
+				) : (
+					<div className="loaded-video-container">
+						{this.props.player.playingVideoId && this.props.video.snippet ? (
+							<div className="loaded-video-container">
+								<div className="loaded-video-player-area">
+									<YoutubePlayer
+										width="680"
+										height="380"
+										videoId={this.props.player.playingVideoId}
+									/>
+									<div className="video-description">
+										<h2 className="video-title">
+											{this.props.video.snippet.title}
+										</h2>
+									</div>
 								</div>
+								<button onClick={this.handleAddVideo}>add video</button>
 							</div>
-							<button onClick={this.handleAddVideo}>add video</button>
-						</div>
-					) : (
-						""
-					)}
-				</div>
+						) : (
+							""
+						)}
+					</div>
+				)}
 			</div>
 		);
 	}
@@ -86,7 +92,8 @@ class CreateVideoPage extends Component {
 function mapStateToProps(state) {
 	return {
 		form: state.form,
-		video: state.video.singleVideo,
+		video: state.youtubeVideoSearch.singleVideo,
+		isFetching: state.youtubeVideoSearch.isFetching,
 		player: state.player
 	};
 }
@@ -94,6 +101,7 @@ function mapStateToProps(state) {
 export default {
 	component: connect(mapStateToProps, {
 		loadYoutubeVideoDetails,
-		addYoutubeVideo
+		addYoutubeVideo,
+		clearLoadedYoutubeVideo
 	})(withStyles(styles)(withRouter(CreateVideoPage)))
 };
