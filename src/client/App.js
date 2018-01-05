@@ -31,6 +31,6 @@ function mapStateToProps({}) {
 }
 
 export default {
-	component: connect(mapStateToProps, { fetchCurrentUser })(App),
-	loadData: ({ dispatch }) => dispatch(fetchCurrentUser())
+	component: connect(mapStateToProps, { fetchCurrentUser })(App)
+	// loadData: ({ dispatch }) => dispatch(fetchCurrentUser())
 };

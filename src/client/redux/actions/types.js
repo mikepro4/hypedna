@@ -11,3 +11,14 @@ export const UPDATE_TIME = "app/UPDATE_TIME";
 export const UPDATE_PLAYER_VIDEO_ID = "app/UPDATE_PLAYER_VIDEO_ID";
 export const RESET_VIDEO = "app/RESET_VIDEO";
 export const SEEK_TO_TIME = "app/SEEK_TO_TIME";
+
+/////////////////////////////////////////////////
+
+// Page: video/:id
+
+export const LOAD_HYPEDNA_VIDEO_DETAILS = "app/LOAD_HYPEDNA_VIDEO_DETAILS";
+export const LOAD_HYPEDNA_VIDEO_DETAILS_SUCCESS =
+	"app/LOAD_HYPEDNA_VIDEO_DETAILS_SUCCESS";
+export const CLEAR_LOADED_HYPEDNA_VIDEO = "app/CLEAR_LOADED_HYPEDNA_VIDEO";
+
+/////////////////////////////////////////////////

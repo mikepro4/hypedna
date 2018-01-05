@@ -77,7 +77,9 @@ class CreateVideoPage extends Component {
 										</h2>
 									</div>
 								</div>
-								<button onClick={this.handleAddVideo}>add video</button>
+								<button onClick={this.handleAddVideo}>
+									{this.props.newVideo ? "add video" : "go to video"}
+								</button>
 							</div>
 						) : (
 							""
@@ -93,6 +95,7 @@ function mapStateToProps(state) {
 	return {
 		form: state.form,
 		video: state.youtubeVideoSearch.singleVideo,
+		newVideo: state.youtubeVideoSearch.newVideo,
 		isFetching: state.youtubeVideoSearch.isFetching,
 		player: state.player
 	};
