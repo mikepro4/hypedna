@@ -14,6 +14,8 @@ $break1: 1100px;
 @import "../react/components/navigation/NavigationSidebar";
 
 //pages
+@import "../react/pages/search/SearchSidebar";
+@import "../react/pages/search/SearchContent";
 
 body {
 	margin: 0;

@@ -7,6 +7,9 @@ import {
 	clearLoadedSearchResults
 } from "../../../redux/actions/pageSearchActions";
 
+import SearchSidebar from "./SearchSidebar";
+import SearchContent from "./SearchContent";
+
 class SearchPage extends Component {
 	static loadData(store, match, route, path, query) {
 		return store.dispatch(searchVideos({}, "snippet.publishedAt"));
@@ -28,7 +31,15 @@ class SearchPage extends Component {
 			<div className="route-content">
 				{this.renderHead()}
 
-				<div className="route-page">search page</div>
+				<div className="route-search">
+					<SearchSidebar />
+					<SearchContent
+						searchResults={
+							this.props.searchResults.all ? this.props.searchResults.all : []
+						}
+						isFetching={this.props.isFetching}
+					/>
+				</div>
 			</div>
 		);
 	}
