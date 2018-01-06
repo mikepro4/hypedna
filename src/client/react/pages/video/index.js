@@ -6,6 +6,9 @@ import { loadHypednaVideoDetails } from "../../../redux/actions/videoPageActions
 import { matchRoutes } from "react-router-config";
 
 class VideoPage extends Component {
+	static loadData(store, match, route, path, query) {
+		return store.dispatch(loadHypednaVideoDetails(match.params.googleId));
+	}
 	componentDidMount() {
 		this.props.loadHypednaVideoDetails(this.props.match.params.googleId);
 	}
@@ -16,26 +19,25 @@ class VideoPage extends Component {
 		</Helmet>
 	);
 	render() {
-		console.log(this.props.match.params.googleId);
 		return (
 			<div className="route-content">
 				{this.renderHead()}
-
-				<div className="route-page">video page</div>
+				{this.props.singleVideo ? (
+					<div>{this.props.singleVideo.snippet.title}</div>
+				) : (
+					"nothing"
+				)}
 			</div>
 		);
 	}
 }
 
-function mapStateToProps({}) {
-	return {};
-}
+const mapStateToProps = state => ({
+	singleVideo: state.pageVideo.singleVideo
+});
 
 export default {
-	component: connect(mapStateToProps, { loadHypednaVideoDetails })(
-		withRouter(VideoPage)
-	),
-	loadData: ({ dispatch }) => {
-		// dispatch(loadHypednaVideoDetails("y7-AucZ9aSY"));
-	}
+	component: withRouter(
+		connect(mapStateToProps, { loadHypednaVideoDetails })(VideoPage)
+	)
 };

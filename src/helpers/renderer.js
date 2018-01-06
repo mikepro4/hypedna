@@ -16,12 +16,14 @@ import { MuiThemeProvider, createMuiTheme } from "material-ui/styles";
 import createGenerateClassName from "material-ui/styles/createGenerateClassName";
 import { green, red } from "material-ui/colors";
 import jssExpand from "jss-expand";
+import { ConnectedRouter } from "react-router-redux";
 
 export default (
 	expressRequest,
 	reduxStore,
 	buildAssets,
-	routerContext = {}
+	routerContext = {},
+	history
 ) => {
 	const injectAssets = assets => {
 		const assetNameWeights = {
@@ -71,9 +73,9 @@ export default (
 		<JssProvider registry={sheetsRegistry} jss={jss}>
 			<MuiThemeProvider theme={theme} sheetsManager={new Map()}>
 				<Provider store={reduxStore}>
-					<StaticRouter location={expressRequest.path} context={routerContext}>
+					<ConnectedRouter history={history}>
 						<div>{renderRoutes(Router)}</div>
-					</StaticRouter>
+					</ConnectedRouter>
 				</Provider>
 			</MuiThemeProvider>
 		</JssProvider>

@@ -8,6 +8,7 @@ import renderer from "./helpers/renderer";
 import { configure as createStore } from "./client/redux/store";
 import reducer from "./client/redux/reducers";
 import buildAssets from "../webpack-assets.json";
+import { ConnectedRouter, push } from "react-router-redux";
 
 const PORT = process.env.PORT || 3000;
 const BASE_API_URL = "http://localhost:5000";
@@ -37,22 +38,42 @@ app.get("*", (request, response) => {
 		headers: { cookie: request.get("cookie") || "" }
 	});
 
-	const store = createStore({}, reducer, axiosInstance);
+	const { history, store } = createStore(
+		{},
+		reducer,
+		axiosInstance,
+		"fromServer"
+	);
 
-	const reactRouterConfigLoadDataPromises = matchRoutes(Router, request.path)
-		.map(({ route }) => (route.loadData ? route.loadData(store) : null))
-		.map(
-			promise =>
-				promise
-					? new Promise((resolve, reject) => {
-							promise.then(resolve).catch(resolve);
-						})
-					: null
-		);
+	store.dispatch(push(request.path));
 
-	Promise.all(reactRouterConfigLoadDataPromises).then(() => {
+	const currentRoute = matchRoutes(Router, request.path);
+
+	const need = currentRoute.map(({ route, match }) => {
+		if (route.component) {
+			return route.component.loadData
+				? // the following will be passed into each component's `loadData` method:
+					route.component.loadData(
+						store,
+						match,
+						route,
+						request.path,
+						request.query
+					)
+				: Promise.resolve(null);
+		}
+		Promise.resolve(null);
+	});
+
+	Promise.all(need).then(() => {
 		const staticRouterContext = {};
-		const html = renderer(request, store, buildAssets, staticRouterContext);
+		const html = renderer(
+			request,
+			store,
+			buildAssets,
+			staticRouterContext,
+			history
+		);
 		if (staticRouterContext.url)
 			return response.redirect(301, staticRouterContext.url);
 		if (staticRouterContext.notFound) response.status(404);

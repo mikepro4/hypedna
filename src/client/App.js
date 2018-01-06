@@ -2,10 +2,14 @@ import React, { Component } from "react";
 import { renderRoutes } from "react-router-config";
 import { connect } from "react-redux";
 import Header from "./react/components/header/Header";
+import { withRouter } from "react-router-dom";
 import NavigationSidebar from "./react/components/navigation/NavigationSidebar";
 import { fetchCurrentUser } from "./redux/actions";
 
 class App extends Component {
+	static loadData(store, match) {
+		return store.dispatch(fetchCurrentUser());
+	}
 	componentDidMount() {
 		this.props.fetchCurrentUser();
 	}
@@ -31,6 +35,6 @@ function mapStateToProps({}) {
 }
 
 export default {
-	component: connect(mapStateToProps, { fetchCurrentUser })(App)
-	// loadData: ({ dispatch }) => dispatch(fetchCurrentUser())
+	component: connect(mapStateToProps, { fetchCurrentUser })(withRouter(App))
 };
+

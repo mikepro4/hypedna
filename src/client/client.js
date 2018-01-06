@@ -10,6 +10,7 @@ import { configure as configureStore } from "./redux/store";
 
 import { MuiThemeProvider, createMuiTheme } from "material-ui/styles";
 import { green, red } from "material-ui/colors";
+import { ConnectedRouter } from "react-router-redux";
 
 import "./styles/main.scss";
 
@@ -18,7 +19,11 @@ const axiosInstance = axios.create({
 	baseURL: PROXY_ROUTE
 });
 
-const store = configureStore(window.INITIAL_STATE, reducer, axiosInstance);
+const { history, store } = configureStore(
+	window.INITIAL_STATE,
+	reducer,
+	axiosInstance
+);
 
 class Main extends Component {
 	componentDidMount() {
@@ -31,9 +36,9 @@ class Main extends Component {
 	render() {
 		return (
 			<Provider store={store}>
-				<BrowserRouter>
+				<ConnectedRouter history={history} location={this.props.location}>
 					<div>{renderRoutes(Router)}</div>
-				</BrowserRouter>
+				</ConnectedRouter>
 			</Provider>
 		);
 	}
