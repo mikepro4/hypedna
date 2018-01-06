@@ -1,12 +1,13 @@
 import React from "react";
 import App from "../App";
 import HomePage from "../react/pages/HomePage";
-import SearchPage from "../react/pages/SearchPage";
 import TagsPage from "../react/pages/TagsPage";
 import VideoPage from "../react/pages/video";
 
 import CreatePage from "../react/pages/create";
 import CreateVideoPage from "../react/pages/create/video";
+
+import SearchPage from "../react/pages/search";
 
 export default [
 	{

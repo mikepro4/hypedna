@@ -7,7 +7,7 @@ import {
 } from "../actions/types";
 
 export const initialState = {
-	videoDetails: {},
+	singleVideo: {},
 	isFetching: false
 };
 
@@ -23,7 +23,7 @@ export const pageVideoReducer = (state = initialState, action) => {
 				isFetching: false
 			});
 		case CLEAR_LOADED_HYPEDNA_VIDEO:
-			return assign({}, state, { videoDetails: {}, isFetching: false });
+			return assign({}, state, { singleVideo: {}, isFetching: false });
 		default:
 			return state;
 	}

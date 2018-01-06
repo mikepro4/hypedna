@@ -2,8 +2,10 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import { Helmet } from "react-helmet";
-import { loadHypednaVideoDetails } from "../../../redux/actions/videoPageActions";
-import { matchRoutes } from "react-router-config";
+import {
+	loadHypednaVideoDetails,
+	clearLoadedHypednaVideo
+} from "../../../redux/actions/pageVideoActions";
 
 class VideoPage extends Component {
 	static loadData(store, match, route, path, query) {
@@ -11,6 +13,9 @@ class VideoPage extends Component {
 	}
 	componentDidMount() {
 		this.props.loadHypednaVideoDetails(this.props.match.params.googleId);
+	}
+	componentWillUnmount() {
+		this.props.clearLoadedHypednaVideo();
 	}
 	renderHead = () => (
 		<Helmet>
@@ -22,7 +27,7 @@ class VideoPage extends Component {
 		return (
 			<div className="route-content">
 				{this.renderHead()}
-				{this.props.singleVideo ? (
+				{this.props.singleVideo.snippet ? (
 					<div>{this.props.singleVideo.snippet.title}</div>
 				) : (
 					"nothing"
@@ -38,6 +43,9 @@ const mapStateToProps = state => ({
 
 export default {
 	component: withRouter(
-		connect(mapStateToProps, { loadHypednaVideoDetails })(VideoPage)
+		connect(mapStateToProps, {
+			loadHypednaVideoDetails,
+			clearLoadedHypednaVideo
+		})(VideoPage)
 	)
 };

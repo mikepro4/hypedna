@@ -22,3 +22,11 @@ export const LOAD_HYPEDNA_VIDEO_DETAILS_SUCCESS =
 export const CLEAR_LOADED_HYPEDNA_VIDEO = "app/CLEAR_LOADED_HYPEDNA_VIDEO";
 
 /////////////////////////////////////////////////
+
+// Page: search
+
+export const LOAD_SEARCH_VIDEO = "app/LOAD_SEARCH_VIDEO";
+export const LOAD_SEARCH_VIDEO_SUCCESS = "app/LOAD_SEARCH_VIDEO_SUCCESS";
+export const CLEAR_SEARCH_VIDEO = "app/CLEAR_SEARCH_VIDEO";
+
+/////////////////////////////////////////////////
