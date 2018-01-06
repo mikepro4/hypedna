@@ -30,3 +30,10 @@ export const LOAD_SEARCH_VIDEO_SUCCESS = "app/LOAD_SEARCH_VIDEO_SUCCESS";
 export const CLEAR_SEARCH_VIDEO = "app/CLEAR_SEARCH_VIDEO";
 
 /////////////////////////////////////////////////
+
+// Object: video
+
+export const DELETE_VIDEO_SUCCESS = "app/DELETE_VIDEO_SUCCESS";
+export const DELETE_VIDEO = "app/DELETE_VIDEO";
+
+/////////////////////////////////////////////////

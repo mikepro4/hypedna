@@ -20,6 +20,9 @@ class SearchPage extends Component {
 	componentWillUnmount() {
 		this.props.clearLoadedSearchResults();
 	}
+	refreshSearch() {
+		this.props.searchVideos({}, "snippet.publishedAt");
+	}
 	renderHead = () => (
 		<Helmet>
 			<title>Search Page</title>
@@ -38,6 +41,9 @@ class SearchPage extends Component {
 							this.props.searchResults.all ? this.props.searchResults.all : []
 						}
 						isFetching={this.props.isFetching}
+						refreshSearch={() => {
+							this.refreshSearch();
+						}}
 					/>
 				</div>
 			</div>

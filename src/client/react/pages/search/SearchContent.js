@@ -1,8 +1,12 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { withRouter, Link } from "react-router-dom";
+import { deleteVideo } from "../../../redux/actions/objectVideoActions";
 
 class SearchContent extends Component {
+	deleteVideo = id => {
+		this.props.deleteVideo(id, this.props.refreshSearch);
+	};
 	renderResults() {
 		if (this.props.isFetching && this.props.searchResults.length === 0) {
 			return <div>Loading</div>;
@@ -13,6 +17,13 @@ class SearchContent extends Component {
 						<li key={video.googleId}>
 							{video.googleId}
 							<Link to={`/video/${video.googleId}`}>Open Video</Link>
+							<a
+								onClick={() => {
+									this.deleteVideo(video.googleId);
+								}}
+							>
+								delete video
+							</a>
 						</li>
 					))}
 				</ul>
@@ -30,4 +41,6 @@ class SearchContent extends Component {
 
 const mapStateToProps = state => ({});
 
-export default withRouter(connect(mapStateToProps, {})(SearchContent));
+export default withRouter(
+	connect(mapStateToProps, { deleteVideo })(SearchContent)
+);
