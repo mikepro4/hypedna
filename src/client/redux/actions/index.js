@@ -1,4 +1,4 @@
-import { FETCH_AUTH } from "./types";
+import { FETCH_AUTH, CURRENT_VIDEO_UPDATE } from "./types";
 import moment from "moment";
 
 export const fetchCurrentUser = () => async (dispatch, getState, api) => {
@@ -7,5 +7,14 @@ export const fetchCurrentUser = () => async (dispatch, getState, api) => {
 	dispatch({
 		type: FETCH_AUTH,
 		payload: res
+	});
+};
+
+export const updateCurrentVideo = (id, action, seconds) => dispatch => {
+	dispatch({
+		type: CURRENT_VIDEO_UPDATE,
+		payload: id,
+		playerAction: action,
+		seconds
 	});
 };

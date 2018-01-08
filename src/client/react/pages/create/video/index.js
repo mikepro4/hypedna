@@ -63,13 +63,13 @@ class CreateVideoPage extends Component {
 					<div>Loading...</div>
 				) : (
 					<div className="loaded-video-container">
-						{this.props.player.playingVideoId && this.props.video.snippet ? (
+						{this.props.currentVideo.videoId && this.props.video.snippet ? (
 							<div className="loaded-video-container">
 								<div className="loaded-video-player-area">
 									<YoutubePlayer
 										width="680"
 										height="380"
-										videoId={this.props.player.playingVideoId}
+										videoId={this.props.currentVideo.videoId}
 									/>
 									<div className="video-description">
 										<h2 className="video-title">
@@ -97,7 +97,8 @@ function mapStateToProps(state) {
 		video: state.youtubeVideoSearch.singleVideo,
 		newVideo: state.youtubeVideoSearch.newVideo,
 		isFetching: state.youtubeVideoSearch.isFetching,
-		player: state.player
+		player: state.player,
+		currentVideo: state.currentVideo
 	};
 }
 

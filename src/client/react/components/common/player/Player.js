@@ -7,6 +7,7 @@ import {
 	updatePlayerStatus,
 	updateTime
 } from "../../../../redux/actions/player";
+import { updateCurrentVideo } from "../../../../redux/actions/";
 
 class YoutubePlayer extends React.Component {
 	constructor(props) {
@@ -26,10 +27,13 @@ class YoutubePlayer extends React.Component {
 
 	onStateChange(event) {
 		clearInterval(this.state.timeInterval);
+		if (this.props.currentVideo.videoId != this.props.player.playingVideoId) {
+			this.clearTime();
+		}
 	}
 
 	componentDidUpdate(event) {
-		switch (this.props.player.status) {
+		switch (this.props.currentVideo.playerAction) {
 			case "play":
 				return this.playVideo();
 			case "pause":
@@ -41,19 +45,32 @@ class YoutubePlayer extends React.Component {
 		}
 	}
 
-	playPauseSwitch() {}
+	playPauseSwitch() {
+		switch (this.props.currentVideo.playerAction) {
+			case "playing":
+				return this.pauseVideo();
+			case "paused":
+				return this.playVideo();
+			case "stopped":
+				return this.playVideo();
+			case undefined:
+				return this.playVideo();
+			default:
+				return this.playVideo();
+		}
+	}
 
 	seekToClip() {}
 
 	playVideo() {
 		console.log("play video");
 		clearInterval(this.state.timeInterval);
-		this.props.updatePlayerStatus("waiting");
+		this.props.updateCurrentVideo(this.props.currentVideo.videoId, "waiting");
 
 		// fake delay needed for the video switch
 		setTimeout(() => {
 			this.state.player.playVideo();
-			this.props.updatePlayerStatus("playing");
+			this.props.updateCurrentVideo(this.props.currentVideo.videoId, "playing");
 		}, 1);
 	}
 
@@ -66,7 +83,7 @@ class YoutubePlayer extends React.Component {
 		this.clearTime();
 		console.log("stop video");
 		this.state.player.stopVideo();
-		this.props.updatePlayerStatus("stopped");
+		this.props.updateCurrentVideo(this.props.currentVideo.videoId, "stopped");
 	}
 
 	seekVideo() {
@@ -90,14 +107,14 @@ class YoutubePlayer extends React.Component {
 	onPlay(event) {
 		console.log("onPlay");
 		this.setState({ timeInterval: null });
-		this.props.updatePlayerStatus("playing");
+		this.props.updateCurrentVideo(this.props.currentVideo.videoId, "playing");
 		this.startTimeInterval();
 	}
 
 	onPause(event) {
 		console.log("onPause");
 		clearInterval(this.state.timeInterval);
-		this.props.updatePlayerStatus("paused");
+		this.props.updateCurrentVideo(this.props.currentVideo.videoId, "paused");
 	}
 
 	startTimeInterval() {
@@ -114,7 +131,7 @@ class YoutubePlayer extends React.Component {
 
 	componentWillUnmount() {
 		clearInterval(this.state.timeInterval);
-		this.props.updatePlayerStatus("cleared");
+		this.props.updateCurrentVideo(null, "cleared");
 	}
 
 	clearTime() {
@@ -138,13 +155,13 @@ class YoutubePlayer extends React.Component {
 
 		let videoClasses = classnames({
 			"video-container": true,
-			"video-loaded": this.props.player.playingVideoId
+			"video-loaded": this.props.currentVideo.videoId
 		});
 
 		return (
 			<div className={videoClasses}>
 				<YouTube
-					videoId={this.props.player.playingVideoId}
+					videoId={this.props.currentVideo.videoId}
 					opts={videoPlayerOptions}
 					onReady={this.onReady.bind(this)}
 					onPlay={this.onPlay.bind(this)}
@@ -159,10 +176,10 @@ class YoutubePlayer extends React.Component {
 }
 
 function mapStateToProps(state) {
-	return { player: state.player };
+	return { player: state.player, currentVideo: state.currentVideo };
 }
 
 export default connect(mapStateToProps, {
-	updatePlayerStatus,
+	updateCurrentVideo,
 	updateTime
 })(YoutubePlayer);

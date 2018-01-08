@@ -97,9 +97,9 @@ a:active {
 	align-items: stretch;
 	justify-content: space-between;
 
-	@media (max-width: $break1) {
-		flex-direction: column;
-	}
+	// @media (max-width: $break1) {
+	// 	flex-direction: column;
+	// }
 
 	.small-sidebar {
 		width: 340px;

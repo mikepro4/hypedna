@@ -3,7 +3,8 @@ import {
 	LOAD_YOUTUBE_VIDEO_DETAILS,
 	LOAD_YOUTUBE_VIDEO_DETAILS_SUCCESS,
 	UPDATE_PLAYER_VIDEO_ID,
-	CLEAR_LOADED_VIDEO
+	CLEAR_LOADED_VIDEO,
+	CURRENT_VIDEO_UPDATE
 } from "./types";
 
 export const loadYoutubeVideoDetails = googleId => async (
@@ -22,11 +23,9 @@ export const loadYoutubeVideoDetails = googleId => async (
 		payload: response.data
 	});
 	dispatch({
-		type: UPDATE_PLAYER_VIDEO_ID,
-		playingVideoId: response.data.videoDetails.googleId,
-		duration: moment
-			.duration(response.data.videoDetails.contentDetails.duration)
-			.asSeconds()
+		type: CURRENT_VIDEO_UPDATE,
+		payload: googleId,
+		playerAction: "stop"
 	});
 };
 

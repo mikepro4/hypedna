@@ -34,18 +34,16 @@ class SearchPage extends Component {
 			<div className="route-content">
 				{this.renderHead()}
 
-				<div className="route-search">
-					<SearchSidebar />
-					<SearchContent
-						searchResults={
-							this.props.searchResults.all ? this.props.searchResults.all : []
-						}
-						isFetching={this.props.isFetching}
-						refreshSearch={() => {
-							this.refreshSearch();
-						}}
-					/>
-				</div>
+				<SearchSidebar />
+				<SearchContent
+					searchResults={
+						this.props.searchResults.all ? this.props.searchResults.all : []
+					}
+					isFetching={this.props.isFetching}
+					refreshSearch={() => {
+						this.refreshSearch();
+					}}
+				/>
 			</div>
 		);
 	}

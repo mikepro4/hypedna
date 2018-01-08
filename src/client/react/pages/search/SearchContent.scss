@@ -1,2 +1,13 @@
 @import "../../../styles/imports/colors";
 
+.search-content-container {
+	flex-grow: 1;
+
+	.player-temp-container {
+		display: block;
+		position: fixed;
+		right: 20px;
+		bottom: 0px;
+		z-index: 1000;
+	}
+}
