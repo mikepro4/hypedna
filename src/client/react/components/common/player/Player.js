@@ -90,7 +90,7 @@ class YoutubePlayer extends React.Component {
 		console.log("seek to");
 		if (this.state.player) {
 			clearInterval(this.state.timeInterval);
-			const seekToSeconds = this.props.player.seekToTime;
+			const seekToSeconds = this.props.currentVideo.seconds;
 			this.playVideo();
 
 			// fake delay needed for the video switch/seek

@@ -1,0 +1,49 @@
+.search-result-item {
+	margin: 20px;
+	border: 1px solid #eaeaea;
+	padding: 20px;
+
+	.video_actions {
+		height: 30px;
+		margin: 10px 0 0 0;
+
+		&.play {
+			li.play {
+				display: block;
+			}
+		}
+		&.pause {
+			li.pause {
+				display: block;
+			}
+		}
+		&.stop {
+			li.stop {
+				display: block;
+			}
+		}
+		&.seek {
+			li.seek {
+				display: block;
+			}
+		}
+
+		li {
+			float: left;
+			margin: 0 10px 0 0;
+
+			&.play {
+				display: none;
+			}
+			&.pause {
+				display: none;
+			}
+			&.stop {
+				display: none;
+			}
+			&.seek {
+				display: none;
+			}
+		}
+	}
+}

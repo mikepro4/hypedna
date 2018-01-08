@@ -10,6 +10,7 @@ import {
 import { updateCurrentVideo } from "../../../redux/actions/";
 import YoutubePlayer from "../../components/common/player/Player";
 import PlayerControls from "../../components/common/player/PlayerControls";
+import SearchResultItem from "./SearchResultItem";
 
 class SearchContent extends Component {
 	deleteVideo = id => {
@@ -19,42 +20,21 @@ class SearchContent extends Component {
 	playVideo = id => {
 		this.props.updateCurrentVideo(id, "play");
 	};
-	renderResults() {
+
+	renderSearchResultItems() {
 		if (this.props.isFetching && this.props.searchResults.length === 0) {
 			return <div>Loading</div>;
 		} else {
 			return (
-				<ul>
+				<div>
 					{this.props.searchResults.map(video => (
-						<li key={video.googleId}>
-							{video.googleId}
-							<Link to={`/video/${video.googleId}`}>Open Video</Link>
-							<a
-								onClick={() => {
-									this.deleteVideo(video.googleId);
-								}}
-							>
-								delete video
-							</a>
-
-							<a
-								onClick={() => {
-									this.props.updateCurrentVideo(video.googleId, "play");
-								}}
-							>
-								play video
-							</a>
-
-							<a
-								onClick={() => {
-									this.props.updateCurrentVideo(video.googleId, "pause");
-								}}
-							>
-								pause video
-							</a>
-						</li>
+						<SearchResultItem
+							key={video._id}
+							video={video}
+							refreshSearch={this.props.refreshSearch}
+						/>
 					))}
-				</ul>
+				</div>
 			);
 		}
 	}
@@ -63,19 +43,19 @@ class SearchContent extends Component {
 			<div className="search-content-container">
 				<div className="search-content">
 					<div className="search-player-area">
-						{this.props.currentVideo.videoId ? (
-							<div className="player-temp-container">
+						<div className="player-temp-container">
+							{this.props.currentVideo.videoId ? (
 								<YoutubePlayer
 									width="300"
 									height="180"
 									videoId={this.props.currentVideo.videoId}
 								/>
-							</div>
-						) : (
-							""
-						)}
+							) : (
+								""
+							)}
+						</div>
 					</div>
-					{this.renderResults()}
+					{this.renderSearchResultItems()}
 				</div>
 			</div>
 		);
