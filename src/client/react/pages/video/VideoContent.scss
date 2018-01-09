@@ -1,22 +1,27 @@
 @import "../../../styles/imports/colors";
 
 .video-content-container {
+	display: flex;
 	flex-grow: 1;
-	overflow-y: scroll;
-	@include webkit-scrollbar-light();
+	position: relative;
 
-	.player-temp-container {
+	.video-timeline-container {
 		display: block;
-		position: fixed;
-		right: 20px;
-		bottom: 0px;
-		z-index: 1000;
+		width: 100%;
+		top: 0;
+		left: 0;
+		height: 45px;
+		padding-right: 16px;
+	}
 
-		@media (max-width: 1100px) {
-			position: fixed;
-			right: 20px;
-			bottom: 0px;
-			z-index: 1000;
-		}
+	.video-tracks-container {
+		position: absolute;
+		top: 45px;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background: $grey;
+		overflow-y: scroll;
+		@include webkit-scrollbar-light();
 	}
 }

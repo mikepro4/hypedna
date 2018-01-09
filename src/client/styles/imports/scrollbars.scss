@@ -26,9 +26,9 @@
 		}
 	}
 	&::-webkit-scrollbar-track {
-		border: solid #fff;
+		border: solid transparent;
 		border-width: 2px;
-		background-color: #fff;
+		background-color: transparent;
 		background-clip: content-box;
 	}
 	&::-webkit-scrollbar-track-piece {

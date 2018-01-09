@@ -3,7 +3,7 @@
 .search-sidebar-container {
 	width: 340px;
 	flex-grow: 0;
-	box-shadow: inset -1px 0 0 0 rgba($black, 0.12);
+	box-shadow: inset -1px 0 0 0 $grey;
 	padding: 30px 1px 0 0;
 
 	.sidebar-title {

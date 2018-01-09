@@ -29,7 +29,6 @@ export const loadHypednaVideoDetails = googleId => async (
 	// 		.asSeconds()
 	// });
 };
-
 export const clearLoadedHypednaVideo = () => dispatch => {
 	dispatch({
 		type: CLEAR_LOADED_HYPEDNA_VIDEO
