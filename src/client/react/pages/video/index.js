@@ -6,6 +6,8 @@ import {
 	loadHypednaVideoDetails,
 	clearLoadedHypednaVideo
 } from "../../../redux/actions/pageVideoActions";
+import VideoSidebar from "./VideoSidebar";
+import VideoContent from "./VideoContent";
 
 class VideoPage extends Component {
 	static loadData(store, match, route, path, query) {
@@ -27,18 +29,16 @@ class VideoPage extends Component {
 		return (
 			<div className="route-content">
 				{this.renderHead()}
-				{this.props.singleVideo.snippet ? (
-					<div>{this.props.singleVideo.snippet.title}</div>
-				) : (
-					"nothing"
-				)}
+				<VideoSidebar />
+				<VideoContent />
 			</div>
 		);
 	}
 }
 
 const mapStateToProps = state => ({
-	singleVideo: state.pageVideo.singleVideo
+	singleVideo: state.pageVideo.singleVideo,
+	isFetching: state.pageVideo.isFetching
 });
 
 export default {
