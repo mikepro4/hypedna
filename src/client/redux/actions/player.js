@@ -13,19 +13,11 @@ export function updatePlayerStatus(status) {
 	};
 }
 
-export function updateTime(currentTime) {
+export function updateTime(duration, currentTime) {
 	return {
 		type: UPDATE_TIME,
+		duration,
 		currentTime
-	};
-}
-
-export function updatePlayerVideo(playingVideoId, duration) {
-	console.log("update");
-	return {
-		type: UPDATE_PLAYER_VIDEO_ID,
-		playingVideoId: playingVideoId,
-		duration
 	};
 }
 

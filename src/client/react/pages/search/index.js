@@ -6,6 +6,7 @@ import {
 	searchVideos,
 	clearLoadedSearchResults
 } from "../../../redux/actions/pageSearchActions";
+import { updateTime } from "../../../redux/actions/player";
 
 import SearchSidebar from "./SearchSidebar";
 import SearchContent from "./SearchContent";
@@ -19,6 +20,7 @@ class SearchPage extends Component {
 	}
 	componentWillUnmount() {
 		this.props.clearLoadedSearchResults();
+		this.props.updateTime(0, 0);
 	}
 	refreshSearch() {
 		this.props.searchVideos({}, "snippet.publishedAt");
@@ -56,8 +58,10 @@ const mapStateToProps = state => ({
 
 export default {
 	component: withRouter(
-		connect(mapStateToProps, { searchVideos, clearLoadedSearchResults })(
-			SearchPage
-		)
+		connect(mapStateToProps, {
+			searchVideos,
+			clearLoadedSearchResults,
+			updateTime
+		})(SearchPage)
 	)
 };

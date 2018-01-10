@@ -8,26 +8,16 @@ import {
 } from "../actions/types";
 
 const initialPlayerState = {
-	playingVideoId: null,
 	duration: 0,
-	currentTime: 0,
-	status: "stopped"
+	currentTime: 0
 };
 
 export default (state = initialPlayerState, action) => {
 	switch (action.type) {
 		case UPDATE_TIME:
 			return assign({}, state, {
+				duration: action.duration || 0,
 				currentTime: action.currentTime || 0
-			});
-
-		case UPDATE_PLAYER_VIDEO_ID:
-			console.log("update reducer");
-			return assign({}, state, {
-				playingVideoId: action.playingVideoId,
-				duration: action.duration,
-				currentTime: 0,
-				status: "stopped"
 			});
 		case UPDATE_STATUS:
 			return assign({}, state, {

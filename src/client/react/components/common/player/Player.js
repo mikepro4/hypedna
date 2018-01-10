@@ -115,11 +115,18 @@ class YoutubePlayer extends React.Component {
 		console.log("onPause");
 		clearInterval(this.state.timeInterval);
 		this.props.updateCurrentVideo(this.props.currentVideo.videoId, "paused");
+		this.props.updateTime(
+			this.state.player.getDuration(),
+			this.state.player.getCurrentTime()
+		);
 	}
 
 	startTimeInterval() {
 		const timeInterval = setInterval(() => {
-			this.props.updateTime(this.state.player.getCurrentTime());
+			this.props.updateTime(
+				this.state.player.getDuration(),
+				this.state.player.getCurrentTime()
+			);
 		}, 100);
 
 		this.setState({ timeInterval });
@@ -135,11 +142,11 @@ class YoutubePlayer extends React.Component {
 	}
 
 	clearTime() {
-		this.props.updateTime(0);
+		// this.props.updateTime(this.state.player.getDuration(), 0);
 	}
 
 	onStop() {
-		this.props.updateTime(0);
+		this.props.updateTime(this.state.player.getDuration(), 0);
 	}
 
 	render() {

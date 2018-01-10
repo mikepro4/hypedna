@@ -12,6 +12,7 @@
 		left: 0;
 		height: 45px;
 		padding-right: 16px;
+		box-shadow: inset 0 -1px 0 0 $grey;
 	}
 
 	.video-tracks-container {
@@ -23,5 +24,30 @@
 		background: $grey;
 		overflow-y: scroll;
 		@include webkit-scrollbar-light();
+
+		.video-track-groups {
+			margin: 20px 10px 100px 20px;
+
+			.video-track-list {
+				background: $white;
+			}
+		}
+	}
+
+	.video-progress-elements {
+		display: flex;
+		height: 45px;
+
+		.video-progress-time {
+			flex-grow: 0;
+			width: 230px;
+			margin: 0 0 0 20px;
+			align-items: center;
+			display: flex;
+		}
+
+		.progress-bar-player-container {
+			flex-grow: 1;
+		}
 	}
 }

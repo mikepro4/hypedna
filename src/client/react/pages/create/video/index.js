@@ -11,7 +11,6 @@ import {
 	addYoutubeVideo,
 	clearLoadedYoutubeVideo
 } from "../../../../redux/actions/youtubeVideoSearch";
-import { updatePlayerVideo } from "../../../../redux/actions/player";
 import YoutubePlayer from "../../../components/common/player/Player";
 import moment from "moment";
 

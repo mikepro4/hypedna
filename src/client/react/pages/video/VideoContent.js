@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import moment from "moment";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import {
@@ -6,12 +7,30 @@ import {
 	deleteTrack,
 	updateTrack
 } from "../../../redux/actions/objectVideoActions";
+import { formatTime } from "../../../utils/timeFormatter";
+import ProgressBar from "../../components/common/player/ProgressBar";
 
 class VideoContent extends Component {
 	render() {
 		return (
 			<div className="video-content-container">
-				<div className="video-timeline-container">timeline</div>
+				<div className="video-timeline-container">
+					{this.props.video.contentDetails && this.props.player ? (
+						<div className="video-progress-elements">
+							<div className="video-progress-time">
+								{formatTime(this.props.player.currentTime)} /{" "}
+								{formatTime(this.props.video.contentDetails.duration)}
+							</div>
+							<ProgressBar
+								duration={moment
+									.duration(this.props.video.contentDetails.duration)
+									.asSeconds()}
+							/>
+						</div>
+					) : (
+						""
+					)}
+				</div>
 				<div className="video-tracks-container">
 					<div className="video-track-groups">
 						<div className="video-track-single-group">

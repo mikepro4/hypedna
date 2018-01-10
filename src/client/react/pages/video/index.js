@@ -6,6 +6,8 @@ import {
 	loadHypednaVideoDetails,
 	clearLoadedHypednaVideo
 } from "../../../redux/actions/pageVideoActions";
+
+import { updateTime } from "../../../redux/actions/player";
 import VideoSidebar from "./VideoSidebar";
 import VideoContent from "./VideoContent";
 
@@ -18,6 +20,7 @@ class VideoPage extends Component {
 	}
 	componentWillUnmount() {
 		this.props.clearLoadedHypednaVideo();
+		this.props.updateTime(0, 0);
 	}
 	renderHead = () => (
 		<Helmet>
@@ -45,7 +48,8 @@ export default {
 	component: withRouter(
 		connect(mapStateToProps, {
 			loadHypednaVideoDetails,
-			clearLoadedHypednaVideo
+			clearLoadedHypednaVideo,
+			updateTime
 		})(VideoPage)
 	)
 };
