@@ -3,7 +3,8 @@ import {
 	LOAD_HYPEDNA_VIDEO_DETAILS,
 	LOAD_HYPEDNA_VIDEO_DETAILS_SUCCESS,
 	CLEAR_LOADED_HYPEDNA_VIDEO,
-	UPDATE_PLAYER_VIDEO_ID
+	UPDATE_PLAYER_VIDEO_ID,
+	UPDATE_PAGE_VIDEO_HOVER_TIME
 } from "./types";
 
 export const loadHypednaVideoDetails = googleId => async (
@@ -32,5 +33,12 @@ export const loadHypednaVideoDetails = googleId => async (
 export const clearLoadedHypednaVideo = () => dispatch => {
 	dispatch({
 		type: CLEAR_LOADED_HYPEDNA_VIDEO
+	});
+};
+
+export const updateHoverTime = hoverTime => dispatch => {
+	dispatch({
+		type: UPDATE_PAGE_VIDEO_HOVER_TIME,
+		hoverTime
 	});
 };

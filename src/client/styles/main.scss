@@ -87,7 +87,6 @@ a:active {
 	left: 96px;
 	bottom: 0;
 	right: 0;
-	overflow-y: scroll;
 	// @include webkit-scrollbar-light();
 }
 
@@ -158,10 +157,7 @@ a:active {
 
 .progress-bar-player-container {
 	display: block;
-	// margin: 15px 0 20px 0;
-	padding: 0 0 0 15px;
 	height: 45px;
-	box-shadow: inset 1px 0 0 0 $grey;
 
 	.progress-bar-wrapper {
 		display: block;
@@ -169,13 +165,13 @@ a:active {
 		width: 100%;
 		cursor: pointer;
 		position: absolute;
-		bottom: 2px;
+		bottom: 3px;
 		left: 0;
 		right: 0;
 
 		.progress-bar {
 			display: block;
-			height: 2px;
+			height: 4px;
 			width: 0;
 			position: absolute;
 			top: 0;
@@ -191,7 +187,7 @@ a:active {
 			left: 0;
 			z-index: 1;
 			height: 2px;
-			background: $yellow;
+			background: transparent;
 		}
 	}
 }
@@ -201,7 +197,7 @@ a:active {
 	position: relative;
 	cursor: pointer;
 	user-select: none;
-	margin: 0 30px 0 0;
+	margin: 0 0 0 0;
 	height: 45px;
 
 	.cursor {
@@ -209,16 +205,26 @@ a:active {
 		position: absolute;
 		border-right: 1px solid $black;
 		left: 0;
-		top: 0;
-		bottom: 0;
+		top: 12px;
+		bottom: 12px;
 
-		&.playing {
-			z-index: 3;
+		.cursor-time {
+			width: 50px;
+			margin-left: -25px;
+			position: absolute;
+			top: -19px;
+			font-size: 11px;
+			left: 0;
+			text-align: center;
+
+			span {
+				background: $white;
+				padding: 0 5px 0 5px;
+			}
 		}
 
 		&.hover {
 			z-index: 3;
-			opacity: 0.3;
 		}
 	}
 
@@ -232,16 +238,6 @@ a:active {
 		height: 78px;
 		top: 6px;
 		opacity: 1;
-	}
-
-	&:hover {
-		.cursor.hover {
-			opacity: 0.2;
-		}
-
-		img {
-			opacity: 1;
-		}
 	}
 }
 
@@ -297,21 +293,32 @@ a:active {
 		// margin: 10px 0 0 0;
 		align-items: center;
 		position: absolute;
-		width: 100%;
+		// width: 100%;
 		z-index: 1;
 
 		li {
 			float: left;
-			width: 32px;
-			margin-right: 32px;
+			width: 45px;
+			// margin-right: 30px;
 			font-size: 10px;
+			position: relative;
+
+			&:before {
+				content: "";
+				position: absolute;
+				bottom: -16px;
+				height: 10px;
+				border-right: 1px solid $grey;
+				width: 0;
+				left: 0;
+			}
 
 			span {
 				opacity: 0.5;
 			}
 
 			&:last-child {
-				margin: 0;
+				// margin: 0;
 			}
 		}
 	}

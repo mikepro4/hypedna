@@ -6,6 +6,7 @@ import { connect } from "react-redux";
 import { updateCurrentVideo } from "../../../../redux/actions/";
 import { formatTime } from "../../../../utils/timeFormatter";
 import Timeline from "./Timeline";
+import { updateHoverTime } from "../../../../redux/actions/pageVideoActions";
 
 class ProgressBar extends React.Component {
 	constructor(props) {
@@ -49,6 +50,7 @@ class ProgressBar extends React.Component {
 	}
 
 	onMouseMove(event) {
+		this.props.updateHoverTime(this.calculateWidth(event));
 		this.setState({
 			hoverWidth: this.calculateWidth(event) * 100 / this.props.duration + "%"
 		});
@@ -58,6 +60,7 @@ class ProgressBar extends React.Component {
 	}
 
 	onMouseLeave(event) {
+		this.props.updateHoverTime(null);
 		this.setState({
 			hoverWidth: 0
 		});
@@ -76,9 +79,9 @@ class ProgressBar extends React.Component {
 			left: this.props.player.currentTime * 100 / this.props.duration + "%"
 		};
 
-		// const cursorHover = {
-		// 	left: this.props.analysis.hoverTime * 100 / this.props.duration + "%"
-		// };
+		const cursorHover = {
+			left: this.props.hoverTime * 100 / this.props.duration + "%"
+		};
 
 		const progressBarHoverWidth = {
 			width: this.state.hoverWidth
@@ -102,6 +105,15 @@ class ProgressBar extends React.Component {
 						<div className="progress-bar" style={progressBarWidth} />
 						<div className="progress-bar-hover" style={progressBarHoverWidth} />
 					</div>
+					{this.props.hoverTime * 100 / this.props.duration > 0 ? (
+						<div className="cursor hover" style={cursorHover}>
+							<div className="cursor-time">
+								<span>{formatTime(this.props.hoverTime)}</span>
+							</div>
+						</div>
+					) : (
+						""
+					)}
 				</div>
 			</div>
 		);
@@ -109,7 +121,14 @@ class ProgressBar extends React.Component {
 }
 
 function mapStateToProps(state) {
-	return { currentVideo: state.currentVideo, player: state.player };
+	return {
+		currentVideo: state.currentVideo,
+		player: state.player,
+		hoverTime: state.pageVideo.hoverTime
+	};
 }
 
-export default connect(mapStateToProps, { updateCurrentVideo })(ProgressBar);
+export default connect(mapStateToProps, {
+	updateCurrentVideo,
+	updateHoverTime
+})(ProgressBar);

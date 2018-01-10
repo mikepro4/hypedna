@@ -16,11 +16,13 @@ class VideoSidebar extends Component {
 				<div className="video-sidebar-content">
 					<div className="sidebar-video-container">
 						{this.props.currentVideo.videoId ? (
-							<YoutubePlayer
-								width="430"
-								height="260"
-								videoId={this.props.currentVideo.videoId}
-							/>
+							<div style={{ display: "none" }}>
+								<YoutubePlayer
+									width="430"
+									height="260"
+									videoId={this.props.currentVideo.videoId}
+								/>
+							</div>
 						) : (
 							""
 						)}

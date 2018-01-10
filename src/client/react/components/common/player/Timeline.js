@@ -22,18 +22,16 @@ export default class Timeline extends React.Component {
 	getTimeline() {
 		if (this.refs.timeline) {
 			const containerWIdth = this.refs.timeline.getBoundingClientRect().width;
-			// console.log(containerWIdth)
-			const timesAmount = Math.floor(containerWIdth / 30 / 2);
-			const timeInterval = Math.floor(this.props.duration / timesAmount);
+			const timesAmount = containerWIdth / 45;
+			const timeInterval = this.props.duration / timesAmount;
 
-			const secondsArray = Array.apply(null, {
-				length: this.props.duration
-			}).map(Number.call, Number);
+			let betterSecondsArray = [0];
 
-			const filteredSeconds = _.filter(secondsArray, number => {
-				return number % timeInterval === 0;
-			});
-			return filteredSeconds;
+			for (let i = 0; i < timesAmount - 2; i++) {
+				betterSecondsArray.push(betterSecondsArray[i] + timeInterval);
+			}
+
+			return betterSecondsArray;
 		}
 	}
 
