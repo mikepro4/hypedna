@@ -4,8 +4,13 @@ import { withStyles } from "material-ui/styles";
 import { withRouter } from "react-router-dom";
 import moment from "moment";
 import keydown from "react-keydown";
+import update from "immutability-helper";
+import * as _ from "lodash";
 import Clip from "./Clip";
-import { updateTrackClips } from "../../../redux/actions/objectVideoActions";
+import {
+	updateTrackClips,
+	optimisticTrackUpdate
+} from "../../../redux/actions/objectVideoActions";
 
 const styles = theme => ({});
 
@@ -18,7 +23,8 @@ class ClipsTimeline extends Component {
 		endPercent: 0,
 		ghostWidth: 0,
 		ghostDirection: null,
-		ghostEndPosition: 0
+		ghostEndPosition: 0,
+		updatedChannelClips: []
 	};
 
 	@keydown("backspace")
@@ -35,6 +41,7 @@ class ClipsTimeline extends Component {
 	};
 
 	onMouseDown = event => {
+		this.originalClips = this.props.track.clips;
 		if (
 			event.target.className !== "clip" &&
 			event.target.className !== "clip-name" &&
@@ -58,6 +65,7 @@ class ClipsTimeline extends Component {
 	};
 
 	onMouseUp = event => {
+		this.props.track.clips = this.originalClips;
 		if (this.state.startedDragging) {
 			this.calculateWidth(event);
 			this.setState(
@@ -98,6 +106,8 @@ class ClipsTimeline extends Component {
 	onMouseMove = event => {
 		// Initial drawing logic
 		if (this.state.startedDragging) {
+			// populate clips with filtered / trimmed clips while moving
+			this.props.track.clips = this.getUpdatedTrackClips(event);
 			let ghostWidth;
 			let ghostDirection = "";
 			let ghostEndPosition = 0;
@@ -141,6 +151,61 @@ class ClipsTimeline extends Component {
 		// Moving logic
 	};
 
+	getUpdatedTrackClips = event => {
+		const endPosition = this.calculateWidth(event);
+		let { newClipStart, newClipEnd } = 0;
+		if (endPosition > this.state.startPercent) {
+			newClipStart = this.state.startPercent * this.props.videoDuration / 100;
+			newClipEnd = endPosition * this.props.videoDuration / 100;
+		} else {
+			newClipEnd = this.state.startPercent * this.props.videoDuration / 100;
+			newClipStart = endPosition * this.props.videoDuration / 100;
+		}
+		console.log(newClipStart, newClipEnd);
+
+		// filter completely overlapping clips
+		const filteredClips = _.filter(this.originalClips, clip => {
+			let start = clip.start;
+			let end = clip.end;
+
+			const startInRange = start >= newClipStart && start <= newClipEnd;
+			const endInRange = end >= newClipStart && end <= newClipEnd;
+
+			let inRange = startInRange && endInRange ? true : false;
+
+			return !inRange;
+		});
+
+		// trim partially overlapping clips
+		const updatedChannelClips = _.map(filteredClips, clip => {
+			let start = clip.start;
+			let end = clip.end;
+			// console.log(newClipStart < clip.end)
+			if (newClipStart > start && newClipStart < end) {
+				let diff = clip.end - newClipStart;
+				end = clip.end - diff;
+			}
+			if (newClipEnd > start && newClipEnd < end) {
+				if (newClipEnd > clip.start) {
+					let diff = newClipEnd - clip.start;
+					start = clip.start + diff;
+				}
+			}
+
+			return {
+				...clip,
+				start: start,
+				end: end
+			};
+		});
+
+		this.setState({
+			updatedChannelClips: updatedChannelClips
+		});
+
+		return updatedChannelClips;
+	};
+
 	calculateHoverSeconds = event => {
 		const seekSeconds =
 			this.calculateWidth(event) * this.props.videoDuration / 100;
@@ -170,8 +235,11 @@ class ClipsTimeline extends Component {
 				start * this.props.videoDuration / 100 >
 			1
 		) {
-			let newClipArray = this.props.track.clips;
+			let newClipArray = this.state.updatedChannelClips;
 			newClipArray.push(newClip);
+			this.props.optimisticTrackUpdate(
+				_.assign({}, this.props.track, { clips: newClipArray })
+			);
 			this.props.updateTrackClips(
 				this.props.video.googleId,
 				this.props.track._id,
@@ -238,6 +306,7 @@ function mapStateToProps(state) {
 	};
 }
 
-export default connect(mapStateToProps, { updateTrackClips })(
-	withStyles(styles)(withRouter(ClipsTimeline))
-);
+export default connect(mapStateToProps, {
+	updateTrackClips,
+	optimisticTrackUpdate
+})(withStyles(styles)(withRouter(ClipsTimeline)));

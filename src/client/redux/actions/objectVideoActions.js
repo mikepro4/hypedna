@@ -117,3 +117,10 @@ export const updateTrackClips = (googleId, trackId, clips) => async (
 		console.log("error");
 	}
 };
+
+export const optimisticTrackUpdate = track => dispatch => {
+	dispatch({
+		type: UPDATE_VIDEO_TRACK,
+		payload: track
+	});
+};
