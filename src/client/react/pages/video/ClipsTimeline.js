@@ -55,7 +55,7 @@ class ClipsTimeline extends Component {
 			});
 		} else if (
 			event.target.className == "clip" ||
-			event.target.className == "clip_name"
+			event.target.className == "clip-name"
 		) {
 			this.setState({
 				startedMoving: true,
@@ -106,7 +106,7 @@ class ClipsTimeline extends Component {
 	onMouseMove = event => {
 		// Initial drawing logic
 		if (this.state.startedDragging) {
-			// populate clips with filtered / trimmed clips while moving
+			// populate clips with temporary array of filtered / trimmed clips while moving
 			this.props.track.clips = this.getUpdatedTrackClips(event);
 			let ghostWidth;
 			let ghostDirection = "";
@@ -149,11 +149,22 @@ class ClipsTimeline extends Component {
 		// Resizing logic
 
 		// Moving logic
+		if (this.state.startedMoving) {
+			console.log("moving clip");
+			const endPosition = this.calculateWidth(event);
+
+			let newClip = {};
+			if (endPosition < this.state.startPercent) {
+			} else if (endPosition > this.state.startPercent) {
+			}
+		}
 	};
 
 	getUpdatedTrackClips = event => {
 		const endPosition = this.calculateWidth(event);
 		let { newClipStart, newClipEnd } = 0;
+
+		// select start and end based on left / right direction
 		if (endPosition > this.state.startPercent) {
 			newClipStart = this.state.startPercent * this.props.videoDuration / 100;
 			newClipEnd = endPosition * this.props.videoDuration / 100;
@@ -161,7 +172,6 @@ class ClipsTimeline extends Component {
 			newClipEnd = this.state.startPercent * this.props.videoDuration / 100;
 			newClipStart = endPosition * this.props.videoDuration / 100;
 		}
-		console.log(newClipStart, newClipEnd);
 
 		// filter completely overlapping clips
 		const filteredClips = _.filter(this.originalClips, clip => {
@@ -180,7 +190,6 @@ class ClipsTimeline extends Component {
 		const updatedChannelClips = _.map(filteredClips, clip => {
 			let start = clip.start;
 			let end = clip.end;
-			// console.log(newClipStart < clip.end)
 			if (newClipStart > start && newClipStart < end) {
 				let diff = clip.end - newClipStart;
 				end = clip.end - diff;
@@ -245,6 +254,7 @@ class ClipsTimeline extends Component {
 				this.props.track._id,
 				newClipArray
 			);
+			this.setState({ updatedChannelClips: [] });
 		}
 	}
 

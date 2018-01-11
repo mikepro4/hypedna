@@ -9,6 +9,7 @@
 	left: 0;
 	background: rgba($black, 0.1);
 	border: 1px solid $black;
+	user-select: none;
 	cursor: pointer;
 
 	&.selected-clip {
