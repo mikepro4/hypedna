@@ -14,7 +14,7 @@ class VideoSidebar extends Component {
 		return (
 			<div className="video-sidebar-container">
 				<div className="video-sidebar-content">
-					<div className="sidebar-video-container">
+					<div className="sidebar-video-container" style={{ display: "none" }}>
 						{this.props.currentVideo.videoId ? (
 							<YoutubePlayer
 								width="430"

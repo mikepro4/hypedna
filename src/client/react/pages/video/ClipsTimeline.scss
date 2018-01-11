@@ -1,0 +1,31 @@
+@import "../../../styles/imports/colors";
+
+.video-single-track-clips {
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	padding: 0 10px 0 0px;
+
+	.track-clips-timeline {
+		display: flex;
+		background: $white;
+		height: 25px;
+		flex-grow: 1;
+		transition: all 0.1s;
+		cursor: text;
+		position: relative;
+
+		&:hover {
+			background: $grey;
+		}
+	}
+}
+
+.ghost-clip {
+	display: block;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 0;
+	background: $yellow;
+}

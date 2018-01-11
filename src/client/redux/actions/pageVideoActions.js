@@ -2,9 +2,7 @@ import moment from "moment";
 import {
 	LOAD_HYPEDNA_VIDEO_DETAILS,
 	LOAD_HYPEDNA_VIDEO_DETAILS_SUCCESS,
-	CLEAR_LOADED_HYPEDNA_VIDEO,
-	UPDATE_PLAYER_VIDEO_ID,
-	UPDATE_PAGE_VIDEO_HOVER_TIME
+	CLEAR_LOADED_HYPEDNA_VIDEO
 } from "./types";
 
 export const loadHypednaVideoDetails = googleId => async (
@@ -22,13 +20,6 @@ export const loadHypednaVideoDetails = googleId => async (
 		type: LOAD_HYPEDNA_VIDEO_DETAILS_SUCCESS,
 		payload: response.data
 	});
-	// dispatch({
-	// 	type: UPDATE_PLAYER_VIDEO_ID,
-	// 	playingVideoId: response.data.videoDetails.googleId,
-	// 	duration: moment
-	// 		.duration(response.data.videoDetails.contentDetails.duration)
-	// 		.asSeconds()
-	// });
 };
 export const clearLoadedHypednaVideo = () => dispatch => {
 	dispatch({

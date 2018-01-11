@@ -1,5 +1,9 @@
 import moment from "moment";
-import { DELETE_VIDEO, DELETE_VIDEO_SUCCESS } from "./types";
+import {
+	DELETE_VIDEO,
+	DELETE_VIDEO_SUCCESS,
+	UPDATE_VIDEO_TRACK
+} from "./types";
 import { loadHypednaVideoDetails } from "./pageVideoActions";
 
 export const deleteVideo = (googleId, success) => async (
@@ -74,8 +78,41 @@ export const updateTrack = (googleId, trackId, newTrack) => async (
 		newTrack
 	});
 	if (response.status === 200) {
-		dispatch(loadHypednaVideoDetails(googleId));
+		const track = await api.post("/get_single_video_track", {
+			googleId,
+			trackId
+		});
+		dispatch({
+			type: UPDATE_VIDEO_TRACK,
+			payload: track.data
+		});
 		console.log("updated video");
+	} else {
+		console.log("error");
+	}
+};
+
+export const updateTrackClips = (googleId, trackId, clips) => async (
+	dispatch,
+	getState,
+	api
+) => {
+	// console.log(clips);
+	const response = await api.post("/video_track_clips_update", {
+		googleId,
+		trackId,
+		clips
+	});
+	if (response.status === 200) {
+		const track = await api.post("/get_single_video_track", {
+			googleId,
+			trackId
+		});
+		dispatch({
+			type: UPDATE_VIDEO_TRACK,
+			payload: track.data
+		});
+		console.log("updated trackid: ", trackId);
 	} else {
 		console.log("error");
 	}

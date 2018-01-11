@@ -18,6 +18,7 @@ import {
 import { formatTime } from "../../../utils/timeFormatter";
 import ProgressBar from "../../components/common/player/ProgressBar";
 import { updateCurrentVideo } from "../../../redux/actions/";
+import ClipsTimeline from "./ClipsTimeline";
 
 const styles = theme => ({
 	iconClass: {
@@ -69,6 +70,29 @@ class VideoContent extends Component {
 		this.setState({ trackMenuOpen: false, activeTrackId: null });
 	};
 
+	// cancel editing here
+
+	componentDidMount() {
+		window.addEventListener("mouseup", this.mouseRelease, false);
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener("mouseup", this.mouseRelease, false);
+	}
+
+	mouseRelease = event => {
+		// console.log(event);
+		// console.log("this.mouseIsDownOnClips: ", this.mouseIsDownOnClips);
+	};
+
+	mouseDownHandler = () => {
+		// this.mouseIsDownOnClips = false;
+	};
+
+	mouseUpHandler = () => {
+		// this.mouseIsDownOnClips = true;
+	};
+
 	render() {
 		const { classes } = this.props;
 		const { anchorEl, popperOpen, activeTrackId } = this.state;
@@ -79,8 +103,8 @@ class VideoContent extends Component {
 					anchorEl={this.state.anchorEl}
 					onClose={this.handleTrackMenuClose}
 					anchorOrigin={{
-						vertical: "bottom",
-						horizontal: "left"
+						vertical: "top",
+						horizontal: "right"
 					}}
 				>
 					<div className="track-popover-container">
@@ -203,7 +227,11 @@ class VideoContent extends Component {
 													</div>
 												</div>
 
-												<div className="video-single-track-clips" />
+												<ClipsTimeline
+													onMouseDown={this.mouseDownHandler}
+													onMouseUp={this.mouseUpHandler}
+													track={track}
+												/>
 											</div>
 										))}
 									</div>

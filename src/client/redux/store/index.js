@@ -37,9 +37,13 @@ export const configure = (
 	const composeArguments = [appliedMiddlewares];
 
 	if (global.window !== undefined) {
+		// composeArguments.push(
+		// 	global.window.__REDUX_DEVTOOLS_EXTENSION__ &&
+		// 		global.window.__REDUX_DEVTOOLS_EXTENSION__()
+		// );
+
 		composeArguments.push(
-			global.window.__REDUX_DEVTOOLS_EXTENSION__ &&
-				global.window.__REDUX_DEVTOOLS_EXTENSION__()
+			window.devToolsExtension ? window.devToolsExtension() : _ => _
 		);
 	}
 

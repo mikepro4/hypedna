@@ -21,6 +21,7 @@ export const LOAD_HYPEDNA_VIDEO_DETAILS = "app/LOAD_HYPEDNA_VIDEO_DETAILS";
 export const LOAD_HYPEDNA_VIDEO_DETAILS_SUCCESS =
 	"app/LOAD_HYPEDNA_VIDEO_DETAILS_SUCCESS";
 export const CLEAR_LOADED_HYPEDNA_VIDEO = "app/CLEAR_LOADED_HYPEDNA_VIDEO";
+export const UPDATE_VIDEO_TRACK = "app/UPDATE_VIDEO_TRACK";
 
 /////////////////////////////////////////////////
 
