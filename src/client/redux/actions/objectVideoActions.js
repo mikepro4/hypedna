@@ -2,7 +2,8 @@ import moment from "moment";
 import {
 	DELETE_VIDEO,
 	DELETE_VIDEO_SUCCESS,
-	UPDATE_VIDEO_TRACK
+	UPDATE_VIDEO_TRACK,
+	SELECT_CLIP
 } from "./types";
 import { loadHypednaVideoDetails } from "./pageVideoActions";
 
@@ -92,7 +93,7 @@ export const updateTrack = (googleId, trackId, newTrack) => async (
 	}
 };
 
-export const updateTrackClips = (googleId, trackId, clips) => async (
+export const updateTrackClips = (googleId, trackId, clips, success) => async (
 	dispatch,
 	getState,
 	api
@@ -113,6 +114,7 @@ export const updateTrackClips = (googleId, trackId, clips) => async (
 			payload: track.data
 		});
 		console.log("updated trackid: ", trackId);
+		success(track.data, { test: "test" });
 	} else {
 		console.log("error");
 	}
@@ -122,5 +124,12 @@ export const optimisticTrackUpdate = track => dispatch => {
 	dispatch({
 		type: UPDATE_VIDEO_TRACK,
 		payload: track
+	});
+};
+
+export const selectClip = clip => dispatch => {
+	dispatch({
+		type: SELECT_CLIP,
+		clip
 	});
 };

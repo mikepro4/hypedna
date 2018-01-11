@@ -6,12 +6,14 @@ import {
 	LOAD_HYPEDNA_VIDEO_DETAILS_SUCCESS,
 	CLEAR_LOADED_HYPEDNA_VIDEO,
 	UPDATE_PAGE_VIDEO_HOVER_TIME,
-	UPDATE_VIDEO_TRACK
+	UPDATE_VIDEO_TRACK,
+	SELECT_CLIP
 } from "../actions/types";
 
 export const initialState = {
 	singleVideo: {},
 	hoverTime: null,
+	selectedClip: null,
 	isFetching: false
 };
 
@@ -40,6 +42,10 @@ export const pageVideoReducer = (state = initialState, action) => {
 				}
 			});
 		}
+		case SELECT_CLIP:
+			return assign({}, state, {
+				selectedClip: action.clip
+			});
 		case CLEAR_LOADED_HYPEDNA_VIDEO:
 			return assign({}, state, { singleVideo: {}, isFetching: false });
 		default:

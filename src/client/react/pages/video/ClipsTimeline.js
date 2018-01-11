@@ -9,7 +9,8 @@ import * as _ from "lodash";
 import Clip from "./Clip";
 import {
 	updateTrackClips,
-	optimisticTrackUpdate
+	optimisticTrackUpdate,
+	selectClip
 } from "../../../redux/actions/objectVideoActions";
 
 const styles = theme => ({});
@@ -252,7 +253,17 @@ class ClipsTimeline extends Component {
 			this.props.updateTrackClips(
 				this.props.video.googleId,
 				this.props.track._id,
-				newClipArray
+				newClipArray,
+				track => {
+					let filteredClip = _.filter(track.clips, clip => {
+						return (
+							clip.end == end * this.props.videoDuration / 100 &&
+							clip.start == start * this.props.videoDuration / 100
+						);
+					});
+					console.log("selected clip: ", filteredClip[0]);
+					this.props.selectClip(filteredClip[0]);
+				}
 			);
 			this.setState({ updatedChannelClips: [] });
 		}
@@ -318,5 +329,6 @@ function mapStateToProps(state) {
 
 export default connect(mapStateToProps, {
 	updateTrackClips,
-	optimisticTrackUpdate
+	optimisticTrackUpdate,
+	selectClip
 })(withStyles(styles)(withRouter(ClipsTimeline)));

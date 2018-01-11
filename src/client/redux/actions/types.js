@@ -21,7 +21,6 @@ export const LOAD_HYPEDNA_VIDEO_DETAILS = "app/LOAD_HYPEDNA_VIDEO_DETAILS";
 export const LOAD_HYPEDNA_VIDEO_DETAILS_SUCCESS =
 	"app/LOAD_HYPEDNA_VIDEO_DETAILS_SUCCESS";
 export const CLEAR_LOADED_HYPEDNA_VIDEO = "app/CLEAR_LOADED_HYPEDNA_VIDEO";
-export const UPDATE_VIDEO_TRACK = "app/UPDATE_VIDEO_TRACK";
 
 /////////////////////////////////////////////////
 
@@ -38,5 +37,7 @@ export const UPDATE_PAGE_VIDEO_HOVER_TIME = "app/UPDATE_PAGE_VIDEO_HOVER_TIME";
 
 export const DELETE_VIDEO_SUCCESS = "app/DELETE_VIDEO_SUCCESS";
 export const DELETE_VIDEO = "app/DELETE_VIDEO";
+export const UPDATE_VIDEO_TRACK = "app/UPDATE_VIDEO_TRACK";
+export const SELECT_CLIP = "app/SELECT_CLIP";
 
 /////////////////////////////////////////////////

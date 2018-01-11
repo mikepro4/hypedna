@@ -5,6 +5,7 @@ import { withRouter } from "react-router-dom";
 import moment from "moment";
 import keydown from "react-keydown";
 import classNames from "classnames";
+import { selectClip } from "../../../redux/actions/objectVideoActions";
 
 const styles = theme => ({});
 
@@ -28,6 +29,15 @@ class Clip extends Component {
 			mousePressed: true
 		});
 		console.log("select clip here");
+		if (this.props.selectedClip && this.props.selectedClip._id) {
+			if (this.props.clip._id === this.props.selectedClip._id) {
+				this.deselectClip();
+			} else {
+				this.props.selectClip(this.props.clip);
+			}
+		} else {
+			this.props.selectClip(this.props.clip);
+		}
 	};
 
 	onMouseUp = () => {
@@ -59,7 +69,10 @@ class Clip extends Component {
 
 		let clipClasses = classNames({
 			clip: true,
-			"selected-clip": false
+			"selected-clip":
+				this.props.selectedClip && this.props.selectedClip._id
+					? this.props.clip._id === this.props.selectedClip._id
+					: false
 		});
 
 		return (
@@ -75,7 +88,12 @@ class Clip extends Component {
 					className="resize-left"
 					onMouseDown={this.props.resizeLeft.bind(this, this.props.clip)}
 				/>
-				<span className="clip-name">{this.props.clip.name}</span>
+				{this.props.clip._id ? (
+					<span className="clip-name">{this.props.clip.name}</span>
+				) : (
+					"saving..."
+				)}
+
 				<span
 					className="resize-right"
 					onMouseDown={this.props.resizeRight.bind(this, this.props.clip)}
@@ -91,10 +109,11 @@ function mapStateToProps(state) {
 		.asSeconds();
 	return {
 		video: state.pageVideo.singleVideo,
-		videoDuration: videoDuration
+		videoDuration: videoDuration,
+		selectedClip: state.pageVideo.selectedClip
 	};
 }
 
-export default connect(mapStateToProps, {})(
+export default connect(mapStateToProps, { selectClip })(
 	withStyles(styles)(withRouter(Clip))
 );
