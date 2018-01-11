@@ -91,6 +91,8 @@ class ClipsTimeline extends Component {
 	};
 
 	onMouseLeave = event => {
+		if (this.originalClips) this.props.track.clips = this.originalClips;
+
 		this.setState({
 			startedDragging: false,
 			startedEditing: false,
@@ -153,11 +155,6 @@ class ClipsTimeline extends Component {
 		if (this.state.startedMoving) {
 			console.log("moving clip");
 			const endPosition = this.calculateWidth(event);
-
-			let newClip = {};
-			if (endPosition < this.state.startPercent) {
-			} else if (endPosition > this.state.startPercent) {
-			}
 		}
 	};
 
@@ -265,6 +262,7 @@ class ClipsTimeline extends Component {
 					this.props.selectClip(filteredClip[0]);
 				}
 			);
+			this.originalClips = null;
 			this.setState({ updatedChannelClips: [] });
 		}
 	}
@@ -323,7 +321,8 @@ function mapStateToProps(state) {
 	return {
 		currentVideo: state.currentVideo,
 		video: state.pageVideo.singleVideo,
-		videoDuration: videoDuration
+		videoDuration: videoDuration,
+		selectedClip: state.pageVideo.selectedClip
 	};
 }
 
