@@ -48,7 +48,7 @@
 								width: 230px;
 								box-shadow: inset -1px 0 0 0 $grey;
 								margin: 0 10px 0 0;
-								padding: 0 35px 0 0;
+								// padding: 0 35px 0 0;
 								align-items: center;
 								font-size: 12px;
 								display: flex;
@@ -71,7 +71,7 @@
 								.track-play-button {
 									position: absolute;
 									right: 9px;
-									top: 7px;
+									top: 8px;
 								}
 							}
 							.video-single-track-clips {
@@ -129,4 +129,9 @@
 			flex-grow: 1;
 		}
 	}
+}
+
+.track-popover-container {
+	padding: 30px;
+	width: 200px;
 }

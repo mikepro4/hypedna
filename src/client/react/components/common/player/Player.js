@@ -167,6 +167,12 @@ class YoutubePlayer extends React.Component {
 
 		return (
 			<div className={videoClasses}>
+				<div
+					className="player-overlay"
+					onClick={() => {
+						this.playPauseSwitch();
+					}}
+				/>
 				<YouTube
 					videoId={this.props.currentVideo.videoId}
 					opts={videoPlayerOptions}
@@ -175,6 +181,7 @@ class YoutubePlayer extends React.Component {
 					onStop={this.onStop.bind(this)}
 					onPause={this.onPause.bind(this)}
 					onEnd={this.onEnd.bind(this)}
+					className="player-video"
 					onStateChange={this.onStateChange.bind(this)}
 				/>
 			</div>

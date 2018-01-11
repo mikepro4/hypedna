@@ -1,11 +1,15 @@
 import React, { Component } from "react";
 import moment from "moment";
+import ButtonBase from "material-ui/ButtonBase";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import { withStyles } from "material-ui/styles";
 import PlayCircleOutline from "material-ui-icons/PlayCircleOutline";
 import PauseCircleOutline from "material-ui-icons/PauseCircleOutline";
+import classNames from "classnames";
 import IconButton from "material-ui/IconButton";
+import Menu, { MenuItem, MenuList } from "material-ui/Menu";
+import Popover from "material-ui/Popover";
 import {
 	addTrack,
 	deleteTrack,
@@ -17,15 +21,94 @@ import { updateCurrentVideo } from "../../../redux/actions/";
 
 const styles = theme => ({
 	iconClass: {
-		width: "30px",
-		height: "30px"
+		width: "28px",
+		height: "28px"
+	},
+	root: {
+		transition: "all .1s",
+
+		"&:hover": {
+			color: "#000000",
+			background: "rgba(0,0,0,0.02)"
+		},
+
+		"&:active": {
+			color: "#ccc"
+		}
+	},
+	button: {
+		position: "absolute",
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		textAlign: "left",
+		width: "100%",
+		justifyContent: "left",
+		fontWeight: 300,
+		paddingRight: "40px"
 	}
 });
 
 class VideoContent extends Component {
+	state = {
+		trackMenuOpen: false,
+		anchorEl: null,
+		activeTrackId: null
+	};
+
+	handleTrackMenuOpen = (event, activeTrackId) => {
+		this.setState({
+			trackMenuOpen: true,
+			anchorEl: event.currentTarget,
+			activeTrackId
+		});
+	};
+
+	handleTrackMenuClose = () => {
+		this.setState({ trackMenuOpen: false, activeTrackId: null });
+	};
+
 	render() {
+		const { classes } = this.props;
+		const { anchorEl, popperOpen, activeTrackId } = this.state;
 		return (
 			<div className="video-content-container">
+				<Popover
+					open={this.state.trackMenuOpen}
+					anchorEl={this.state.anchorEl}
+					onClose={this.handleTrackMenuClose}
+					anchorOrigin={{
+						vertical: "bottom",
+						horizontal: "left"
+					}}
+				>
+					<div className="track-popover-container">
+						<button
+							onClick={() => {
+								this.props.deleteTrack(
+									this.props.video.googleId,
+									this.state.activeTrackId
+								);
+								this.handleTrackMenuClose();
+							}}
+						>
+							delete
+						</button>
+						<button
+							onClick={() => {
+								this.props.updateTrack(
+									this.props.video.googleId,
+									this.state.activeTrackId,
+									"updated category"
+								);
+								this.handleTrackMenuClose();
+							}}
+						>
+							update category
+						</button>
+					</div>
+				</Popover>
 				<div className="video-timeline-container">
 					{this.props.video.contentDetails && this.props.player ? (
 						<div className="video-progress-elements">
@@ -97,11 +180,20 @@ class VideoContent extends Component {
 										{this.props.video.tracks.map(track => (
 											<div className="video-single-track" key={track._id}>
 												<div className="video-single-track-info">
-													<div className="entity-avatar" />
-													<div className="enitity-display-name">
-														{track.category}
-													</div>
-
+													<ButtonBase
+														className={classNames(
+															this.props.classes.button,
+															this.props.classes.root
+														)}
+														onClick={event => {
+															this.handleTrackMenuOpen(event, track._id);
+														}}
+													>
+														<div className="entity-avatar" />
+														<div className="enitity-display-name">
+															{track.category}
+														</div>
+													</ButtonBase>
 													<div className="track-play-button">
 														<IconButton
 															className={this.props.classes.iconClass}
@@ -110,29 +202,8 @@ class VideoContent extends Component {
 														</IconButton>
 													</div>
 												</div>
-												<div className="video-single-track-clips">
-													<button
-														onClick={() => {
-															this.props.deleteTrack(
-																this.props.video.googleId,
-																track._id
-															);
-														}}
-													>
-														delete
-													</button>
-													<button
-														onClick={() => {
-															this.props.updateTrack(
-																this.props.video.googleId,
-																track._id,
-																"updated category"
-															);
-														}}
-													>
-														update category
-													</button>
-												</div>
+
+												<div className="video-single-track-clips" />
 											</div>
 										))}
 									</div>
