@@ -84,20 +84,11 @@ class Clip extends Component {
 				onMouseUp={this.onMouseUp.bind(this)}
 				onMouseLeave={this.onMouseLeave.bind(this)}
 			>
-				<span
-					className="resize-left"
-					onMouseDown={this.props.resizeLeft.bind(this, this.props.clip)}
-				/>
 				{this.props.clip._id ? (
 					<span className="clip-name">{this.props.clip.name}</span>
 				) : (
 					"saving..."
 				)}
-
-				<span
-					className="resize-right"
-					onMouseDown={this.props.resizeRight.bind(this, this.props.clip)}
-				/>
 			</div>
 		);
 	}

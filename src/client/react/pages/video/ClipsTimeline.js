@@ -16,16 +16,25 @@ import {
 const styles = theme => ({});
 
 class ClipsTimeline extends Component {
-	state = {
-		startedDragging: false,
-		startedEditing: false,
-		startedMoving: false,
-		startPercent: 0,
-		endPercent: 0,
-		ghostWidth: 0,
-		ghostDirection: null,
-		ghostEndPosition: 0,
-		updatedChannelClips: []
+	loadInitialState = () => {
+		this.setState({
+			startedDragging: false,
+			startedEditing: false,
+			startedMoving: false,
+			startPercent: 0,
+			endPercent: 0,
+			ghostWidth: 0,
+			ghostDirection: null,
+			ghostEndPosition: 0,
+			updatedClips: [],
+			updatedSingleClip: {},
+			originalClips: []
+		});
+		this.props.selectClip(null);
+	};
+
+	componentWillMount = () => {
+		this.loadInitialState();
 	};
 
 	@keydown("backspace")
@@ -33,23 +42,17 @@ class ClipsTimeline extends Component {
 		console.log("delete clip");
 	}
 
-	calculateWidth = event => {
-		const percent =
-			(event.pageX - this.refs.clip_timeline.getBoundingClientRect().x) *
-			100 /
-			this.refs.clip_timeline.getBoundingClientRect().width;
-		return percent;
-	};
-
 	onMouseDown = event => {
-		this.originalClips = this.props.track.clips;
+		// make a copy of track's clips for editing
+		this.setState({ originalClips: this.props.track.clips });
+
 		if (
 			event.target.className !== "clip" &&
 			event.target.className !== "clip-name" &&
 			event.target.className !== "resize-left" &&
 			event.target.className !== "resize-right"
 		) {
-			this.calculateWidth(event);
+			// enable drawing state
 			this.setState({
 				startedDragging: true,
 				startPercent: this.calculateWidth(event)
@@ -58,6 +61,7 @@ class ClipsTimeline extends Component {
 			event.target.className == "clip" ||
 			event.target.className == "clip-name"
 		) {
+			// enable moving state
 			this.setState({
 				startedMoving: true,
 				startPercent: this.calculateWidth(event)
@@ -65,126 +69,196 @@ class ClipsTimeline extends Component {
 		}
 	};
 
-	onMouseUp = event => {
-		this.props.track.clips = this.originalClips;
+	onMouseMove = event => {
 		if (this.state.startedDragging) {
-			this.calculateWidth(event);
-			this.setState(
-				{
-					startedDragging: false,
-					endPercent: this.calculateWidth(event),
-					ghostWidth: 0,
-					ghostEndPosition: 0
-				},
-				() => {
-					this.createClip();
-				}
-			);
+			this.handleDrawingClip(event);
+		} else if (this.state.startedMoving) {
+			this.handleMovingClip(event);
+		} else if (this.state.startedResizing) {
+		}
+	};
+
+	onMouseUp = event => {
+		if (this.state.startedDragging) {
+			// action after releasing mouse - new clip
+			this.handleCreateNewClip();
+		} else if (this.state.startedMoving) {
+			// action after releasing mouse - moving clip
+			this.handleMoveClip();
+		} else if (this.state.startedEditing) {
+			// action after releasing mouse - resizing clip
+			this.handleResizeClip();
 		}
 
-		this.setState({
-			startedEditing: false,
-			startedEditingLeft: false,
-			startedEditingRight: false,
-			startedMoving: false
-		});
+		// reset all states
+		this.loadInitialState();
 	};
 
 	onMouseLeave = event => {
-		if (this.originalClips) this.props.track.clips = this.originalClips;
+		this.loadInitialState();
+	};
+
+	handleDrawingClip = event => {
+		// replace rendered clips with a filtered copy
+		const updatedClips = this.getUpdatedTrackClips(
+			{
+				start: this.calculateStartEnd(event).newClipStart,
+				end: this.calculateStartEnd(event).newClipEnd
+			},
+			this.state.originalClips
+		);
+
+		this.props.track.clips = updatedClips;
 
 		this.setState({
-			startedDragging: false,
-			startedEditing: false,
-			startedMoving: false,
-			startPercent: 0,
-			endPercent: 0,
-			ghostWidth: 0,
-			ghostEndPosition: 0,
-			startedEditingLeft: false,
-			startedEditingRight: false
+			endPercent: this.calculateWidth(event),
+			updatedClips: updatedClips
+		});
+
+		this.calculateGhostStyle(event);
+	};
+
+	handleMovingClip = event => {
+		const filteredClipArray = _.filter(this.state.originalClips, clip => {
+			return clip._id == this.props.selectedClip._id;
+		});
+
+		let newMovedClip = {};
+		let diff =
+			this.calculateStartEnd(event).newClipEnd -
+			this.calculateStartEnd(event).newClipStart;
+
+		if (this.calculateStartEnd(event).endPosition >= this.state.startPercent) {
+			newMovedClip = _.assign({}, filteredClipArray[0], {
+				start: this.props.selectedClip.start + diff,
+				end: this.props.selectedClip.end + diff
+			});
+		} else if (
+			this.calculateStartEnd(event).endPosition <= this.state.startPercent
+		) {
+			newMovedClip = _.assign({}, filteredClipArray[0], {
+				start: this.props.selectedClip.start - diff,
+				end: this.props.selectedClip.end - diff
+			});
+		}
+
+		let cliptoUpdateIndex = _.findIndex(this.state.originalClips, {
+			_id: this.props.selectedClip._id
+		});
+
+		let newClipsArray = update(this.state.originalClips, {
+			$splice: [[cliptoUpdateIndex, 1, newMovedClip]]
+		});
+
+		const updatedClips = this.getUpdatedTrackClips(newMovedClip, newClipsArray);
+
+		this.props.optimisticTrackUpdate(
+			_.assign({}, this.props.track, { clips: updatedClips })
+		);
+
+		this.setState({
+			updatedSingleClip: newMovedClip,
+			updatedClips: updatedClips
 		});
 	};
 
-	onMouseMove = event => {
-		// Initial drawing logic
-		if (this.state.startedDragging) {
-			// populate clips with temporary array of filtered / trimmed clips while moving
-			this.props.track.clips = this.getUpdatedTrackClips(event);
-			let ghostWidth;
-			let ghostDirection = "";
-			let ghostEndPosition = 0;
-			const endPosition = this.calculateWidth(event);
+	handleEditingClip = () => {};
 
-			if (endPosition > this.state.startPercent) {
-				ghostWidth = endPosition - this.state.startPercent;
-				ghostDirection = "right";
-			} else {
-				ghostWidth = this.state.startPercent - endPosition;
-				ghostEndPosition = endPosition;
-				ghostDirection = "left";
-			}
-			this.setState(
-				{
-					ghostWidth: ghostWidth,
-					ghostDirection: ghostDirection,
-					ghostEndPosition: ghostEndPosition
-				},
-				() => {
-					let ghostStyle;
-					if (this.state.ghostDirection === "left") {
-						ghostStyle = {
-							width: this.state.ghostWidth * this.props.videoDuration / 100,
-							left: this.state.ghostEndPosition * this.props.videoDuration / 100
-						};
-						// this.props.dispatch(updateRangeTime(ghostStyle.left, ghostStyle.width, 'left'))
-					} else if (this.state.ghostDirection === "right") {
-						ghostStyle = {
-							left: this.state.startPercent * this.props.videoDuration / 100,
-							width: this.state.ghostWidth * this.props.videoDuration / 100
-						};
-						// this.props.dispatch(updateRangeTime(ghostStyle.left, ghostStyle.width, 'right'))
-					}
+	handleCreateNewClip = () => {
+		let { start, end } = 0;
+
+		start =
+			this.state.endPercent > this.state.startPercent
+				? this.state.startPercent
+				: this.state.endPercent;
+		end =
+			this.state.endPercent < this.state.startPercent
+				? this.state.startPercent
+				: this.state.endPercent;
+
+		const newClip = {
+			start: start * this.props.videoDuration / 100,
+			end: end * this.props.videoDuration / 100,
+			name: "Clip Name"
+		};
+
+		if (newClip.end - newClip.start / 100 > 1) {
+			let newClipsArray = this.state.updatedClips;
+			newClipsArray.push(newClip);
+
+			// Update track's clips immediately
+			this.props.optimisticTrackUpdate(
+				_.assign({}, this.props.track, { clips: newClipsArray })
+			);
+
+			// Send request and update in DB
+			this.props.updateTrackClips(
+				this.props.video.googleId,
+				this.props.track._id,
+				newClipsArray,
+				track => {
+					let filteredClip = _.filter(track.clips, clip => {
+						return clip.end == newClip.end && clip.start == newClip.start;
+					});
+					this.props.selectClip(filteredClip[0]);
 				}
 			);
 		}
-
-		// Resizing logic
-
-		// Moving logic
-		if (this.state.startedMoving) {
-			console.log("moving clip");
-			const endPosition = this.calculateWidth(event);
-		}
 	};
 
-	getUpdatedTrackClips = event => {
-		const endPosition = this.calculateWidth(event);
-		let { newClipStart, newClipEnd } = 0;
+	handleMoveClip = () => {
+		this.props.optimisticTrackUpdate(
+			_.assign({}, this.props.track, { clips: this.state.updatedClips })
+		);
+		this.props.updateTrackClips(
+			this.props.video.googleId,
+			this.props.track._id,
+			this.state.updatedClips,
+			track => {}
+		);
+	};
 
-		// select start and end based on left / right direction
-		if (endPosition > this.state.startPercent) {
-			newClipStart = this.state.startPercent * this.props.videoDuration / 100;
-			newClipEnd = endPosition * this.props.videoDuration / 100;
-		} else {
-			newClipEnd = this.state.startPercent * this.props.videoDuration / 100;
-			newClipStart = endPosition * this.props.videoDuration / 100;
-		}
+	handleResizeClip = () => {};
+
+	getUpdatedTrackClips = (newClip, clipsArray) => {
+		// trim and filter overlapping clips
+		const filteredClips = this.filterOverlappingClips(newClip, clipsArray);
+		const trimmedClips = this.trimOverlappingClips(newClip, filteredClips);
+		return trimmedClips;
+	};
+
+	filterOverlappingClips = (newClip, clipsArray) => {
+		const newClipStart = newClip.start;
+		const newClipEnd = newClip.end;
 
 		// filter completely overlapping clips
-		const filteredClips = _.filter(this.originalClips, clip => {
-			let start = clip.start;
-			let end = clip.end;
+		const filteredClips = _.filter(clipsArray, clip => {
+			if (
+				this.state.startedMoving &&
+				this.props.selectedClip &&
+				clip._id == this.props.selectedClip._id
+			) {
+				// don't filter the selected clip while moving
+				return true;
+			} else {
+				let start = clip.start;
+				let end = clip.end;
 
-			const startInRange = start >= newClipStart && start <= newClipEnd;
-			const endInRange = end >= newClipStart && end <= newClipEnd;
+				const startInRange = start >= newClipStart && start <= newClipEnd;
+				const endInRange = end >= newClipStart && end <= newClipEnd;
 
-			let inRange = startInRange && endInRange ? true : false;
+				let inRange = startInRange && endInRange ? true : false;
 
-			return !inRange;
+				return !inRange;
+			}
 		});
+		return filteredClips;
+	};
 
-		// trim partially overlapping clips
+	trimOverlappingClips = (newClip, filteredClips) => {
+		const newClipStart = newClip.start;
+		const newClipEnd = newClip.end;
+
 		const updatedChannelClips = _.map(filteredClips, clip => {
 			let start = clip.start;
 			let end = clip.end;
@@ -206,11 +280,15 @@ class ClipsTimeline extends Component {
 			};
 		});
 
-		this.setState({
-			updatedChannelClips: updatedChannelClips
-		});
-
 		return updatedChannelClips;
+	};
+
+	calculateWidth = event => {
+		const percent =
+			(event.pageX - this.refs.clip_timeline.getBoundingClientRect().x) *
+			100 /
+			this.refs.clip_timeline.getBoundingClientRect().width;
+		return percent;
 	};
 
 	calculateHoverSeconds = event => {
@@ -219,59 +297,45 @@ class ClipsTimeline extends Component {
 		return seekSeconds;
 	};
 
-	createClip() {
-		let { start, end } = 0;
+	calculateStartEnd = event => {
+		const endPosition = this.calculateWidth(event);
+		let { newClipStart, newClipEnd } = 0;
 
-		start =
-			this.state.endPercent > this.state.startPercent
-				? this.state.startPercent
-				: this.state.endPercent;
-		end =
-			this.state.endPercent < this.state.startPercent
-				? this.state.startPercent
-				: this.state.endPercent;
-
-		const newClip = {
-			start: start * this.props.videoDuration / 100,
-			end: end * this.props.videoDuration / 100,
-			name: "Clip Name"
-		};
-
-		if (
-			end * this.props.videoDuration / 100 -
-				start * this.props.videoDuration / 100 >
-			1
-		) {
-			let newClipArray = this.state.updatedChannelClips;
-			newClipArray.push(newClip);
-			this.props.optimisticTrackUpdate(
-				_.assign({}, this.props.track, { clips: newClipArray })
-			);
-			this.props.updateTrackClips(
-				this.props.video.googleId,
-				this.props.track._id,
-				newClipArray,
-				track => {
-					let filteredClip = _.filter(track.clips, clip => {
-						return (
-							clip.end == end * this.props.videoDuration / 100 &&
-							clip.start == start * this.props.videoDuration / 100
-						);
-					});
-					console.log("selected clip: ", filteredClip[0]);
-					this.props.selectClip(filteredClip[0]);
-				}
-			);
-			this.originalClips = null;
-			this.setState({ updatedChannelClips: [] });
+		// select start and end based on left / right direction
+		if (endPosition > this.state.startPercent) {
+			newClipStart = this.state.startPercent * this.props.videoDuration / 100;
+			newClipEnd = endPosition * this.props.videoDuration / 100;
+		} else {
+			newClipEnd = this.state.startPercent * this.props.videoDuration / 100;
+			newClipStart = endPosition * this.props.videoDuration / 100;
 		}
-	}
+		return { newClipStart, newClipEnd, endPosition };
+	};
 
-	resizeLeft = clip => {};
-	resizeRight = clip => {};
-	selectClip = clip => {};
+	calculateGhostStyle = event => {
+		let ghostWidth;
+		let ghostDirection = "";
+		let ghostEndPosition = 0;
 
-	render() {
+		if (this.calculateStartEnd(event).endPosition > this.state.startPercent) {
+			ghostWidth =
+				this.calculateStartEnd(event).endPosition - this.state.startPercent;
+			ghostDirection = "right";
+		} else {
+			ghostWidth =
+				this.state.startPercent - this.calculateStartEnd(event).endPosition;
+			ghostEndPosition = this.calculateStartEnd(event).endPosition;
+			ghostDirection = "left";
+		}
+
+		this.setState({
+			ghostWidth: ghostWidth,
+			ghostDirection: ghostDirection,
+			ghostEndPosition: ghostEndPosition
+		});
+	};
+
+	getGhostStyle = () => {
 		let ghostStyle = {};
 		if (this.state.ghostDirection === "left") {
 			ghostStyle = {
@@ -284,6 +348,10 @@ class ClipsTimeline extends Component {
 				width: this.state.ghostWidth + "%"
 			};
 		}
+		return ghostStyle;
+	};
+
+	render() {
 		return (
 			<div className="video-single-track-clips">
 				<div
@@ -294,18 +362,10 @@ class ClipsTimeline extends Component {
 					onMouseLeave={this.onMouseLeave}
 					onMouseMove={this.onMouseMove}
 				>
-					<div className="ghost-clip" style={ghostStyle} />
+					<div className="ghost-clip" style={this.getGhostStyle()} />
 					{this.props.track.clips
 						? this.props.track.clips.map((clip, i) => {
-								return (
-									<Clip
-										clip={clip}
-										resizeLeft={this.resizeLeft.bind(this)}
-										resizeRight={this.resizeRight.bind(this)}
-										clipPosition={i}
-										key={i}
-									/>
-								);
+								return <Clip clip={clip} clipPosition={i} key={i} />;
 							})
 						: ""}
 				</div>
