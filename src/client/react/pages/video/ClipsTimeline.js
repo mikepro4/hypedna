@@ -18,6 +18,7 @@ const styles = theme => ({});
 class ClipsTimeline extends Component {
 	loadInitialState = () => {
 		this.setState({
+			movedClip: false,
 			startedDragging: false,
 			startedEditing: false,
 			startedMoving: false,
@@ -30,7 +31,6 @@ class ClipsTimeline extends Component {
 			updatedSingleClip: {},
 			originalClips: []
 		});
-		this.props.selectClip(null);
 	};
 
 	componentWillMount = () => {
@@ -61,7 +61,6 @@ class ClipsTimeline extends Component {
 			event.target.className == "clip" ||
 			event.target.className == "clip-name"
 		) {
-			// enable moving state
 			this.setState({
 				startedMoving: true,
 				startPercent: this.calculateWidth(event)
@@ -82,19 +81,27 @@ class ClipsTimeline extends Component {
 		if (this.state.startedDragging) {
 			// action after releasing mouse - new clip
 			this.handleCreateNewClip();
+
+			console.log("handl create");
 		} else if (this.state.startedMoving) {
 			// action after releasing mouse - moving clip
-			this.handleMoveClip();
+			if (this.state.movedClip) {
+				console.log("handl move");
+
+				this.handleMoveClip();
+			}
 		} else if (this.state.startedEditing) {
 			// action after releasing mouse - resizing clip
 			this.handleResizeClip();
 		}
+		this.loadInitialState();
 
 		// reset all states
-		this.loadInitialState();
 	};
 
 	onMouseLeave = event => {
+		if (this.state.originalClips.length > 0)
+			this.props.track.clips = this.state.originalClips;
 		this.loadInitialState();
 	};
 
@@ -128,65 +135,120 @@ class ClipsTimeline extends Component {
 			this.calculateStartEnd(event).newClipEnd -
 			this.calculateStartEnd(event).newClipStart;
 
-		if (this.calculateStartEnd(event).endPosition >= this.state.startPercent) {
-			newMovedClip = _.assign({}, filteredClipArray[0], {
-				start: this.props.selectedClip.start + diff,
-				end: this.props.selectedClip.end + diff
+		if (diff > 0) {
+			this.setState({
+				movedClip: true
 			});
-		} else if (
-			this.calculateStartEnd(event).endPosition <= this.state.startPercent
-		) {
-			newMovedClip = _.assign({}, filteredClipArray[0], {
-				start: this.props.selectedClip.start - diff,
-				end: this.props.selectedClip.end - diff
+
+			if (
+				this.calculateStartEnd(event).endPosition >= this.state.startPercent
+			) {
+				newMovedClip = _.assign({}, filteredClipArray[0], {
+					start: this.props.selectedClip.start + diff,
+					end: this.props.selectedClip.end + diff
+				});
+			} else if (
+				this.calculateStartEnd(event).endPosition <= this.state.startPercent
+			) {
+				newMovedClip = _.assign({}, filteredClipArray[0], {
+					start: this.props.selectedClip.start - diff,
+					end: this.props.selectedClip.end - diff
+				});
+			}
+
+			let cliptoUpdateIndex = _.findIndex(this.state.originalClips, {
+				_id: this.props.selectedClip._id
 			});
+
+			let newClipsArray = update(this.state.originalClips, {
+				$splice: [[cliptoUpdateIndex, 1, newMovedClip]]
+			});
+
+			const updatedClips = this.getUpdatedTrackClips(
+				newMovedClip,
+				newClipsArray
+			);
+			if (updatedClips.length > 0) {
+				this.props.track.clips = updatedClips;
+				console.log(updatedClips);
+
+				// this.props.optimisticTrackUpdate(
+				// 	_.assign({}, this.props.track, { clips: updatedClips })
+				// );
+
+				this.setState({
+					updatedSingleClip: newMovedClip,
+					updatedClips: updatedClips
+				});
+			}
 		}
-
-		let cliptoUpdateIndex = _.findIndex(this.state.originalClips, {
-			_id: this.props.selectedClip._id
-		});
-
-		let newClipsArray = update(this.state.originalClips, {
-			$splice: [[cliptoUpdateIndex, 1, newMovedClip]]
-		});
-
-		const updatedClips = this.getUpdatedTrackClips(newMovedClip, newClipsArray);
-
-		this.props.optimisticTrackUpdate(
-			_.assign({}, this.props.track, { clips: updatedClips })
-		);
-
-		this.setState({
-			updatedSingleClip: newMovedClip,
-			updatedClips: updatedClips
-		});
 	};
 
 	handleEditingClip = () => {};
 
 	handleCreateNewClip = () => {
 		let { start, end } = 0;
+		console.log(this.state.endPercent);
 
-		start =
-			this.state.endPercent > this.state.startPercent
-				? this.state.startPercent
-				: this.state.endPercent;
-		end =
-			this.state.endPercent < this.state.startPercent
-				? this.state.startPercent
-				: this.state.endPercent;
+		if (this.state.endPercent == 0) {
+			console.log("just click");
+			this.addFixSizeClip();
+		} else if (this.state.endPercent > 0) {
+			start =
+				this.state.endPercent > this.state.startPercent
+					? this.state.startPercent
+					: this.state.endPercent;
+			end =
+				this.state.endPercent < this.state.startPercent
+					? this.state.startPercent
+					: this.state.endPercent;
 
+			const newClip = {
+				start: start * this.props.videoDuration / 100,
+				end: end * this.props.videoDuration / 100,
+				name: "Clip Name 2"
+			};
+			console.log(newClip);
+
+			if (newClip.end - newClip.start > 0) {
+				let newClipsArray = this.state.updatedClips;
+				newClipsArray.push(newClip);
+
+				// Update track's clips immediately
+				this.props.optimisticTrackUpdate(
+					_.assign({}, this.props.track, { clips: newClipsArray })
+				);
+
+				// Send request and update in DB
+				this.props.updateTrackClips(
+					this.props.video.googleId,
+					this.props.track._id,
+					newClipsArray,
+					track => {
+						let filteredClip = _.filter(track.clips, clip => {
+							return clip.end == newClip.end && clip.start == newClip.start;
+						});
+						this.props.selectClip(filteredClip[0]);
+					}
+				);
+			} else {
+				this.addFixSizeClip();
+			}
+		}
+	};
+
+	addFixSizeClip = () => {
 		const newClip = {
-			start: start * this.props.videoDuration / 100,
-			end: end * this.props.videoDuration / 100,
-			name: "Clip Name"
+			start: this.state.startPercent * this.props.videoDuration / 100,
+			end: (this.state.startPercent + 1) * this.props.videoDuration / 100,
+			name: "Clip Name 2"
 		};
+		let newClipsArray = this.state.originalClips;
+		newClipsArray.push(newClip);
 
-		if (newClip.end - newClip.start / 100 > 1) {
-			let newClipsArray = this.state.updatedClips;
-			newClipsArray.push(newClip);
-
-			// Update track's clips immediately
+		// Update track's clips immediately
+		if (this.state.originalClips.length > 0) {
+			console.log(this.state.originalClips);
 			this.props.optimisticTrackUpdate(
 				_.assign({}, this.props.track, { clips: newClipsArray })
 			);
@@ -203,6 +265,8 @@ class ClipsTimeline extends Component {
 					this.props.selectClip(filteredClip[0]);
 				}
 			);
+		} else {
+			console.log("else here");
 		}
 	};
 
@@ -216,6 +280,8 @@ class ClipsTimeline extends Component {
 			this.state.updatedClips,
 			track => {}
 		);
+		// refresh clip that's selected to updated start / end
+		this.props.selectClip(this.state.updatedSingleClip);
 	};
 
 	handleResizeClip = () => {};

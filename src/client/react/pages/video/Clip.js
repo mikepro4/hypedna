@@ -36,7 +36,9 @@ class Clip extends Component {
 				this.props.selectClip(this.props.clip);
 			}
 		} else {
-			this.props.selectClip(this.props.clip);
+			if (this.props.clip._id) {
+				this.props.selectClip(this.props.clip);
+			}
 		}
 	};
 
