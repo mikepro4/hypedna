@@ -10,10 +10,6 @@ import { selectClip } from "../../../redux/actions/objectVideoActions";
 const styles = theme => ({});
 
 class Clip extends Component {
-	state = {
-		mousePressed: false
-	};
-
 	calculateClipPosition = seconds => {
 		const left = seconds * 100 / this.props.videoDuration + "%";
 		return left;
@@ -24,23 +20,11 @@ class Clip extends Component {
 		return width;
 	};
 
-	onClipClick = event => {
-		this.setState({
-			mousePressed: true
-		});
-	};
+	onClipClick = event => {};
 
-	onMouseUp = () => {
-		this.setState({
-			mousePressed: false
-		});
-	};
+	onMouseUp = () => {};
 
-	onMouseLeave = () => {
-		this.setState({
-			mousePressed: false
-		});
-	};
+	onMouseLeave = () => {};
 
 	onDoubleClick = event => {
 		console.log("start playing clip");

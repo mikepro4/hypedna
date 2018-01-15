@@ -7,14 +7,35 @@ import {
 	CLEAR_LOADED_HYPEDNA_VIDEO,
 	UPDATE_PAGE_VIDEO_HOVER_TIME,
 	UPDATE_VIDEO_TRACK,
-	SELECT_CLIP
+	SELECT_CLIP,
+	RESET_EDITOR,
+	UPDATE_EDITOR
 } from "../actions/types";
+
+const initialEditorState = {
+	movedClip: false,
+	startedDrawing: false,
+	startedEditing: false,
+	startedEditingLeft: false,
+	startedEditingRight: false,
+	startedMoving: false,
+	startPercent: 0,
+	endPercent: 0,
+	ghostWidth: 0,
+	ghostDirection: null,
+	ghostEndPosition: 0,
+	updatedClips: [],
+	updatedSingleClip: {},
+	editingTrack: null,
+	editingTimeline: null
+};
 
 export const initialState = {
 	singleVideo: {},
 	hoverTime: null,
 	selectedClip: null,
-	isFetching: false
+	isFetching: false,
+	editor: initialEditorState
 };
 
 export const pageVideoReducer = (state = initialState, action) => {
@@ -32,6 +53,8 @@ export const pageVideoReducer = (state = initialState, action) => {
 				singleVideo: action.payload,
 				isFetching: false
 			});
+		case CLEAR_LOADED_HYPEDNA_VIDEO:
+			return assign({}, state, { singleVideo: {}, isFetching: false });
 		case UPDATE_VIDEO_TRACK: {
 			let tracktoUpdateIndex = _.findIndex(state.singleVideo.tracks, {
 				_id: action.payload._id
@@ -46,8 +69,15 @@ export const pageVideoReducer = (state = initialState, action) => {
 			return assign({}, state, {
 				selectedClip: action.clip
 			});
-		case CLEAR_LOADED_HYPEDNA_VIDEO:
-			return assign({}, state, { singleVideo: {}, isFetching: false });
+		case RESET_EDITOR:
+			return assign({}, state, {
+				editor: initialEditorState
+			});
+		case UPDATE_EDITOR:
+			let editorObj = assign({}, state.editor, action.editor);
+			return assign({}, state, {
+				editor: editorObj
+			});
 		default:
 			return state;
 	}

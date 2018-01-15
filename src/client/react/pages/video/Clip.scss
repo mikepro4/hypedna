@@ -15,30 +15,28 @@
 
 	.resize-left {
 		display: none;
-		width: 9px;
-		height: 9px;
+		width: 5px;
 		position: absolute;
-		top: 6px;
-		left: -6px;
+		top: 0px;
+		left: 0px;
+		bottom: 0;
 		background: $white;
-		border-radius: 10px;
 		position: absolute;
 		border: 1px solid $black;
-		cursor: w-resize;
+		cursor: col-resize;
 	}
 
 	.resize-right {
 		display: none;
-		width: 9px;
-		height: 9px;
+		width: 5px;
 		position: absolute;
-		top: 6px;
-		right: -6px;
+		top: 0px;
+		right: 0px;
+		bottom: 0;
 		background: $white;
-		border-radius: 10px;
 		position: absolute;
 		border: 1px solid $black;
-		cursor: e-resize;
+		cursor: col-resize;
 	}
 
 	&.selected-clip {
@@ -52,11 +50,8 @@
 			opacity: 0;
 			display: block;
 			transition: all 0.1s;
-		}
 
-		&:hover {
-			.resize-left,
-			.resize-right {
+			&:hover {
 				opacity: 1;
 			}
 		}

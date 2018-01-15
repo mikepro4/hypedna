@@ -40,4 +40,9 @@ export const DELETE_VIDEO = "app/DELETE_VIDEO";
 export const UPDATE_VIDEO_TRACK = "app/UPDATE_VIDEO_TRACK";
 export const SELECT_CLIP = "app/SELECT_CLIP";
 
+// editor
+
+export const RESET_EDITOR = "app/RESET_EDITOR";
+export const UPDATE_EDITOR = "app/UPDATE_EDITOR";
+
 /////////////////////////////////////////////////

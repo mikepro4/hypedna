@@ -3,7 +3,9 @@ import {
 	DELETE_VIDEO,
 	DELETE_VIDEO_SUCCESS,
 	UPDATE_VIDEO_TRACK,
-	SELECT_CLIP
+	SELECT_CLIP,
+	RESET_EDITOR,
+	UPDATE_EDITOR
 } from "./types";
 import { loadHypednaVideoDetails } from "./pageVideoActions";
 
@@ -131,5 +133,20 @@ export const selectClip = clip => dispatch => {
 	dispatch({
 		type: SELECT_CLIP,
 		clip
+	});
+};
+
+// Editor actions
+
+export const resetEditor = () => dispatch => {
+	dispatch({
+		type: RESET_EDITOR
+	});
+};
+
+export const updateEditor = editor => dispatch => {
+	dispatch({
+		type: UPDATE_EDITOR,
+		editor
 	});
 };
