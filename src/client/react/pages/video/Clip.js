@@ -5,11 +5,13 @@ import { withRouter } from "react-router-dom";
 import moment from "moment";
 import keydown from "react-keydown";
 import classNames from "classnames";
+import shouldPureComponentUpdate from "react-pure-render/function";
 import { selectClip } from "../../../redux/actions/objectVideoActions";
 
 const styles = theme => ({});
 
 class Clip extends Component {
+	shouldComponentUpdate = shouldPureComponentUpdate;
 	calculateClipPosition = seconds => {
 		const left = seconds * 100 / this.props.videoDuration + "%";
 		return left;

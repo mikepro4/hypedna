@@ -58,14 +58,31 @@ const styles = theme => ({
 });
 
 class VideoTracks extends Component {
-	state = {
-		trackMenuOpen: false,
-		anchorEl: null,
-		activeTrackId: null
+	loadInitialState = () => {
+		this.setState({
+			trackMenuOpen: false,
+			anchorEl: null,
+			activeTrackId: null,
+			movedClip: false,
+			startedDrawing: false,
+			startedEditing: false,
+			startedEditingLeft: false,
+			startedEditingRight: false,
+			startedMoving: false,
+			startPercent: 0,
+			endPercent: 0,
+			ghostWidth: 0,
+			ghostDirection: null,
+			ghostEndPosition: 0,
+			updatedClips: [],
+			updatedSingleClip: {},
+			editingTrack: null,
+			editingTimeline: null
+		});
 	};
 
 	componentWillMount = () => {
-		this.props.resetEditor();
+		this.loadInitialState();
 	};
 
 	componentDidMount = () => {
@@ -83,8 +100,8 @@ class VideoTracks extends Component {
 	pageMouseDown = () => {
 		console.log("page mouse down");
 
-		if (this.props.editor.editingTimeline) {
-			this.props.updateEditor({
+		if (this.state.editingTimeline) {
+			this.setState({
 				startPercent: this.calculatePercentFromClick(event),
 				endPercent: 0
 			});
@@ -100,18 +117,18 @@ class VideoTracks extends Component {
 				) {
 					console.log("clicked on clip : started moving");
 
-					this.props.updateEditor({
+					this.setState({
 						startedMoving: true
 					});
 				} else {
 					console.log("started resizing");
-					this.props.updateEditor({
+					this.setState({
 						startedEditing: true
 					});
 				}
 			} else {
 				console.log("clicked on timeline : started drawing");
-				this.props.updateEditor({
+				this.setState({
 					startedDrawing: true
 				});
 			}
@@ -120,26 +137,26 @@ class VideoTracks extends Component {
 
 	pageMouseUp = () => {
 		console.log("page mouse up");
-		if (this.props.editor.startedDrawing) {
+		if (this.state.startedDrawing) {
 			console.log("create clip after drawing");
 			this.handleCreateNewClip();
-		} else if (this.props.editor.startedMoving) {
-			if (this.props.editor.movedClip) {
+		} else if (this.state.startedMoving) {
+			if (this.state.movedClip) {
 				console.log("update track after moving");
 				this.handleMoveClip();
 			}
-		} else if (this.props.editor.startedEditing) {
+		} else if (this.state.startedEditing) {
 			this.handleMoveClip();
 		}
-		this.props.resetEditor();
+		this.loadInitialState();
 	};
 
 	pageMouseMove = () => {
-		if (this.props.editor.startedDrawing) {
+		if (this.state.startedDrawing) {
 			this.handleDrawingClip(event);
-		} else if (this.props.editor.startedMoving) {
+		} else if (this.state.startedMoving) {
 			this.handleMovingClip(event);
-		} else if (this.props.editor.startedEditing) {
+		} else if (this.state.startedEditing) {
 			console.log("resizing here");
 			this.handleResizingClip(event);
 		}
@@ -168,19 +185,19 @@ class VideoTracks extends Component {
 
 		const updatedClips = this.getUpdatedTrackClips(
 			newClip,
-			this.props.editor.editingTrack.clips
+			this.state.editingTrack.clips
 		);
 
 		// this.props.optimisticTrackUpdate(
-		// 	_.assign({}, this.props.editor.editingTrack, { clips: updatedClips })
+		// 	_.assign({}, this.state.editingTrack, { clips: updatedClips })
 		// );
 
-		let updatedTrack = _.assign({}, this.props.editor.editingTrack, {
+		let updatedTrack = _.assign({}, this.state.editingTrack, {
 			clips: updatedClips
 		});
 
 		let tracktoUpdateIndex = _.findIndex(this.props.video.tracks, {
-			_id: this.props.editor.editingTrack._id
+			_id: this.state.editingTrack._id
 		});
 		// ghetto as fuck but improves performance
 		this.props.video.tracks[tracktoUpdateIndex] = updatedTrack;
@@ -194,23 +211,19 @@ class VideoTracks extends Component {
 			endPercent = this.calculatePercentFromClick(event);
 		}
 
-		this.props.updateEditor({
+		this.setState({
 			endPercent: endPercent,
 			updatedClips: updatedClips,
 			updatedSingleClip: newClip
 		});
-
 		this.calculateGhostStyle(event);
 	};
 
 	handleMovingClip = event => {
 		console.log("moving clip");
-		const filteredClipArray = _.filter(
-			this.props.editor.editingTrack.clips,
-			clip => {
-				return clip._id == this.props.selectedClip._id;
-			}
-		);
+		const filteredClipArray = _.filter(this.state.editingTrack.clips, clip => {
+			return clip._id == this.props.selectedClip._id;
+		});
 
 		let newMovedClip = {};
 		let diff =
@@ -218,21 +231,19 @@ class VideoTracks extends Component {
 			this.calculateStartEnd(event).newClipStart;
 
 		if (diff > 0) {
-			this.props.updateEditor({
+			this.setState({
 				movedClip: true
 			});
 
 			if (
-				this.calculateStartEnd(event).endPosition >=
-				this.props.editor.startPercent
+				this.calculateStartEnd(event).endPosition >= this.state.startPercent
 			) {
 				newMovedClip = _.assign({}, filteredClipArray[0], {
 					start: this.props.selectedClip.start + diff,
 					end: this.props.selectedClip.end + diff
 				});
 			} else if (
-				this.calculateStartEnd(event).endPosition <=
-				this.props.editor.startPercent
+				this.calculateStartEnd(event).endPosition <= this.state.startPercent
 			) {
 				newMovedClip = _.assign({}, filteredClipArray[0], {
 					start: this.props.selectedClip.start - diff,
@@ -252,14 +263,11 @@ class VideoTracks extends Component {
 				newMovedClip.start = this.props.videoDuration - clipDuration;
 			}
 
-			let cliptoUpdateIndex = _.findIndex(
-				this.props.editor.editingTrack.clips,
-				{
-					_id: this.props.selectedClip._id
-				}
-			);
+			let cliptoUpdateIndex = _.findIndex(this.state.editingTrack.clips, {
+				_id: this.props.selectedClip._id
+			});
 
-			let newClipsArray = update(this.props.editor.editingTrack.clips, {
+			let newClipsArray = update(this.state.editingTrack.clips, {
 				$splice: [[cliptoUpdateIndex, 1, newMovedClip]]
 			});
 
@@ -270,20 +278,20 @@ class VideoTracks extends Component {
 
 			if (updatedClips.length > 0) {
 				// this.props.optimisticTrackUpdate(
-				// 	_.assign({}, this.props.editor.editingTrack, { clips: updatedClips })
+				// 	_.assign({}, this.state.editingTrack, { clips: updatedClips })
 				// );
 
-				let updatedTrack = _.assign({}, this.props.editor.editingTrack, {
+				let updatedTrack = _.assign({}, this.state.editingTrack, {
 					clips: updatedClips
 				});
 
 				let tracktoUpdateIndex = _.findIndex(this.props.video.tracks, {
-					_id: this.props.editor.editingTrack._id
+					_id: this.state.editingTrack._id
 				});
 				// ghetto as fuck but improves performance
 				this.props.video.tracks[tracktoUpdateIndex] = updatedTrack;
 
-				this.props.updateEditor({
+				this.setState({
 					updatedSingleClip: newMovedClip,
 					updatedClips: updatedClips
 				});
@@ -294,7 +302,7 @@ class VideoTracks extends Component {
 	handleResizingClip = event => {
 		console.log("resizing clip");
 		let newClip = {};
-		if (this.props.editor.startedEditingLeft) {
+		if (this.state.startedEditingLeft) {
 			console.log("editing left handle");
 
 			if (this.calculateSecondsFromClick(event) < this.props.selectedClip.end) {
@@ -308,7 +316,7 @@ class VideoTracks extends Component {
 					end: this.calculateSecondsFromClick(event)
 				});
 			}
-		} else if (this.props.editor.startedEditingRight) {
+		} else if (this.state.startedEditingRight) {
 			console.log("editing right handle");
 			if (
 				this.calculateSecondsFromClick(event) > this.props.selectedClip.start
@@ -341,11 +349,11 @@ class VideoTracks extends Component {
 			newClip.start = this.props.videoDuration - clipDuration - offsetDiff;
 		}
 
-		let cliptoUpdateIndex = _.findIndex(this.props.editor.editingTrack.clips, {
+		let cliptoUpdateIndex = _.findIndex(this.state.editingTrack.clips, {
 			_id: this.props.selectedClip._id
 		});
 
-		let newClipsArray = update(this.props.editor.editingTrack.clips, {
+		let newClipsArray = update(this.state.editingTrack.clips, {
 			$splice: [[cliptoUpdateIndex, 1, newClip]]
 		});
 
@@ -353,9 +361,9 @@ class VideoTracks extends Component {
 
 		if (updatedClips.length > 0) {
 			this.props.optimisticTrackUpdate(
-				_.assign({}, this.props.editor.editingTrack, { clips: updatedClips })
+				_.assign({}, this.state.editingTrack, { clips: updatedClips })
 			);
-			this.props.updateEditor({
+			this.setState({
 				updatedSingleClip: newClip,
 				updatedClips: updatedClips
 			});
@@ -365,24 +373,18 @@ class VideoTracks extends Component {
 	handleCreateNewClip = () => {
 		let { start, end } = 0;
 
-		if (
-			this.props.editor.endPercent == 0 &&
-			this.props.editor.ghostWidth == 0
-		) {
+		if (this.state.endPercent == 0 && this.state.ghostWidth == 0) {
 			console.log("create fixed size clip");
 			this.addFixSizeClip();
-		} else if (
-			this.props.editor.endPercent > 0 ||
-			this.props.editor.ghostWidth > 0
-		) {
+		} else if (this.state.endPercent > 0 || this.state.ghostWidth > 0) {
 			start =
-				this.props.editor.endPercent > this.props.editor.startPercent
-					? this.calculateSecondsFromPercent(this.props.editor.startPercent)
-					: this.calculateSecondsFromPercent(this.props.editor.endPercent);
+				this.state.endPercent > this.state.startPercent
+					? this.calculateSecondsFromPercent(this.state.startPercent)
+					: this.calculateSecondsFromPercent(this.state.endPercent);
 			end =
-				this.props.editor.endPercent < this.props.editor.startPercent
-					? this.calculateSecondsFromPercent(this.props.editor.startPercent)
-					: this.calculateSecondsFromPercent(this.props.editor.endPercent);
+				this.state.endPercent < this.state.startPercent
+					? this.calculateSecondsFromPercent(this.state.startPercent)
+					: this.calculateSecondsFromPercent(this.state.endPercent);
 
 			if (start < 0) {
 				start = 0;
@@ -405,15 +407,15 @@ class VideoTracks extends Component {
 	addFixSizeClip = () => {
 		console.log("addFixSizeClip");
 		const newClip = {
-			start: this.calculateSecondsFromPercent(this.props.editor.startPercent),
-			end: this.calculateSecondsFromPercent(this.props.editor.startPercent + 1),
+			start: this.calculateSecondsFromPercent(this.state.startPercent),
+			end: this.calculateSecondsFromPercent(this.state.startPercent + 1),
 			name: "Clip Name 2"
 		};
-		let newClipsArray = this.props.editor.editingTrack.clips;
+		let newClipsArray = this.state.editingTrack.clips;
 
 		newClipsArray.push(newClip);
 
-		if (this.props.editor.editingTrack.clips.length > 0) {
+		if (this.state.editingTrack.clips.length > 0) {
 			this.addNewClipAndSelect(newClipsArray, newClip);
 		}
 	};
@@ -422,13 +424,13 @@ class VideoTracks extends Component {
 		console.log("addNewClipAndSelect");
 		// Update track's clips immediately
 		this.props.optimisticTrackUpdate(
-			_.assign({}, this.props.editor.editingTrack, { clips: newClipsArray })
+			_.assign({}, this.state.editingTrack, { clips: newClipsArray })
 		);
 
 		// Send request and update in DB
 		this.props.updateTrackClips(
 			this.props.video.googleId,
-			this.props.editor.editingTrack._id,
+			this.state.editingTrack._id,
 			newClipsArray,
 			track => {
 				let filteredClip = _.filter(track.clips, clip => {
@@ -447,7 +449,7 @@ class VideoTracks extends Component {
 			name: "Clip Name 2"
 		};
 
-		let newClipsArray = this.props.editor.updatedClips;
+		let newClipsArray = this.state.updatedClips;
 		newClipsArray.push(newClip);
 		this.addNewClipAndSelect(newClipsArray, newClip);
 	};
@@ -455,18 +457,18 @@ class VideoTracks extends Component {
 	handleMoveClip = () => {
 		console.log("handleMoveClip");
 		this.props.optimisticTrackUpdate(
-			_.assign({}, this.props.editor.editingTrack, {
-				clips: this.props.editor.updatedClips
+			_.assign({}, this.state.editingTrack, {
+				clips: this.state.updatedClips
 			})
 		);
 		this.props.updateTrackClips(
 			this.props.video.googleId,
-			this.props.editor.editingTrack._id,
-			this.props.editor.updatedClips,
+			this.state.editingTrack._id,
+			this.state.updatedClips,
 			track => {}
 		);
 		// refresh clip that's selected to updated start / end
-		this.props.selectClip(this.props.editor.updatedSingleClip);
+		this.props.selectClip(this.state.updatedSingleClip);
 	};
 
 	handleTrackMenuOpen = (event, activeTrackId) => {
@@ -495,7 +497,7 @@ class VideoTracks extends Component {
 		// filter completely overlapping clips
 		const filteredClips = _.filter(clipsArray, clip => {
 			if (
-				(this.props.editor.startedMoving || this.props.editor.startedEditing) &&
+				(this.state.startedMoving || this.state.startedEditing) &&
 				this.props.selectedClip &&
 				clip._id == this.props.selectedClip._id
 			) {
@@ -545,7 +547,7 @@ class VideoTracks extends Component {
 	};
 
 	getClickedClip = event => {
-		let matchedClip = _.filter(this.props.editor.editingTrack.clips, clip => {
+		let matchedClip = _.filter(this.state.editingTrack.clips, clip => {
 			let clickedSecond = this.calculateSecondsFromClick(event);
 			return clickedSecond >= clip.start && clickedSecond <= clip.end;
 		});
@@ -557,13 +559,11 @@ class VideoTracks extends Component {
 		let { newClipStart, newClipEnd } = 0;
 
 		// select start and end based on left / right direction
-		if (endPosition > this.props.editor.startPercent) {
-			newClipStart =
-				this.props.editor.startPercent * this.props.videoDuration / 100;
+		if (endPosition > this.state.startPercent) {
+			newClipStart = this.state.startPercent * this.props.videoDuration / 100;
 			newClipEnd = endPosition * this.props.videoDuration / 100;
 		} else {
-			newClipEnd =
-				this.props.editor.startPercent * this.props.videoDuration / 100;
+			newClipEnd = this.state.startPercent * this.props.videoDuration / 100;
 			newClipStart = endPosition * this.props.videoDuration / 100;
 		}
 		return { newClipStart, newClipEnd, endPosition };
@@ -575,7 +575,7 @@ class VideoTracks extends Component {
 		let ghostEndPosition = 0;
 
 		console.log(
-			this.calculateStartEnd(event).endPosition > this.props.editor.startPercent
+			this.calculateStartEnd(event).endPosition > this.state.startPercent
 		);
 
 		let endPosition;
@@ -587,52 +587,48 @@ class VideoTracks extends Component {
 			endPosition = this.calculateStartEnd(event).endPosition;
 		}
 
-		if (
-			this.calculateStartEnd(event).endPosition > this.props.editor.startPercent
-		) {
+		if (this.calculateStartEnd(event).endPosition > this.state.startPercent) {
 			if (this.calculateStartEnd(event).endPosition > 100) {
 				ghostWidth =
 					this.calculateStartEnd(event).endPosition -
-					this.props.editor.startPercent -
+					this.state.startPercent -
 					(this.calculateStartEnd(event).endPosition - 100);
 			} else {
 				ghostWidth =
-					this.calculateStartEnd(event).endPosition -
-					this.props.editor.startPercent;
+					this.calculateStartEnd(event).endPosition - this.state.startPercent;
 			}
 
 			ghostDirection = "right";
 		} else {
 			if (this.calculateStartEnd(event).endPosition < 0) {
 				ghostWidth =
-					this.props.editor.startPercent -
+					this.state.startPercent -
 					this.calculateStartEnd(event).endPosition -
 					Math.abs(this.calculateStartEnd(event).endPosition);
 			} else {
 				ghostWidth =
-					this.props.editor.startPercent -
-					this.calculateStartEnd(event).endPosition;
+					this.state.startPercent - this.calculateStartEnd(event).endPosition;
 			}
 			ghostEndPosition = endPosition;
 			ghostDirection = "left";
 		}
 
-		this.props.updateEditor({
+		this.setState({
 			ghostWidth: ghostWidth,
 			ghostDirection: ghostDirection,
 			ghostEndPosition: ghostEndPosition
 		});
 
-		// if(this.props.editor.updatedSingleClip.end > this.props.editor.updatedSingleClip.start) {
+		// if(this.state.updatedSingleClip.end > this.state.updatedSingleClip.start) {
 		//   	ghostWidth =
-		// 			(this.props.editor.updatedSingleClip.end -
-		// 			this.props.editor.updatedSingleClip.start) * this.props.videoDuration / 100;
+		// 			(this.state.updatedSingleClip.end -
+		// 			this.state.updatedSingleClip.start) * this.props.videoDuration / 100;
 		// 		ghostDirection = "right";
 		// }
 	};
 
 	calculatePercentFromClick = event => {
-		const timeline = this.props.editor.editingTimeline;
+		const timeline = this.state.editingTimeline;
 		const percent = (event.pageX - timeline.x) * 100 / timeline.width;
 		return percent;
 	};
@@ -645,6 +641,10 @@ class VideoTracks extends Component {
 
 	calculateSecondsFromPercent = percent => {
 		return percent * this.props.videoDuration / 100;
+	};
+
+	updateEditor = state => {
+		this.setState(state);
 	};
 
 	render() {
@@ -685,6 +685,8 @@ class VideoTracks extends Component {
 											<ClipsTimeline
 												onMouseDown={this.mouseDownHandler}
 												onMouseUp={this.mouseUpHandler}
+												editor={this.state}
+												updateEditor={this.updateEditor}
 												track={track}
 											/>
 										</div>

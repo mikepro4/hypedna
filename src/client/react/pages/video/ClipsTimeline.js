@@ -6,9 +6,10 @@ import keydown from "react-keydown";
 import update from "immutability-helper";
 import * as _ from "lodash";
 import Clip from "./Clip";
-import { updateEditor } from "../../../redux/actions/objectVideoActions";
+import shouldPureComponentUpdate from "react-pure-render/function";
 
 class ClipsTimeline extends Component {
+	shouldComponentUpdate = shouldPureComponentUpdate;
 	componentWillMount = () => {};
 
 	onMouseDown = event => {
@@ -88,11 +89,8 @@ function mapStateToProps(state) {
 		currentVideo: state.currentVideo,
 		video: state.pageVideo.singleVideo,
 		videoDuration: videoDuration,
-		selectedClip: state.pageVideo.selectedClip,
-		editor: state.pageVideo.editor
+		selectedClip: state.pageVideo.selectedClip
 	};
 }
 
-export default connect(mapStateToProps, {
-	updateEditor
-})(withRouter(ClipsTimeline));
+export default connect(mapStateToProps, {})(withRouter(ClipsTimeline));
