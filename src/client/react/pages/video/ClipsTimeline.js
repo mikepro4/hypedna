@@ -18,6 +18,8 @@ class ClipsTimeline extends Component {
 			movedClip: false,
 			startedDrawing: false,
 			startedEditing: false,
+			startedEditingLeft: false,
+			startedEditingRight: false,
 			startedMoving: false,
 			startPercent: 0,
 			endPercent: 0,
@@ -45,12 +47,23 @@ class ClipsTimeline extends Component {
 		const clickedClip = this.getClickedClip(event);
 
 		if (clickedClip) {
-			console.log("clicked on clip : started moving");
-
 			this.props.selectClip(clickedClip);
-			this.setState({
-				startedMoving: true
-			});
+
+			if (
+				event.target.className !== "resize-left" &&
+				event.target.className !== "resize-right"
+			) {
+				console.log("clicked on clip : started moving");
+
+				this.setState({
+					startedMoving: true
+				});
+			} else {
+				console.log("started resizing");
+				this.setState({
+					startedEditing: true
+				});
+			}
 		} else {
 			console.log("clicked on timeline : started drawing");
 			this.setState({
@@ -64,7 +77,9 @@ class ClipsTimeline extends Component {
 			this.handleDrawingClip(event);
 		} else if (this.state.startedMoving) {
 			this.handleMovingClip(event);
-		} else if (this.state.startedResizing) {
+		} else if (this.state.startedEditing) {
+			console.log("resizing here");
+			this.handleResizingClip(event);
 		}
 	};
 
@@ -78,7 +93,7 @@ class ClipsTimeline extends Component {
 				this.handleMoveClip();
 			}
 		} else if (this.state.startedEditing) {
-			// this.handleResizeClip();
+			this.handleMoveClip();
 		}
 		this.loadInitialState();
 	};
@@ -110,7 +125,6 @@ class ClipsTimeline extends Component {
 	};
 
 	handleMovingClip = event => {
-		console.log("moving");
 		const filteredClipArray = _.filter(this.state.originalClips, clip => {
 			return clip._id == this.props.selectedClip._id;
 		});
@@ -141,6 +155,18 @@ class ClipsTimeline extends Component {
 				});
 			}
 
+			// Provide left / right boundaries
+
+			let clipDuration = newMovedClip.end - newMovedClip.start;
+
+			if (newMovedClip.start < 0) {
+				newMovedClip.start = 0;
+				newMovedClip.end = clipDuration;
+			} else if (newMovedClip.end > this.props.videoDuration) {
+				newMovedClip.end = this.props.videoDuration;
+				newMovedClip.start = this.props.videoDuration - clipDuration;
+			}
+
 			let cliptoUpdateIndex = _.findIndex(this.state.originalClips, {
 				_id: this.props.selectedClip._id
 			});
@@ -164,6 +190,72 @@ class ClipsTimeline extends Component {
 					updatedClips: updatedClips
 				});
 			}
+		}
+	};
+
+	handleResizingClip = event => {
+		let newClip = {};
+		if (this.state.startedEditingLeft) {
+			console.log("editing left handle");
+
+			if (this.calculateSecondsFromClick(event) < this.props.selectedClip.end) {
+				newClip = _.assign({}, this.props.selectedClip, {
+					start: this.calculateSecondsFromClick(event),
+					end: this.props.selectedClip.end
+				});
+			} else {
+				newClip = _.assign({}, this.props.selectedClip, {
+					start: this.props.selectedClip.end,
+					end: this.calculateSecondsFromClick(event)
+				});
+			}
+		} else if (this.state.startedEditingRight) {
+			console.log("editing right handle");
+			if (
+				this.calculateSecondsFromClick(event) > this.props.selectedClip.start
+			) {
+				newClip = _.assign({}, this.props.selectedClip, {
+					start: this.props.selectedClip.start,
+					end: this.calculateSecondsFromClick(event)
+				});
+			} else {
+				newClip = _.assign({}, this.props.selectedClip, {
+					start: this.calculateSecondsFromClick(event),
+					end: this.props.selectedClip.start
+				});
+			}
+		}
+
+		// shitty boundaries here
+
+		let clipDuration = newClip.end - newClip.start;
+
+		if (newClip.start < 0) {
+			newClip.start = 0;
+			newClip.end = clipDuration;
+		} else if (newClip.end > this.props.videoDuration) {
+			newClip.end = this.props.videoDuration;
+			newClip.start = this.props.videoDuration - clipDuration;
+		}
+
+		let cliptoUpdateIndex = _.findIndex(this.state.originalClips, {
+			_id: this.props.selectedClip._id
+		});
+
+		let newClipsArray = update(this.state.originalClips, {
+			$splice: [[cliptoUpdateIndex, 1, newClip]]
+		});
+
+		const updatedClips = this.getUpdatedTrackClips(newClip, newClipsArray);
+
+		if (updatedClips.length > 0) {
+			this.props.optimisticTrackUpdate(
+				_.assign({}, this.props.track, { clips: updatedClips })
+			);
+			this.setState({
+				updatedSingleClip: newClip,
+				updatedClips: updatedClips
+			});
 		}
 	};
 
@@ -319,7 +411,7 @@ class ClipsTimeline extends Component {
 		// filter completely overlapping clips
 		const filteredClips = _.filter(clipsArray, clip => {
 			if (
-				this.state.startedMoving &&
+				(this.state.startedMoving || this.state.startedEditing) &&
 				this.props.selectedClip &&
 				clip._id == this.props.selectedClip._id
 			) {
@@ -410,6 +502,18 @@ class ClipsTimeline extends Component {
 		return ghostStyle;
 	};
 
+	resizeLeft = () => {
+		this.setState({
+			startedEditingLeft: true
+		});
+	};
+
+	resizeRight = () => {
+		this.setState({
+			startedEditingRight: true
+		});
+	};
+
 	render() {
 		return (
 			<div className="video-single-track-clips">
@@ -424,7 +528,15 @@ class ClipsTimeline extends Component {
 					<div className="ghost-clip" style={this.getGhostStyle()} />
 					{this.props.track.clips
 						? this.props.track.clips.map((clip, i) => {
-								return <Clip clip={clip} clipPosition={i} key={i} />;
+								return (
+									<Clip
+										clip={clip}
+										clipPosition={i}
+										key={i}
+										resizeLeft={this.resizeLeft.bind(this)}
+										resizeRight={this.resizeRight.bind(this)}
+									/>
+								);
 							})
 						: ""}
 				</div>

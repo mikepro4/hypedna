@@ -28,20 +28,6 @@ class Clip extends Component {
 		this.setState({
 			mousePressed: true
 		});
-		// if (this.props.selectedClip && this.props.selectedClip._id) {
-		// 	if (this.props.clip._id === this.props.selectedClip._id) {
-		// 		this.deselectClip();
-		// 	} else {
-		// 		console.log("select clip here");
-		//
-		// 		this.props.selectClip(this.props.clip);
-		// 	}
-		// } else {
-		// 	if (this.props.clip._id) {
-		// 		console.log("select clip here");
-		// 		this.props.selectClip(this.props.clip);
-		// 	}
-		// }
 	};
 
 	onMouseUp = () => {
@@ -94,8 +80,22 @@ class Clip extends Component {
 					"saving..."
 				)}
 
-				{this.props.clip._id ? <div className="resize-left" /> : ""}
-				{this.props.clip._id ? <div className="resize-right" /> : ""}
+				{this.props.clip._id ? (
+					<div
+						className="resize-left"
+						onMouseDown={this.props.resizeLeft.bind(this, this.props.clip)}
+					/>
+				) : (
+					""
+				)}
+				{this.props.clip._id ? (
+					<div
+						className="resize-right"
+						onMouseDown={this.props.resizeRight.bind(this, this.props.clip)}
+					/>
+				) : (
+					""
+				)}
 			</div>
 		);
 	}
