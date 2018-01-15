@@ -4,6 +4,8 @@ import { connect } from "react-redux";
 import Header from "./react/components/header/Header";
 import { withRouter } from "react-router-dom";
 import NavigationSidebar from "./react/components/navigation/NavigationSidebar";
+import keydown from "react-keydown";
+
 import { fetchCurrentUser } from "./redux/actions";
 
 class App extends Component {
@@ -12,6 +14,10 @@ class App extends Component {
 	}
 	componentDidMount() {
 		this.props.fetchCurrentUser();
+	}
+	@keydown("backspace")
+	deleteClip() {
+		console.log("delete clip");
 	}
 	render() {
 		return (
@@ -37,4 +43,3 @@ function mapStateToProps({}) {
 export default {
 	component: connect(mapStateToProps, { fetchCurrentUser })(withRouter(App))
 };
-

@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { withStyles } from "material-ui/styles";
 import { withRouter } from "react-router-dom";
 import moment from "moment";
 import keydown from "react-keydown";
@@ -13,13 +12,11 @@ import {
 	selectClip
 } from "../../../redux/actions/objectVideoActions";
 
-const styles = theme => ({});
-
 class ClipsTimeline extends Component {
 	loadInitialState = () => {
 		this.setState({
 			movedClip: false,
-			startedDragging: false,
+			startedDrawing: false,
 			startedEditing: false,
 			startedMoving: false,
 			startPercent: 0,
@@ -37,39 +34,33 @@ class ClipsTimeline extends Component {
 		this.loadInitialState();
 	};
 
-	@keydown("backspace")
-	deleteClip() {
-		console.log("delete clip");
-	}
-
 	onMouseDown = event => {
 		// make a copy of track's clips for editing
-		this.setState({ originalClips: this.props.track.clips });
+		this.setState({
+			originalClips: this.props.track.clips,
+			startPercent: this.calculatePercentFromClick(event),
+			endPercent: 0
+		});
 
-		if (
-			event.target.className !== "clip" &&
-			event.target.className !== "clip-name" &&
-			event.target.className !== "resize-left" &&
-			event.target.className !== "resize-right"
-		) {
-			// enable drawing state
+		const clickedClip = this.getClickedClip(event);
+
+		if (clickedClip) {
+			console.log("clicked on clip : started moving");
+
+			this.props.selectClip(clickedClip);
 			this.setState({
-				startedDragging: true,
-				startPercent: this.calculateWidth(event)
+				startedMoving: true
 			});
-		} else if (
-			event.target.className == "clip" ||
-			event.target.className == "clip-name"
-		) {
+		} else {
+			console.log("clicked on timeline : started drawing");
 			this.setState({
-				startedMoving: true,
-				startPercent: this.calculateWidth(event)
+				startedDrawing: true
 			});
 		}
 	};
 
 	onMouseMove = event => {
-		if (this.state.startedDragging) {
+		if (this.state.startedDrawing) {
 			this.handleDrawingClip(event);
 		} else if (this.state.startedMoving) {
 			this.handleMovingClip(event);
@@ -78,25 +69,18 @@ class ClipsTimeline extends Component {
 	};
 
 	onMouseUp = event => {
-		if (this.state.startedDragging) {
-			// action after releasing mouse - new clip
+		if (this.state.startedDrawing) {
+			console.log("create clip after drawing");
 			this.handleCreateNewClip();
-
-			console.log("handl create");
 		} else if (this.state.startedMoving) {
-			// action after releasing mouse - moving clip
 			if (this.state.movedClip) {
-				console.log("handl move");
-
+				console.log("update track after moving");
 				this.handleMoveClip();
 			}
 		} else if (this.state.startedEditing) {
-			// action after releasing mouse - resizing clip
-			this.handleResizeClip();
+			// this.handleResizeClip();
 		}
 		this.loadInitialState();
-
-		// reset all states
 	};
 
 	onMouseLeave = event => {
@@ -106,7 +90,7 @@ class ClipsTimeline extends Component {
 	};
 
 	handleDrawingClip = event => {
-		// replace rendered clips with a filtered copy
+		console.log("draw clip here");
 		const updatedClips = this.getUpdatedTrackClips(
 			{
 				start: this.calculateStartEnd(event).newClipStart,
@@ -118,7 +102,7 @@ class ClipsTimeline extends Component {
 		this.props.track.clips = updatedClips;
 
 		this.setState({
-			endPercent: this.calculateWidth(event),
+			endPercent: this.calculatePercentFromClick(event),
 			updatedClips: updatedClips
 		});
 
@@ -126,6 +110,7 @@ class ClipsTimeline extends Component {
 	};
 
 	handleMovingClip = event => {
+		console.log("moving");
 		const filteredClipArray = _.filter(this.state.originalClips, clip => {
 			return clip._id == this.props.selectedClip._id;
 		});
@@ -168,105 +153,17 @@ class ClipsTimeline extends Component {
 				newMovedClip,
 				newClipsArray
 			);
-			if (updatedClips.length > 0) {
-				this.props.track.clips = updatedClips;
-				console.log(updatedClips);
 
-				// this.props.optimisticTrackUpdate(
-				// 	_.assign({}, this.props.track, { clips: updatedClips })
-				// );
+			if (updatedClips.length > 0) {
+				this.props.optimisticTrackUpdate(
+					_.assign({}, this.props.track, { clips: updatedClips })
+				);
 
 				this.setState({
 					updatedSingleClip: newMovedClip,
 					updatedClips: updatedClips
 				});
 			}
-		}
-	};
-
-	handleEditingClip = () => {};
-
-	handleCreateNewClip = () => {
-		let { start, end } = 0;
-		console.log(this.state.endPercent);
-
-		if (this.state.endPercent == 0) {
-			console.log("just click");
-			this.addFixSizeClip();
-		} else if (this.state.endPercent > 0) {
-			start =
-				this.state.endPercent > this.state.startPercent
-					? this.state.startPercent
-					: this.state.endPercent;
-			end =
-				this.state.endPercent < this.state.startPercent
-					? this.state.startPercent
-					: this.state.endPercent;
-
-			const newClip = {
-				start: start * this.props.videoDuration / 100,
-				end: end * this.props.videoDuration / 100,
-				name: "Clip Name 2"
-			};
-			console.log(newClip);
-
-			if (newClip.end - newClip.start > 0) {
-				let newClipsArray = this.state.updatedClips;
-				newClipsArray.push(newClip);
-
-				// Update track's clips immediately
-				this.props.optimisticTrackUpdate(
-					_.assign({}, this.props.track, { clips: newClipsArray })
-				);
-
-				// Send request and update in DB
-				this.props.updateTrackClips(
-					this.props.video.googleId,
-					this.props.track._id,
-					newClipsArray,
-					track => {
-						let filteredClip = _.filter(track.clips, clip => {
-							return clip.end == newClip.end && clip.start == newClip.start;
-						});
-						this.props.selectClip(filteredClip[0]);
-					}
-				);
-			} else {
-				this.addFixSizeClip();
-			}
-		}
-	};
-
-	addFixSizeClip = () => {
-		const newClip = {
-			start: this.state.startPercent * this.props.videoDuration / 100,
-			end: (this.state.startPercent + 1) * this.props.videoDuration / 100,
-			name: "Clip Name 2"
-		};
-		let newClipsArray = this.state.originalClips;
-		newClipsArray.push(newClip);
-
-		// Update track's clips immediately
-		if (this.state.originalClips.length > 0) {
-			console.log(this.state.originalClips);
-			this.props.optimisticTrackUpdate(
-				_.assign({}, this.props.track, { clips: newClipsArray })
-			);
-
-			// Send request and update in DB
-			this.props.updateTrackClips(
-				this.props.video.googleId,
-				this.props.track._id,
-				newClipsArray,
-				track => {
-					let filteredClip = _.filter(track.clips, clip => {
-						return clip.end == newClip.end && clip.start == newClip.start;
-					});
-					this.props.selectClip(filteredClip[0]);
-				}
-			);
-		} else {
-			console.log("else here");
 		}
 	};
 
@@ -284,7 +181,129 @@ class ClipsTimeline extends Component {
 		this.props.selectClip(this.state.updatedSingleClip);
 	};
 
-	handleResizeClip = () => {};
+	handleCreateNewClip = () => {
+		let { start, end } = 0;
+		console.log("endPercent: ", this.state.endPercent);
+
+		if (this.state.endPercent == 0) {
+			console.log("create fixed size clip");
+			this.addFixSizeClip();
+		} else if (this.state.endPercent > 0) {
+			start =
+				this.state.endPercent > this.state.startPercent
+					? this.calculateSecondsFromPercent(this.state.startPercent)
+					: this.calculateSecondsFromPercent(this.state.endPercent);
+			end =
+				this.state.endPercent < this.state.startPercent
+					? this.calculateSecondsFromPercent(this.state.startPercent)
+					: this.calculateSecondsFromPercent(this.state.endPercent);
+
+			const clipLength = end - start;
+			if (clipLength < 1) {
+				console.log("create fixed size clip because less than 1 second");
+				this.addFixSizeClip();
+			} else {
+				console.log("create actual size clip");
+				this.addActualSizeClip(start, end);
+			}
+		}
+	};
+
+	addActualSizeClip = (start, end) => {
+		if (this.checkIfCanAddClip()) {
+			const newClip = {
+				start: start,
+				end: end,
+				name: "Clip Name 2"
+			};
+
+			let newClipsArray = this.state.updatedClips;
+			newClipsArray.push(newClip);
+			this.addNewClipAndSelect(newClipsArray, newClip);
+		}
+	};
+
+	addFixSizeClip = () => {
+		const newClip = {
+			start: this.calculateSecondsFromPercent(this.state.startPercent),
+			end: this.calculateSecondsFromPercent(this.state.startPercent + 1),
+			name: "Clip Name 2"
+		};
+		let newClipsArray = this.state.originalClips;
+
+		if (this.checkIfCanAddClip(newClip, newClipsArray)) {
+			newClipsArray.push(newClip);
+
+			// Update track's clips immediately
+			if (this.state.originalClips.length > 0) {
+				this.addNewClipAndSelect(newClipsArray, newClip);
+			}
+		}
+	};
+
+	addNewClipAndSelect = (newClipsArray, newClip) => {
+		// Update track's clips immediately
+		this.props.optimisticTrackUpdate(
+			_.assign({}, this.props.track, { clips: newClipsArray })
+		);
+
+		// Send request and update in DB
+		this.props.updateTrackClips(
+			this.props.video.googleId,
+			this.props.track._id,
+			newClipsArray,
+			track => {
+				let filteredClip = _.filter(track.clips, clip => {
+					return clip.end == newClip.end && clip.start == newClip.start;
+				});
+				this.props.selectClip(filteredClip[0]);
+			}
+		);
+	};
+
+	checkIfCanAddClip = () => {
+		return true;
+	};
+
+	calculateHoverSeconds = event => {};
+
+	calculateStartEnd = event => {
+		const endPosition = this.calculatePercentFromClick(event);
+		let { newClipStart, newClipEnd } = 0;
+
+		// select start and end based on left / right direction
+		if (endPosition > this.state.startPercent) {
+			newClipStart = this.state.startPercent * this.props.videoDuration / 100;
+			newClipEnd = endPosition * this.props.videoDuration / 100;
+		} else {
+			newClipEnd = this.state.startPercent * this.props.videoDuration / 100;
+			newClipStart = endPosition * this.props.videoDuration / 100;
+		}
+		return { newClipStart, newClipEnd, endPosition };
+	};
+
+	calculateGhostStyle = event => {
+		let ghostWidth;
+		let ghostDirection = "";
+		let ghostEndPosition = 0;
+
+		if (this.calculateStartEnd(event).endPosition > this.state.startPercent) {
+			ghostWidth =
+				this.calculateStartEnd(event).endPosition - this.state.startPercent;
+			ghostDirection = "right";
+		} else {
+			ghostWidth =
+				this.state.startPercent - this.calculateStartEnd(event).endPosition;
+			ghostEndPosition = this.calculateStartEnd(event).endPosition;
+			ghostDirection = "left";
+		}
+
+		this.setState({
+			ghostWidth: ghostWidth,
+			ghostDirection: ghostDirection,
+			ghostEndPosition: ghostEndPosition
+		});
+	};
 
 	getUpdatedTrackClips = (newClip, clipsArray) => {
 		// trim and filter overlapping clips
@@ -349,7 +368,15 @@ class ClipsTimeline extends Component {
 		return updatedChannelClips;
 	};
 
-	calculateWidth = event => {
+	getClickedClip = event => {
+		let matchedClip = _.filter(this.props.track.clips, clip => {
+			let clickedSecond = this.calculateSecondsFromClick(event);
+			return clickedSecond >= clip.start && clickedSecond <= clip.end;
+		});
+		return matchedClip[0] ? matchedClip[0] : false;
+	};
+
+	calculatePercentFromClick = event => {
 		const percent =
 			(event.pageX - this.refs.clip_timeline.getBoundingClientRect().x) *
 			100 /
@@ -357,48 +384,14 @@ class ClipsTimeline extends Component {
 		return percent;
 	};
 
-	calculateHoverSeconds = event => {
-		const seekSeconds =
-			this.calculateWidth(event) * this.props.videoDuration / 100;
-		return seekSeconds;
+	calculateSecondsFromClick = event => {
+		return (
+			this.calculatePercentFromClick(event) * this.props.videoDuration / 100
+		);
 	};
 
-	calculateStartEnd = event => {
-		const endPosition = this.calculateWidth(event);
-		let { newClipStart, newClipEnd } = 0;
-
-		// select start and end based on left / right direction
-		if (endPosition > this.state.startPercent) {
-			newClipStart = this.state.startPercent * this.props.videoDuration / 100;
-			newClipEnd = endPosition * this.props.videoDuration / 100;
-		} else {
-			newClipEnd = this.state.startPercent * this.props.videoDuration / 100;
-			newClipStart = endPosition * this.props.videoDuration / 100;
-		}
-		return { newClipStart, newClipEnd, endPosition };
-	};
-
-	calculateGhostStyle = event => {
-		let ghostWidth;
-		let ghostDirection = "";
-		let ghostEndPosition = 0;
-
-		if (this.calculateStartEnd(event).endPosition > this.state.startPercent) {
-			ghostWidth =
-				this.calculateStartEnd(event).endPosition - this.state.startPercent;
-			ghostDirection = "right";
-		} else {
-			ghostWidth =
-				this.state.startPercent - this.calculateStartEnd(event).endPosition;
-			ghostEndPosition = this.calculateStartEnd(event).endPosition;
-			ghostDirection = "left";
-		}
-
-		this.setState({
-			ghostWidth: ghostWidth,
-			ghostDirection: ghostDirection,
-			ghostEndPosition: ghostEndPosition
-		});
+	calculateSecondsFromPercent = percent => {
+		return percent * this.props.videoDuration / 100;
 	};
 
 	getGhostStyle = () => {
@@ -456,4 +449,4 @@ export default connect(mapStateToProps, {
 	updateTrackClips,
 	optimisticTrackUpdate,
 	selectClip
-})(withStyles(styles)(withRouter(ClipsTimeline)));
+})(withRouter(ClipsTimeline));
