@@ -148,7 +148,7 @@ class ClipsTimeline extends Component {
 
 		const updatedClips = this.getUpdatedTrackClips(
 			newClip,
-			this.props.track.clips
+			this.state.originalClips
 		);
 
 		this.props.track.clips = updatedClips;
