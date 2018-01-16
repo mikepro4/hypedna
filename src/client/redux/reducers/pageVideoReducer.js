@@ -21,7 +21,8 @@ export const pageVideoReducer = (state = initialState, action) => {
 	switch (action.type) {
 		case UPDATE_PAGE_VIDEO_HOVER_TIME:
 			return assign({}, state, {
-				hoverTime: action.hoverTime
+				hoverTime: action.hoverTime,
+				startTime: action.startTime ? action.startTime : null
 			});
 		case LOAD_HYPEDNA_VIDEO_DETAILS:
 			return assign({}, state, {

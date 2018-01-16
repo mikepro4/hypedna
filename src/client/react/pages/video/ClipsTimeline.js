@@ -1,10 +1,12 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
+import classNames from "classnames";
 import moment from "moment";
 import keydown from "react-keydown";
 import update from "immutability-helper";
 import * as _ from "lodash";
+import { formatTime } from "../../../utils/timeFormatter";
 import Clip from "./Clip";
 import {
 	updateTrackClips,
@@ -15,6 +17,8 @@ import {
 class ClipsTimeline extends Component {
 	loadInitialState = () => {
 		this.setState({
+			showCursor: false,
+			showRange: false,
 			movedClip: false,
 			startedDrawing: false,
 			startedEditing: false,
@@ -28,23 +32,33 @@ class ClipsTimeline extends Component {
 			ghostEndPosition: 0,
 			updatedClips: [],
 			updatedSingleClip: {},
-			originalClips: []
+			originalClips: [],
+			editingTrackId: null,
+			hoverTime: null,
+			range: null
 		});
 	};
 
 	componentWillMount = () => {
 		this.loadInitialState();
 	};
+	componentDidMount = () => {
+		window.addEventListener("mousemove", this.onMouseMove, false);
+	};
+
+	componentWillUnmount = () => {
+		window.removeEventListener("mousemove", this.onMouseMove, false);
+	};
 
 	onMouseDown = event => {
 		// make a copy of track's clips for editing
 		window.addEventListener("mouseup", this.onMouseUp, false);
-		window.addEventListener("mousemove", this.onMouseMove, false);
 
 		this.setState({
 			originalClips: this.props.track.clips,
 			startPercent: this.calculatePercentFromClick(event),
-			endPercent: 0
+			endPercent: 0,
+			editingTrackId: this.props.track._id
 		});
 
 		const clickedClip = this.getClickedClip(event);
@@ -84,6 +98,8 @@ class ClipsTimeline extends Component {
 			console.log("resizing here");
 			this.handleResizingClip(event);
 		}
+
+		this.updateHoverTime(event);
 	};
 
 	onMouseUp = event => {
@@ -101,7 +117,7 @@ class ClipsTimeline extends Component {
 
 		this.loadInitialState();
 		window.removeEventListener("mouseup", this.onMouseUp, false);
-		window.removeEventListener("mousemove", this.onMouseMove, false);
+		// window.removeEventListener("mousemove", this.onMouseMove, false);
 	};
 
 	// onMouseLeave = event => {
@@ -553,6 +569,10 @@ class ClipsTimeline extends Component {
 		return percent * this.props.videoDuration / 100;
 	};
 
+	calculatePercentFromSeconds = seconds => {
+		return seconds * 100 / this.props.videoDuration;
+	};
+
 	getGhostStyle = () => {
 		let ghostStyle = {};
 		if (this.state.ghostDirection === "left") {
@@ -581,6 +601,108 @@ class ClipsTimeline extends Component {
 		});
 	};
 
+	updateHoverTime = event => {
+		if (this.state.editingTrackId == this.props.track._id) {
+			const endPosition = this.calculatePercentFromClick(event);
+			let { start, end, hoverTime } = 0;
+			let range = null;
+
+			// select start and end based on left / right direction
+			if (endPosition > this.state.startPercent) {
+				start = this.calculateSecondsFromPercent(this.state.startPercent);
+				end = this.calculateSecondsFromPercent(endPosition);
+			} else {
+				end = this.calculateSecondsFromPercent(this.state.startPercent);
+				start = this.calculateSecondsFromPercent(endPosition);
+			}
+
+			hoverTime = this.calculateSecondsFromPercent(endPosition);
+
+			if (start < 0) {
+				start = 0;
+				hoverTime = 0;
+			}
+
+			if (end > this.props.videoDuration) {
+				end = this.props.videoDuration;
+				hoverTime = this.props.videoDuration;
+			}
+
+			if (this.state.startedDrawing) {
+				range = {
+					startTime: start,
+					endTime: end
+				};
+			} else if (this.state.startedMoving || this.state.startedEditing) {
+				range = {
+					startTime: this.state.updatedSingleClip.start,
+					endTime: this.state.updatedSingleClip.end
+				};
+			}
+
+			console.log(hoverTime, range);
+			this.setState({
+				showRange: true,
+				range,
+				hoverTime
+			});
+		} else {
+			this.setState({
+				showRange: false,
+				range: null
+			});
+		}
+	};
+
+	updateOnlyHover = event => {
+		if (
+			this.state.editingTrackId != this.props.track._id &&
+			!this.getClickedClip(event)
+		) {
+			let { start, end, hoverTime } = 0;
+			hoverTime = this.calculateSecondsFromClick(event);
+
+			if (this.calculateSecondsFromClick(event) > this.state.startPercent) {
+				start = this.calculateSecondsFromPercent(this.state.startPercent);
+				end = this.calculateSecondsFromClick(event);
+			} else {
+				end = this.calculateSecondsFromPercent(this.state.startPercent);
+				start = this.calculateSecondsFromClick(event);
+			}
+
+			if (start < 0) {
+				hoverTime = 0;
+			}
+
+			if (end > this.props.videoDuration) {
+				hoverTime = this.props.videoDuration;
+			}
+			console.log(hoverTime);
+			this.setState({
+				showCursor: true,
+				hoverTime: hoverTime
+			});
+		} else {
+			this.setState({
+				showCursor: false,
+				hoverTime: null
+			});
+		}
+	};
+
+	hideCursor = () => {
+		this.setState({
+			showCursor: false,
+			hoverTime: null
+		});
+	};
+
+	getCursorStyle = () => {
+		return {
+			left: this.calculatePercentFromSeconds(this.state.hoverTime) + "%"
+		};
+	};
+
 	render() {
 		return (
 			<div className="video-single-track-clips">
@@ -588,7 +710,50 @@ class ClipsTimeline extends Component {
 					className="track-clips-timeline"
 					ref="clip_timeline"
 					onMouseDown={this.onMouseDown}
+					onMouseMove={this.updateOnlyHover}
+					onMouseLeave={this.hideCursor}
 				>
+					{this.state.showCursor ? (
+						<div className="timeline-cursor" style={this.getCursorStyle()}>
+							<span className="cursor" />
+							<div className="cursor-time-container">
+								<span className="cursor-time">
+									{formatTime(this.state.hoverTime)}
+								</span>
+							</div>
+						</div>
+					) : (
+						""
+					)}
+
+					{this.state.showRange ? (
+						<div
+							className={classNames({
+								"cursor-range": true,
+								"range-left": this.state.ghostDirection === "left",
+								"range-right": this.state.ghostDirection === "right"
+							})}
+							style={this.getCursorStyle()}
+						>
+							<span className="cursor" />
+							<div className="range-container">
+								<span className="range">
+									<span className="range-time">
+										{formatTime(this.state.range.startTime)} –{" "}
+										{formatTime(this.state.range.endTime)}
+									</span>{" "}
+									<span className="duration-container">
+										({formatTime(
+											this.state.range.endTime - this.state.range.startTime
+										)})
+									</span>
+								</span>
+							</div>
+						</div>
+					) : (
+						""
+					)}
+
 					<div className="ghost-clip" style={this.getGhostStyle()} />
 					{this.props.track.clips
 						? this.props.track.clips.map((clip, i) => {

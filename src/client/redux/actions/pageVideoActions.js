@@ -28,9 +28,10 @@ export const clearLoadedHypednaVideo = () => dispatch => {
 	});
 };
 
-export const updateHoverTime = hoverTime => dispatch => {
+export const updateHoverTime = (hoverTime, startTime) => dispatch => {
 	dispatch({
 		type: UPDATE_PAGE_VIDEO_HOVER_TIME,
-		hoverTime
+		hoverTime,
+		startTime
 	});
 };
