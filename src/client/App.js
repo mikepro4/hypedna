@@ -5,8 +5,8 @@ import Header from "./react/components/header/Header";
 import { withRouter } from "react-router-dom";
 import NavigationSidebar from "./react/components/navigation/NavigationSidebar";
 import keydown from "react-keydown";
-
 import { fetchCurrentUser } from "./redux/actions";
+import { selectClip, deleteClip } from "./redux/actions/objectVideoActions";
 
 class App extends Component {
 	static loadData(store, match) {
@@ -15,10 +15,21 @@ class App extends Component {
 	componentDidMount() {
 		this.props.fetchCurrentUser();
 	}
+
+	@keydown("esc")
+	deselectClip() {
+		console.log("deselect clip");
+		this.props.selectClip(null);
+	}
+
 	@keydown("backspace")
 	deleteClip() {
-		console.log("delete clip");
+		console.log(this.props.selectedClip);
+		if (this.props.selectedClip) {
+			this.props.deleteClip(this.props.selectedClip);
+		}
 	}
+
 	render() {
 		return (
 			<div className="app-container">
@@ -36,10 +47,14 @@ class App extends Component {
 	}
 }
 
-function mapStateToProps({}) {
-	return {};
+function mapStateToProps(state) {
+	return { selectedClip: state.pageVideo.selectedClip };
 }
 
 export default {
-	component: connect(mapStateToProps, { fetchCurrentUser })(withRouter(App))
+	component: connect(mapStateToProps, {
+		fetchCurrentUser,
+		selectClip,
+		deleteClip
+	})(withRouter(App))
 };

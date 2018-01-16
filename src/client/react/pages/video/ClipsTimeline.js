@@ -117,13 +117,7 @@ class ClipsTimeline extends Component {
 
 		this.loadInitialState();
 		window.removeEventListener("mouseup", this.onMouseUp, false);
-		// window.removeEventListener("mousemove", this.onMouseMove, false);
 	};
-
-	// onMouseLeave = event => {
-	//
-	// 	this.loadInitialState();
-	// };
 
 	handleDrawingClip = event => {
 		console.log("drawing clip");
@@ -640,7 +634,6 @@ class ClipsTimeline extends Component {
 				};
 			}
 
-			console.log(hoverTime, range);
 			this.setState({
 				showRange: true,
 				range,
@@ -677,7 +670,6 @@ class ClipsTimeline extends Component {
 			if (end > this.props.videoDuration) {
 				hoverTime = this.props.videoDuration;
 			}
-			console.log(hoverTime);
 			this.setState({
 				showCursor: true,
 				hoverTime: hoverTime

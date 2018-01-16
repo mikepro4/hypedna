@@ -3,7 +3,6 @@ import { connect } from "react-redux";
 import { withStyles } from "material-ui/styles";
 import { withRouter } from "react-router-dom";
 import moment from "moment";
-import keydown from "react-keydown";
 import classNames from "classnames";
 import { selectClip } from "../../../redux/actions/objectVideoActions";
 
@@ -44,11 +43,6 @@ class Clip extends Component {
 
 	onDoubleClick = event => {
 		console.log("start playing clip");
-	};
-
-	@keydown("esc")
-	deselectClip = () => {
-		console.log("deselect clip");
 	};
 
 	render() {

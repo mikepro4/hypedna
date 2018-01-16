@@ -6,6 +6,8 @@ import {
 	SELECT_CLIP
 } from "./types";
 import { loadHypednaVideoDetails } from "./pageVideoActions";
+import update from "immutability-helper";
+import * as _ from "lodash";
 
 export const deleteVideo = (googleId, success) => async (
 	dispatch,
@@ -132,4 +134,38 @@ export const selectClip = clip => dispatch => {
 		type: SELECT_CLIP,
 		clip
 	});
+};
+
+export const deleteClip = selectedClip => async (dispatch, getState, api) => {
+	let trackId;
+	let video = getState().pageVideo.singleVideo;
+	let googleId = video.googleId;
+
+	let filteredTracks = _.filter(video.tracks, track => {
+		let filteredClips = _.filter(track.clips, clip => {
+			return selectedClip._id === clip._id;
+		});
+		return filteredClips.length > 0;
+	});
+	let filteredTrack = filteredTracks[0];
+	if (filteredTrack) {
+		trackId = filteredTrack._id;
+	}
+
+	let cliptoUpdateIndex = _.findIndex(filteredTrack.clips, {
+		_id: selectedClip._id
+	});
+
+	let newClipsArray = update(filteredTrack.clips, {
+		$splice: [[cliptoUpdateIndex, 1]]
+	});
+
+	let updatedTrack = _.assign({}, filteredTrack, { clips: newClipsArray });
+
+	dispatch(optimisticTrackUpdate(updatedTrack));
+	dispatch(
+		updateTrackClips(googleId, trackId, newClipsArray, () => {
+			console.log("deleted clip");
+		})
+	);
 };
