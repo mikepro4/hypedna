@@ -38,6 +38,9 @@ class ClipsTimeline extends Component {
 
 	onMouseDown = event => {
 		// make a copy of track's clips for editing
+		window.addEventListener("mouseup", this.onMouseUp, false);
+		window.addEventListener("mousemove", this.onMouseMove, false);
+
 		this.setState({
 			originalClips: this.props.track.clips,
 			startPercent: this.calculatePercentFromClick(event),
@@ -96,6 +99,8 @@ class ClipsTimeline extends Component {
 			this.handleMoveClip();
 		}
 		this.loadInitialState();
+		window.removeEventListener("mouseup", this.onMouseUp, false);
+		window.removeEventListener("mousemove", this.onMouseMove, false);
 	};
 
 	onMouseLeave = event => {
@@ -181,9 +186,11 @@ class ClipsTimeline extends Component {
 			);
 
 			if (updatedClips.length > 0) {
-				this.props.optimisticTrackUpdate(
-					_.assign({}, this.props.track, { clips: updatedClips })
-				);
+				// this.props.optimisticTrackUpdate(
+				// 	_.assign({}, this.props.track, { clips: updatedClips })
+				// );
+
+				this.props.track.clips = updatedClips;
 
 				this.setState({
 					updatedSingleClip: newMovedClip,
@@ -249,9 +256,11 @@ class ClipsTimeline extends Component {
 		const updatedClips = this.getUpdatedTrackClips(newClip, newClipsArray);
 
 		if (updatedClips.length > 0) {
-			this.props.optimisticTrackUpdate(
-				_.assign({}, this.props.track, { clips: updatedClips })
-			);
+			// this.props.optimisticTrackUpdate(
+			// 	_.assign({}, this.props.track, { clips: updatedClips })
+			// );
+
+			this.props.track.clips = updatedClips;
 			this.setState({
 				updatedSingleClip: newClip,
 				updatedClips: updatedClips
@@ -521,9 +530,6 @@ class ClipsTimeline extends Component {
 					className="track-clips-timeline"
 					ref="clip_timeline"
 					onMouseDown={this.onMouseDown}
-					onMouseUp={this.onMouseUp}
-					onMouseLeave={this.onMouseLeave}
-					onMouseMove={this.onMouseMove}
 				>
 					<div className="ghost-clip" style={this.getGhostStyle()} />
 					{this.props.track.clips
