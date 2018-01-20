@@ -14,7 +14,11 @@ import {
 	RESET_BROWSER
 } from "./types";
 
-export const loadAllEntityTypes = () => async (dispatch, getState, api) => {
+export const loadAllEntityTypes = success => async (
+	dispatch,
+	getState,
+	api
+) => {
 	console.log("load all entity types");
 
 	const response = await api.post("/load_all_entity_types", {});
@@ -22,6 +26,10 @@ export const loadAllEntityTypes = () => async (dispatch, getState, api) => {
 		type: LOAD_ALL_ENTITY_TYPES_SUCCESS,
 		payload: response.data
 	});
+
+	if (success) {
+		success(response.data);
+	}
 };
 
 export const searchEntityTypes = () => async (dispatch, getState, api) => {

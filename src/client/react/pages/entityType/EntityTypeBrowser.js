@@ -10,6 +10,7 @@ import {
 	addEntityType,
 	updateBrowser,
 	loadEntityTypeDetails,
+	loadAllEntityTypes,
 	resetBrowser
 } from "../../../redux/actions/pageEntityTypeActions";
 
@@ -21,6 +22,9 @@ import EntityTypeBrowserGroup from "./EntityTypeBrowserGroup";
 class EntityTypeBrowser extends Component {
 	componentWillMount = () => {
 		this.props.resetBrowser();
+		this.props.loadAllEntityTypes(() => {
+			this.computeGroups();
+		});
 	};
 
 	componentDidMount = () => {
@@ -34,7 +38,7 @@ class EntityTypeBrowser extends Component {
 		this.computeGroups(activeGroups);
 	};
 
-	componentDidUpdate = () => {
+	componentDidUpdate = (prevState, newState) => {
 		if (this.props.location.search) {
 			if (!this.isEqualQueryString()) {
 				this.props.updateBrowser(this.getQueryParams());
@@ -103,6 +107,8 @@ class EntityTypeBrowser extends Component {
 			initial: "false",
 			activeEntityTypeGroups: activeGroups
 		});
+
+		this.computeGroups(activeGroups);
 	};
 
 	createEntyTypeGroup = (entities, topLevel, parentId) => {
@@ -110,7 +116,7 @@ class EntityTypeBrowser extends Component {
 			entityTypes: entities,
 			topLevel: topLevel,
 			activeEventTypeId: "",
-			parentId: ""
+			parentId: parentId
 		};
 
 		return entityTypeGroup;
@@ -143,7 +149,7 @@ class EntityTypeBrowser extends Component {
 		}
 	};
 
-	updateGroup = (newGroup, position) => {
+	updateGroups = (newGroup, position) => {
 		let newGroupsArray = update(this.props.browser.activeEntityTypeGroups, {
 			$splice: [[position, 1, newGroup]]
 		});
@@ -155,12 +161,161 @@ class EntityTypeBrowser extends Component {
 		this.computeGroups(newGroupsArray);
 	};
 
-	toggleEntityType = (id, group, position) => {
-		console.log("toggle entity type");
+	sliceGroups = (newGroup, position) => {
+		let newGroupsArray = update(this.props.browser.activeEntityTypeGroups, {
+			$splice: [[position, 1, newGroup]]
+		});
+
+		let slicedGroupArray;
+
+		// slice array elemnents if other groups are open
+		if (newGroupsArray && newGroupsArray.length > 1) {
+			if (position == 0) {
+				slicedGroupArray = newGroupsArray.slice(
+					0,
+					-(newGroupsArray.length - 1)
+				);
+			} else {
+				slicedGroupArray = newGroupsArray.slice(
+					0,
+					-(newGroupsArray.length - position)
+				);
+			}
+		} else {
+			slicedGroupArray = newGroupsArray;
+		}
+
+		this.updateQueryString({
+			activeEntityTypeGroups: slicedGroupArray
+		});
+		this.computeGroups(slicedGroupArray);
 	};
 
-	computeGroups = activeGroups => {
-		console.log("active groups");
+	getEntityTypeDetails = id => {
+		let filteredEntityType = _.filter(this.props.allEntityTypes, entityType => {
+			return entityType._id == id;
+		});
+		return filteredEntityType[0];
+	};
+
+	toggleEntityType = (id, group, position) => {
+		console.log("toggle entity type");
+
+		let newGroup;
+		if (group.activeEventTypeId == id) {
+			newGroup = _.assign({}, group, { activeEventTypeId: "" });
+			this.sliceGroups(newGroup, position);
+		} else {
+			newGroup = _.assign({}, group, { activeEventTypeId: id });
+			this.updateGroups(newGroup, position);
+		}
+	};
+
+	computeGroups = newGroupsArray => {
+		console.log("computeGroups");
+
+		if (!newGroupsArray) {
+			newGroupsArray = this.getQueryParams().activeEntityTypeGroups;
+		}
+
+		let allActive;
+
+		let filteredArray = _.filter(newGroupsArray, group => {
+			return !_.isEmpty(group.activeEventTypeId);
+		});
+
+		if (filteredArray && filteredArray.length > 0) {
+			allActive = _.map(filteredArray, group => {
+				return { id: group.activeEventTypeId };
+			});
+		} else {
+			allActive = [];
+		}
+		console.log("allActive: ", allActive);
+
+		let activeGroups = [];
+
+		let topLevelGroup = _.filter(newGroupsArray, group => {
+			return group.topLevel == "true";
+		});
+
+		activeGroups.push(topLevelGroup[0]);
+
+		// if (
+		// 	this.props.browser.activeEntityTypeGroups &&
+		// 	this.props.browser.activeEntityTypeGroups.length > 0
+		// ) {
+		// 	console.log(this.props.browser.activeEntityTypeGroups);
+		// 	activeGroups = update(activeGroups, {
+		// 		$push: newGroupsArray
+		// 	});
+		// }
+
+		_.forEach(allActive, activeEntityType => {
+			// console.log(activeEntityType);
+			let ownAsParent = _.filter(this.props.allEntityTypes, entityType => {
+				if (entityType.parentEntityTypes) {
+					let containsAsParent = _.filter(
+						entityType.parentEntityTypes,
+						parentEntityType => {
+							return parentEntityType.entityTypeId == activeEntityType.id;
+						}
+					);
+					if (containsAsParent && containsAsParent.length > 0) {
+						return true;
+					}
+				} else {
+					return false;
+				}
+			});
+
+			if (ownAsParent && ownAsParent.length > 0) {
+				// console.log("ownAsParent: ", ownAsParent);
+				let newGroup = this.createEntyTypeGroup(
+					ownAsParent,
+					false,
+					activeEntityType.id
+				);
+
+				console.log("allActive: ", allActive);
+
+				let addedSameId = _.filter(newGroupsArray, group => {
+					return group.parentId == newGroup.parentId;
+				});
+
+				if (addedSameId && addedSameId.length > 0) {
+				} else {
+					activeGroups = update(newGroupsArray, {
+						$push: [newGroup]
+					});
+
+					console.log("activeGroups: ", activeGroups);
+
+					let newArr = _.filter(activeGroups, group => {
+						if (group.parentId) {
+							let containsActiveId = _.filter(allActive, active => {
+								return group.parentId == active.id;
+							});
+							return containsActiveId.length > 0;
+						} else {
+							if (group.topLevel == "true") {
+								return true;
+							} else {
+								return false;
+							}
+						}
+					});
+
+					console.log("newArr: ", newArr);
+
+					this.updateQueryString({
+						activeEntityTypeGroups: newArr
+					});
+				}
+			} else {
+				console.log("no children");
+			}
+		});
 	};
 
 	render() {
@@ -192,6 +347,7 @@ class EntityTypeBrowser extends Component {
 }
 
 const mapStateToProps = state => ({
+	pageEntityType: state.pageEntityType,
 	browser: state.pageEntityType.browser,
 	isFetchingBrowser: state.pageEntityType.isFetchingBrowser,
 	allEntityTypes: state.pageEntityType.allEntityTypes
@@ -202,6 +358,7 @@ export default withRouter(
 		addEntityType,
 		updateBrowser,
 		loadEntityTypeDetails,
-		resetBrowser
+		resetBrowser,
+		loadAllEntityTypes
 	})(EntityTypeBrowser)
 );

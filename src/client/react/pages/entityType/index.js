@@ -8,8 +8,8 @@ import EntityTypeBrowser from "./EntityTypeBrowser";
 import EntityTypeEditor from "./EntityTypeEditor";
 
 class EntityPage extends Component {
-	componentDidMount() {
-		this.props.loadAllEntityTypes();
+	componentWillMount() {
+		// this.props.loadAllEntityTypes();
 	}
 	componentWillUnmount() {}
 	renderHead = () => (
