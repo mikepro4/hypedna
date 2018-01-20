@@ -314,6 +314,26 @@ class EntityTypeBrowser extends Component {
 				}
 			} else {
 				console.log("no children");
+				let newArr = _.filter(newGroupsArray, group => {
+					if (group.parentId) {
+						let containsActiveId = _.filter(allActive, active => {
+							return group.parentId == active.id;
+						});
+						return containsActiveId.length > 0;
+					} else {
+						if (group.topLevel == "true") {
+							return true;
+						} else {
+							return false;
+						}
+					}
+				});
+
+				console.log("newArr: ", newArr);
+
+				this.updateQueryString({
+					activeEntityTypeGroups: newArr
+				});
 			}
 		});
 	};
