@@ -5,6 +5,7 @@ import { withStyles } from "material-ui/styles";
 import HomeIcon from "material-ui-icons/Home";
 import SearchIcon from "material-ui-icons/Search";
 import LabelIcon from "material-ui-icons/Label";
+import DescriptionIcon from "material-ui-icons/Description";
 import PersonIcon from "material-ui-icons/Person";
 import SubscriptionsIcon from "material-ui-icons/Subscriptions";
 import { Link } from "react-router-dom";
@@ -66,16 +67,16 @@ class NavigationSidebar extends Component {
 					<li className="single-sidebar-link">
 						<IconButton
 							className={
-								this.props.location.pathname == "/tags"
+								this.props.location.pathname == "/entityType"
 									? this.props.classes.linkItemActive
 									: this.props.classes.linkItem
 							}
 							aria-label="Tags"
 							component={Link}
-							to="/tags"
+							to="/entityType"
 						>
-							<LabelIcon />
-							<div className={this.props.classes.linkLabel}>Tags</div>
+							<DescriptionIcon />
+							<div className={this.props.classes.linkLabel}>Entity Types</div>
 						</IconButton>
 					</li>
 

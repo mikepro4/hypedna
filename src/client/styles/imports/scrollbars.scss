@@ -37,23 +37,24 @@
 	}
 
 	&::-webkit-scrollbar:horizontal {
-		height: 12px;
+		height: 16px;
 		background-color: transparent;
 		background-clip: content-box;
 	}
 
 	&::-webkit-scrollbar-track:horizontal {
-		background-color: #fff;
+		background-color: transparent;
 		background-clip: content-box;
 	}
 	&::-webkit-scrollbar-track-piece:horizontal {
-		border-top: 1px solid #ccc;
+		border-top: 1px solid transparent;
 		border-left: 1px solid transparent;
 	}
 	&::-webkit-scrollbar-thumb:horizontal {
 		border: solid transparent;
-		border-width: 2px 1px 2px 2px;
-		background-color: #c5c5c5;
+		border-width: 5px 4px 5px 4px;
+		height: 5px;
+		background-color: $strokeColor;
 		background-clip: content-box;
 
 		&:hover {

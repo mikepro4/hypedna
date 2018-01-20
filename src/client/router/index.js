@@ -9,6 +9,8 @@ import CreateVideoPage from "../react/pages/create/video";
 
 import SearchPage from "../react/pages/search";
 
+import EntityTypePage from "../react/pages/entityType";
+
 export default [
 	{
 		...App,
@@ -60,6 +62,14 @@ export default [
 				// exact: true,
 				params: {
 					name: "video_page"
+				}
+			},
+			{
+				...EntityTypePage,
+				path: "/entityType",
+				// exact: true,
+				params: {
+					name: "entity_type_page"
 				}
 			}
 		]
