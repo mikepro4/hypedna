@@ -22,7 +22,8 @@ export const initialState = {
 		initial: "true",
 		active: [],
 		selectedEntityType: null,
-		activeEntityTypeGroups: []
+		activeEntityTypeGroups: [],
+		showNoChildren: "false"
 	},
 	editor: {},
 	isFetchingEditor: false,

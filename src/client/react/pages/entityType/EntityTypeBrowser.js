@@ -143,6 +143,12 @@ class EntityTypeBrowser extends Component {
 								/>
 							);
 						})}
+
+						{this.props.browser.showNoChildren == "true" ? (
+							<div>no children</div>
+						) : (
+							""
+						)}
 					</div>
 				);
 			}
@@ -154,9 +160,18 @@ class EntityTypeBrowser extends Component {
 			$splice: [[position, 1, newGroup]]
 		});
 
+		let newPosition = position + 1;
+
+		if (newGroupsArray.length > newPosition) {
+			let diff = newGroupsArray.length - newPosition;
+			newGroupsArray = newGroupsArray.slice(0, -diff);
+		}
+
 		this.updateQueryString({
 			activeEntityTypeGroups: newGroupsArray
 		});
+
+		// slice shit here
 
 		this.computeGroups(newGroupsArray);
 	};
@@ -241,18 +256,7 @@ class EntityTypeBrowser extends Component {
 
 		activeGroups.push(topLevelGroup[0]);
 
-		// if (
-		// 	this.props.browser.activeEntityTypeGroups &&
-		// 	this.props.browser.activeEntityTypeGroups.length > 0
-		// ) {
-		// 	console.log(this.props.browser.activeEntityTypeGroups);
-		// 	activeGroups = update(activeGroups, {
-		// 		$push: newGroupsArray
-		// 	});
-		// }
-
 		_.forEach(allActive, activeEntityType => {
-			// console.log(activeEntityType);
 			let ownAsParent = _.filter(this.props.allEntityTypes, entityType => {
 				if (entityType.parentEntityTypes) {
 					let containsAsParent = _.filter(
@@ -270,7 +274,6 @@ class EntityTypeBrowser extends Component {
 			});
 
 			if (ownAsParent && ownAsParent.length > 0) {
-				// console.log("ownAsParent: ", ownAsParent);
 				let newGroup = this.createEntyTypeGroup(
 					ownAsParent,
 					false,
@@ -288,54 +291,30 @@ class EntityTypeBrowser extends Component {
 					activeGroups = update(newGroupsArray, {
 						$push: [newGroup]
 					});
-
-					console.log("activeGroups: ", activeGroups);
-
-					let newArr = _.filter(activeGroups, group => {
-						if (group.parentId) {
-							let containsActiveId = _.filter(allActive, active => {
-								return group.parentId == active.id;
-							});
-							return containsActiveId.length > 0;
-						} else {
-							if (group.topLevel == "true") {
-								return true;
-							} else {
-								return false;
-							}
-						}
-					});
-
-					console.log("newArr: ", newArr);
-
 					this.updateQueryString({
-						activeEntityTypeGroups: newArr
+						activeEntityTypeGroups: activeGroups,
+						showNoChildren: "false"
 					});
 				}
 			} else {
 				console.log("no children");
-				let newArr = _.filter(newGroupsArray, group => {
-					if (group.parentId) {
-						let containsActiveId = _.filter(allActive, active => {
-							return group.parentId == active.id;
-						});
-						return containsActiveId.length > 0;
-					} else {
-						if (group.topLevel == "true") {
-							return true;
-						} else {
-							return false;
-						}
-					}
-				});
-
-				console.log("newArr: ", newArr);
 
 				this.updateQueryString({
-					activeEntityTypeGroups: newArr
+					activeEntityTypeGroups: newGroupsArray,
+					showNoChildren: "true"
 				});
 			}
 		});
+		if (
+			allActive.length == 0 &&
+			this.props.browser.activeEntityTypeGroups &&
+			this.props.browser.activeEntityTypeGroups.length > 0
+		) {
+			this.updateQueryString({
+				activeEntityTypeGroups: newGroupsArray,
+				showNoChildren: "false"
+			});
+		}
 	};
 
 	render() {
