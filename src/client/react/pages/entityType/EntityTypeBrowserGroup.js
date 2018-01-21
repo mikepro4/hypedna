@@ -44,7 +44,9 @@ class EntityTypeBrowserGroup extends Component {
 						</div>
 						<div className="header-count-label">
 							<span className="entity-type-level">
-								{this.props.group.isTopLevel ? "Top Level" : "Sub Types of"}
+								{this.props.group.topLevel == "true"
+									? "Top Level"
+									: "Sub Types of"}
 							</span>
 							<span className="entity-type-reference">Entity Types</span>
 						</div>

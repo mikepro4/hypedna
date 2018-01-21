@@ -145,7 +145,16 @@ class EntityTypeBrowser extends Component {
 						})}
 
 						{this.props.browser.showNoChildren == "true" ? (
-							<div>no children</div>
+							<div>
+								no children{" "}
+								<button
+									onClick={() => {
+										this.createNewSubtype();
+									}}
+								>
+									creste new sub type{" "}
+								</button>
+							</div>
 						) : (
 							""
 						)}
@@ -315,6 +324,39 @@ class EntityTypeBrowser extends Component {
 				showNoChildren: "false"
 			});
 		}
+	};
+
+	createNewSubtype = () => {
+		let arrayLength = this.props.browser.activeEntityTypeGroups.length;
+		let lastEntityTypeId = this.props.browser.activeEntityTypeGroups[
+			arrayLength - 1
+		].activeEventTypeId;
+
+		let parentEntityTypes = [];
+		parentEntityTypes.push({ entityTypeId: lastEntityTypeId });
+		this.props.addEntityType(
+			{
+				genericProperties: {
+					displayName:
+						"New Entity Type " + (this.props.allEntityTypes.length + 1)
+				},
+				parentEntityTypes: parentEntityTypes
+			},
+			this.props.history,
+			data => {
+				let test = [];
+				test.push(data);
+				let newGroup = this.createEntyTypeGroup(test, false, lastEntityTypeId);
+				let newArray = update(this.props.browser.activeEntityTypeGroups, {
+					$push: [newGroup]
+				});
+
+				this.updateQueryString({
+					activeEntityTypeGroups: newArray,
+					showNoChildren: "false"
+				});
+			}
+		);
 	};
 
 	render() {

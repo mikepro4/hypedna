@@ -47,9 +47,18 @@ export const addEntityType = (entityType, history, success) => async (
 ) => {
 	console.log("add entity type");
 
-	const response = await api.post("/entity_type_add", entityType);
-	handleEntityTypeAdded(response, history, success);
-	dispatch(loadAllEntityTypes(response));
+	// const response = await api.post("/entity_type_add", entityType);
+
+	api
+		.post("/entity_type_add", entityType)
+		.then(response => {
+			dispatch(loadAllEntityTypes());
+			if (success) {
+				success(response.data);
+			}
+			// handleEntityTypeAdded(response, history, success);
+		})
+		.catch(() => {});
 };
 
 function handleEntityTypeAdded(response, history, success) {
