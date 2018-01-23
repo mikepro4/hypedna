@@ -36,8 +36,26 @@ export const searchEntityTypes = () => async (dispatch, getState, api) => {
 	console.log("search entity types");
 };
 
-export const updateEntityType = () => async (dispatch, getState, api) => {
-	console.log("update entity type");
+export const updateEntityType = (id, newEntityType, success) => async (
+	dispatch,
+	getState,
+	api
+) => {
+	const response = await api.post("/entity_type_update", {
+		id,
+		newEntityType
+	});
+	if (response.status === 200) {
+		const entityType = await api.post("/get_single_entity_type", {
+			id
+		});
+		if (success) {
+			success(entityType.data);
+		}
+		console.log("updated entity type");
+	} else {
+		console.log("error");
+	}
 };
 
 export const addEntityType = (entityType, history, success) => async (

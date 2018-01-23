@@ -32,6 +32,22 @@ class EntityTypeBrowserGroup extends Component {
 
 	addEntityType = () => {
 		console.log("add entity type");
+		this.props.addEntityTypeToGroup(
+			this.props.group.parentId,
+			this.props.group,
+			this.props.position
+		);
+	};
+
+	getParentName = () => {
+		let entityType = _.filter(this.props.allEntityTypes, entityType => {
+			return entityType._id == this.props.group.parentId;
+		});
+		if (entityType[0] && entityType[0].genericProperties) {
+			return entityType[0].genericProperties.displayName;
+		} else {
+			return "";
+		}
 	};
 
 	render() {
@@ -55,9 +71,13 @@ class EntityTypeBrowserGroup extends Component {
 								<span className="entity-type-level">
 									{this.props.group.topLevel == "true"
 										? "Top Level"
-										: "Sub Types of"}
+										: "Sub types of"}
 								</span>
-								<span className="entity-type-reference">Entity Types</span>
+								<span className="entity-type-reference">
+									{this.props.group.topLevel == "true"
+										? "Entity Types"
+										: `"${this.getParentName()}"`}
+								</span>
 							</div>
 						</div>
 

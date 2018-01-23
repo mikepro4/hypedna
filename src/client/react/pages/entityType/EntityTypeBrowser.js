@@ -117,12 +117,22 @@ class EntityTypeBrowser extends Component {
 	};
 
 	createEntyTypeGroup = (entities, topLevel, parentId) => {
-		let entityTypeGroup = {
-			entityTypes: entities,
-			topLevel: topLevel,
-			activeEventTypeId: "",
-			parentId: parentId
-		};
+		let entityTypeGroup;
+		if (_.isEmpty(parentId)) {
+			entityTypeGroup = {
+				entityTypes: entities,
+				topLevel: "true",
+				activeEventTypeId: "",
+				parentId: parentId
+			};
+		} else {
+			entityTypeGroup = {
+				entityTypes: entities,
+				topLevel: topLevel,
+				activeEventTypeId: "",
+				parentId: parentId
+			};
+		}
 
 		return entityTypeGroup;
 	};
@@ -142,6 +152,7 @@ class EntityTypeBrowser extends Component {
 									toggleEntityType={this.toggleEntityType}
 									updateQueryString={this.updateQueryString}
 									resetBrowser={this.resetBrowser}
+									addEntityTypeToGroup={this.addEntityTypeToGroup}
 									group={group}
 									position={i}
 									key={i}
@@ -206,6 +217,58 @@ class EntityTypeBrowser extends Component {
 			newGroup = _.assign({}, group, { activeEventTypeId: id });
 			this.updateGroups(newGroup, position);
 		}
+	};
+
+	addEntityTypeToGroup = (id, group, position) => {
+		let parentEntityTypes = [];
+		parentEntityTypes.push({ entityTypeId: id });
+		this.props.addEntityType(
+			{
+				genericProperties: {
+					displayName:
+						"New Entity Type " + (this.props.allEntityTypes.length + 1)
+				},
+				parentEntityTypes: parentEntityTypes
+			},
+			this.props.history,
+			data => {
+				let updatedEntitiesArray = update(
+					this.props.browser.activeEntityTypeGroups[position].entityTypes,
+					{ $push: [data] }
+				);
+
+				let newGroup = this.createEntyTypeGroup(
+					updatedEntitiesArray,
+					false,
+					id
+				);
+				newGroup.activeEventTypeId = data._id;
+
+				let newPosition = position + 1;
+
+				let newArray = update(this.props.browser.activeEntityTypeGroups, {
+					$splice: [[position, 1, newGroup]]
+				});
+
+				let slicedArray;
+
+				if (this.props.browser.activeEntityTypeGroups.length > newPosition) {
+					let diff =
+						this.props.browser.activeEntityTypeGroups.length - newPosition;
+
+					slicedArray = newArray.slice(0, -diff);
+				} else {
+					slicedArray = newArray;
+				}
+
+				this.updateQueryString({
+					activeEntityTypeGroups: slicedArray,
+					showNoChildren: "false",
+					selectedEntityType: data._id
+				});
+				this.computeGroups(slicedArray);
+			}
+		);
 	};
 
 	computeGroups = newGroupsArray => {
