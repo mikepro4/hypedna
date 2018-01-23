@@ -19,9 +19,9 @@ import {
 export const initialState = {
 	allEntityTypes: [],
 	browser: {
-		initial: "true",
+		initial: "false",
 		active: [],
-		selectedEntityType: null,
+		selectedEntityType: "",
 		activeEntityTypeGroups: [],
 		showNoChildren: "false"
 	},

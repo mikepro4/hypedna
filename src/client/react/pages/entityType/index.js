@@ -8,6 +8,9 @@ import EntityTypeBrowser from "./EntityTypeBrowser";
 import EntityTypeEditor from "./EntityTypeEditor";
 
 class EntityPage extends Component {
+	static loadData(store, match, route, path, query) {
+		return store.dispatch(loadAllEntityTypes());
+	}
 	componentWillMount() {
 		// this.props.loadAllEntityTypes();
 	}

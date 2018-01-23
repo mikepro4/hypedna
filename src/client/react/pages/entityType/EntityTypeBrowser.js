@@ -20,12 +20,7 @@ import CloseIcon from "material-ui-icons/Close";
 import EntityTypeBrowserGroup from "./EntityTypeBrowserGroup";
 
 class EntityTypeBrowser extends Component {
-	componentWillMount = () => {
-		this.props.resetBrowser();
-		this.props.loadAllEntityTypes(() => {
-			this.computeGroups();
-		});
-	};
+	componentWillMount = () => {};
 
 	componentDidMount = () => {
 		let activeGroups = this.getQueryParams().activeEntityTypeGroups;
@@ -35,20 +30,29 @@ class EntityTypeBrowser extends Component {
 		} else {
 			this.initialBrowserUpdate();
 		}
-		this.computeGroups(activeGroups);
+
+		if (!_.isEmpty(this.props.allEntityTypes)) {
+			this.computeGroups(activeGroups);
+		}
 	};
 
 	componentDidUpdate = (prevState, newState) => {
-		if (this.props.location.search) {
+		if (
+			this.props.location.search &&
+			!_.isEmpty(this.getQueryParams().initial)
+		) {
 			if (!this.isEqualQueryString()) {
 				this.props.updateBrowser(this.getQueryParams());
 			}
+		} else {
+			this.resetBrowser();
 		}
 	};
 
 	resetBrowser = () => {
 		this.updateQueryString({
 			initial: "true",
+			showNoChildren: "false",
 			activeEntityTypeGroups: []
 		});
 	};
@@ -78,6 +82,7 @@ class EntityTypeBrowser extends Component {
 	updateQueryString = updatedState => {
 		let queryParams = this.getQueryParams();
 		const updatedQuery = _.assign({}, queryParams, updatedState);
+		// const updatedQuery = update(queryParams, { $merge: updatedState });
 		const str = qs.stringify(updatedQuery);
 		this.props.history.push({
 			search: "?" + str
@@ -180,39 +185,7 @@ class EntityTypeBrowser extends Component {
 			activeEntityTypeGroups: newGroupsArray
 		});
 
-		// slice shit here
-
 		this.computeGroups(newGroupsArray);
-	};
-
-	sliceGroups = (newGroup, position) => {
-		let newGroupsArray = update(this.props.browser.activeEntityTypeGroups, {
-			$splice: [[position, 1, newGroup]]
-		});
-
-		let slicedGroupArray;
-
-		// slice array elemnents if other groups are open
-		if (newGroupsArray && newGroupsArray.length > 1) {
-			if (position == 0) {
-				slicedGroupArray = newGroupsArray.slice(
-					0,
-					-(newGroupsArray.length - 1)
-				);
-			} else {
-				slicedGroupArray = newGroupsArray.slice(
-					0,
-					-(newGroupsArray.length - position)
-				);
-			}
-		} else {
-			slicedGroupArray = newGroupsArray;
-		}
-
-		this.updateQueryString({
-			activeEntityTypeGroups: slicedGroupArray
-		});
-		this.computeGroups(slicedGroupArray);
 	};
 
 	getEntityTypeDetails = id => {
@@ -228,7 +201,7 @@ class EntityTypeBrowser extends Component {
 		let newGroup;
 		if (group.activeEventTypeId == id) {
 			newGroup = _.assign({}, group, { activeEventTypeId: "" });
-			this.sliceGroups(newGroup, position);
+			this.updateGroups(newGroup, position);
 		} else {
 			newGroup = _.assign({}, group, { activeEventTypeId: id });
 			this.updateGroups(newGroup, position);
@@ -255,7 +228,6 @@ class EntityTypeBrowser extends Component {
 		} else {
 			allActive = [];
 		}
-		console.log("allActive: ", allActive);
 
 		let activeGroups = [];
 
@@ -264,6 +236,7 @@ class EntityTypeBrowser extends Component {
 		});
 
 		activeGroups.push(topLevelGroup[0]);
+		// console.log("this.props.allEntityTypes: ", this.props.allEntityTypes);
 
 		_.forEach(allActive, activeEntityType => {
 			let ownAsParent = _.filter(this.props.allEntityTypes, entityType => {
@@ -289,8 +262,6 @@ class EntityTypeBrowser extends Component {
 					activeEntityType.id
 				);
 
-				console.log("allActive: ", allActive);
-
 				let addedSameId = _.filter(newGroupsArray, group => {
 					return group.parentId == newGroup.parentId;
 				});
@@ -302,15 +273,20 @@ class EntityTypeBrowser extends Component {
 					});
 					this.updateQueryString({
 						activeEntityTypeGroups: activeGroups,
-						showNoChildren: "false"
+						showNoChildren: "false",
+						selectedEntityType: newGroup.parentId
 					});
+					if (newGroup.parentId) {
+						this.props.loadEntityTypeDetails(newGroup.parentId);
+					}
 				}
 			} else {
 				console.log("no children");
 
 				this.updateQueryString({
 					activeEntityTypeGroups: newGroupsArray,
-					showNoChildren: "true"
+					showNoChildren: "true",
+					selectedEntityType: activeEntityType.id
 				});
 			}
 		});

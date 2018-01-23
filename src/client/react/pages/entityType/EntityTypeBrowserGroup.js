@@ -36,65 +36,75 @@ class EntityTypeBrowserGroup extends Component {
 
 	render() {
 		return (
-			<div className="browser-single-group">
-				<div className="single-group-header">
-					<div className="header-left">
-						<div className="header-count">
-							{this.props.group.entityTypes.length}
+			<div
+				className="browser-single-group"
+				className={classNames({
+					"browser-single-group": true,
+					"browser-single-group-selected":
+						this.props.group.activeEventTypeId ==
+						this.props.browser.selectedEntityType
+				})}
+			>
+				<div className="entity-single-group-content">
+					<div className="single-group-header">
+						<div className="header-left">
+							<div className="header-count">
+								{this.props.group.entityTypes.length}
+							</div>
+							<div className="header-count-label">
+								<span className="entity-type-level">
+									{this.props.group.topLevel == "true"
+										? "Top Level"
+										: "Sub Types of"}
+								</span>
+								<span className="entity-type-reference">Entity Types</span>
+							</div>
 						</div>
-						<div className="header-count-label">
-							<span className="entity-type-level">
-								{this.props.group.topLevel == "true"
-									? "Top Level"
-									: "Sub Types of"}
-							</span>
-							<span className="entity-type-reference">Entity Types</span>
-						</div>
-					</div>
 
-					<div className="header-right">
-						<ul className="header-actions">
-							<li className="single-action">
-								<button
-									className="header-button"
-									onClick={() => this.addEntityType()}
-								>
-									<AddCircleIcon />
-									<span className="button-label">New</span>
-								</button>
-							</li>
-
-							<li className="single-action">
-								<button
-									className="header-button"
-									onClick={() => this.resetBrowser()}
-								>
-									<CloseIcon />
-								</button>
-							</li>
-						</ul>
-					</div>
-				</div>
-				<div className="single-group-search">search here</div>
-				<div className="single-group-results">
-					{this.props.group.entityTypes.length > 0
-						? this.props.group.entityTypes.map(entityType => {
-								return (
-									<div
-										className={classNames({
-											"single-group-result": true,
-											selected: this.checkActive(entityType._id)
-										})}
-										onClick={() => {
-											this.toggleEntityType(entityType._id);
-										}}
-										key={entityType._id}
+						<div className="header-right">
+							<ul className="header-actions">
+								<li className="single-action">
+									<button
+										className="header-button"
+										onClick={() => this.addEntityType()}
 									>
-										{entityType.genericProperties.displayName}
-									</div>
-								);
-							})
-						: ""}
+										<AddCircleIcon />
+										<span className="button-label">New</span>
+									</button>
+								</li>
+
+								<li className="single-action">
+									<button
+										className="header-button"
+										onClick={() => this.resetBrowser()}
+									>
+										<CloseIcon />
+									</button>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div className="single-group-search">search here</div>
+					<div className="single-group-results">
+						{this.props.group.entityTypes.length > 0
+							? this.props.group.entityTypes.map(entityType => {
+									return (
+										<div
+											className={classNames({
+												"single-group-result": true,
+												selected: this.checkActive(entityType._id)
+											})}
+											onClick={() => {
+												this.toggleEntityType(entityType._id);
+											}}
+											key={entityType._id}
+										>
+											{entityType.genericProperties.displayName}
+										</div>
+									);
+								})
+							: ""}
+					</div>
 				</div>
 			</div>
 		);
