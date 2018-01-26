@@ -22,6 +22,8 @@ import CloseIcon from "material-ui-icons/Close";
 import EntityTypeBrowserGroup from "./EntityTypeBrowserGroup";
 import EntityTypeSelector from "./EntityTypeSelector";
 
+import Button from "../../components/common/button/Button";
+
 class EntityTypeBrowser extends Component {
 	state = {
 		showNoChildren: false,
@@ -136,6 +138,7 @@ class EntityTypeBrowser extends Component {
 									updateQueryString={this.updateQueryString}
 									resetBrowser={this.resetBrowser}
 									addEntityTypeToGroup={this.addEntityTypeToGroup}
+									closeEntityType={this.closeEntityType}
 									group={group}
 									position={i}
 									key={i}
@@ -143,33 +146,55 @@ class EntityTypeBrowser extends Component {
 							);
 						})}
 
-						{this.state.showNoChildren ? (
-							<div>
-								no children{" "}
-								<button
-									onClick={() => {
-										this.createNewSubtype();
-									}}
-								>
-									creste new sub type{" "}
-								</button>
-							</div>
-						) : (
-							""
-						)}
+						{this.state.showNoChildren ? this.renderNewSubTypeButton() : ""}
 					</div>
 				);
 			}
 		}
 	};
 
+	closeEntityType = (id, parentId, position) => {
+		if (parentId) {
+			let newActive = this.props.browser.active.slice(0, position - 1);
+			this.updateBrowser({
+				active: newActive
+			});
+		} else {
+			this.resetBrowser();
+		}
+	};
+
+	renderNewSubTypeButton = () => {
+		let lastActiveId = this.props.browser.active[
+			this.props.browser.active.length - 1
+		].entityTypeId;
+		let activeEntity = _.filter(this.props.allEntityTypes, entity => {
+			return entity._id == lastActiveId;
+		});
+		return (
+			<div className="no-children-container">
+				<Button onClick={() => this.createNewSubtype()} buttonBlack>
+					New Sub-Type of "{activeEntity[0].genericProperties.displayName}"
+				</Button>
+			</div>
+		);
+	};
+
 	renderInitialState = () => {
 		return (
-			<div>
-				<EntityTypeSelector loadCustomEntity={this.loadCustomEntity} />
-				<button onClick={() => this.loadTopLevelEntities()}>
-					Load top level entities
-				</button>
+			<div className="browser-initial-state">
+				<div className="browser-initial-content">
+					<h1>Choose How To Load Entity Types</h1>
+					<div className="browser-selector">
+						<EntityTypeSelector onChange={this.loadCustomEntity} />
+					</div>
+
+					<div className="browser-top-level">
+						<Button onClick={() => this.loadTopLevelEntities()} buttonBlack>
+							Load Top Level Entity Types
+						</Button>
+					</div>
+				</div>
 			</div>
 		);
 	};
@@ -204,7 +229,6 @@ class EntityTypeBrowser extends Component {
 			[entity => entity.genericProperties.displayName.toLowerCase()],
 			["asc"]
 		);
-		console.log("createEntyTypeGroup - entityTypes: ", sortedEntities, single);
 		return {
 			entityTypes: sortedEntities,
 			activeEntityTypeId: activeEntityTypeId ? activeEntityTypeId : null,

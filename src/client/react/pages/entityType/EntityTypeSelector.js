@@ -10,12 +10,17 @@ import Select from "react-select";
 class EntityTypeSelector extends Component {
 	state = {};
 
-	updateValue = value => {
-		this.props.loadCustomEntity(value);
+	onChange = value => {
+		this.props.onChange(value);
 	};
 
 	render() {
-		let entityTypes = _.map(this.props.allEntityTypes, entityType => {
+		let sortedEntities = _.orderBy(
+			this.props.allEntityTypes,
+			[entity => entity.genericProperties.displayName.toLowerCase()],
+			["asc"]
+		);
+		let entityTypes = _.map(sortedEntities, entityType => {
 			return {
 				id: entityType._id,
 				name: entityType.genericProperties.displayName
@@ -29,10 +34,11 @@ class EntityTypeSelector extends Component {
 					simpleValue
 					clearable
 					name="select-city"
-					onChange={this.updateValue}
+					onChange={this.onChange}
 					searchable
 					labelKey="name"
 					valueKey="id"
+					placeholder="Type Entity Type Name..."
 				/>
 			</div>
 		);

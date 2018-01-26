@@ -5,6 +5,7 @@ import { withRouter } from "react-router-dom";
 import update from "immutability-helper";
 import classNames from "classnames";
 import qs from "qs";
+import ChevronRightIcon from "material-ui-icons/ChevronRight";
 
 import {
 	addEntityType,
@@ -19,6 +20,11 @@ import CloseIcon from "material-ui-icons/Close";
 class EntityTypeBrowserGroup extends Component {
 	resetBrowser = () => {
 		console.log("reset");
+		this.props.closeEntityType(
+			this.props.group._id,
+			this.props.group.parentId,
+			this.props.position
+		);
 	};
 
 	checkActive = id => {
@@ -84,6 +90,7 @@ class EntityTypeBrowserGroup extends Component {
 				className="browser-single-group"
 				className={classNames({
 					"browser-single-group": true,
+					hasArrow: this.props.group.activeEntityTypeId ? true : false,
 					"browser-single-group-selected":
 						this.props.group.activeEntityTypeId ==
 						this.props.browser.selectedEntityType
@@ -154,6 +161,10 @@ class EntityTypeBrowserGroup extends Component {
 								})
 							: ""}
 					</div>
+				</div>
+
+				<div className="browser-arrow">
+					<ChevronRightIcon />
 				</div>
 			</div>
 		);
