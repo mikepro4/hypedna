@@ -22,11 +22,10 @@ class EntityTypeBrowserGroup extends Component {
 	};
 
 	checkActive = id => {
-		return this.props.group.activeEventTypeId == id;
+		return this.props.group.activeEntityTypeId == id;
 	};
 
 	toggleEntityType = id => {
-		// console.log("activate");
 		this.props.toggleEntityType(id, this.props.group, this.props.position);
 	};
 
@@ -50,14 +49,35 @@ class EntityTypeBrowserGroup extends Component {
 		}
 	};
 
+	getParentsCount = id => {
+		let ownAsParent = _.filter(this.props.allEntityTypes, entityType => {
+			if (entityType.parentEntityTypes) {
+				let containsAsParent = _.filter(
+					entityType.parentEntityTypes,
+					parentEntityType => {
+						return parentEntityType.entityTypeId == id;
+					}
+				);
+				if (containsAsParent && containsAsParent.length > 0) {
+					return true;
+				}
+			} else {
+				return false;
+			}
+		});
+
+		return ownAsParent.length;
+	};
+
 	render() {
+		let topLevel = _.isEmpty(this.props.group.parentId);
 		return (
 			<div
 				className="browser-single-group"
 				className={classNames({
 					"browser-single-group": true,
 					"browser-single-group-selected":
-						this.props.group.activeEventTypeId ==
+						this.props.group.activeEntityTypeId ==
 						this.props.browser.selectedEntityType
 				})}
 			>
@@ -69,14 +89,10 @@ class EntityTypeBrowserGroup extends Component {
 							</div>
 							<div className="header-count-label">
 								<span className="entity-type-level">
-									{this.props.group.topLevel == "true"
-										? "Top Level"
-										: "Sub types of"}
+									{topLevel ? "Top Level" : "Sub types of"}
 								</span>
 								<span className="entity-type-reference">
-									{this.props.group.topLevel == "true"
-										? "Entity Types"
-										: `"${this.getParentName()}"`}
+									{topLevel ? "Entity Types" : `"${this.getParentName()}"`}
 								</span>
 							</div>
 						</div>
@@ -119,7 +135,9 @@ class EntityTypeBrowserGroup extends Component {
 											}}
 											key={entityType._id}
 										>
-											{entityType.genericProperties.displayName}
+											{entityType.genericProperties.displayName} ({this.getParentsCount(
+												entityType._id
+											)})
 										</div>
 									);
 								})

@@ -3,7 +3,10 @@ import * as _ from "lodash";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import EntityTypeEditorForm from "./EntityTypeEditorForm";
-import { updateEntityType } from "../../../redux/actions/pageEntityTypeActions";
+import {
+	updateEntityType,
+	loadAllEntityTypes
+} from "../../../redux/actions/pageEntityTypeActions";
 import update from "immutability-helper";
 
 import qs from "qs";
@@ -23,40 +26,7 @@ class EntityEditor extends Component {
 			this.props.browser.selectedEntityType,
 			newEntityType,
 			test => {
-				let positionToUpdate = _.findIndex(
-					this.props.browser.activeEntityTypeGroups,
-					{
-						activeEventTypeId: this.props.browser.selectedEntityType
-					}
-				);
-				let groupToUpdate = this.props.browser.activeEntityTypeGroups[
-					positionToUpdate
-				];
-				let entityToUpdate = _.filter(groupToUpdate.entityTypes, entity => {
-					return entity._id == this.props.browser.selectedEntityType;
-				});
-
-				let positionToUpdateEntity = _.findIndex(groupToUpdate.entityTypes, {
-					_id: this.props.browser.selectedEntityType
-				});
-
-				let newEntityArray = update(groupToUpdate.entityTypes, {
-					$splice: [[positionToUpdateEntity, 1, newEntityType]]
-				});
-
-				let newGroup = this.props.browser.activeEntityTypeGroups[
-					positionToUpdate
-				];
-
-				newGroup.entityTypes = newEntityArray;
-
-				let newGroupsArray = update(this.props.browser.activeEntityTypeGroups, {
-					$splice: [[positionToUpdate, 1, newGroup]]
-				});
-
-				this.updateQueryString({
-					activeEntityTypeGroups: newGroupsArray
-				});
+				this.props.loadAllEntityTypes();
 			}
 		);
 	};
@@ -115,5 +85,7 @@ const mapStateToProps = state => ({
 });
 
 export default withRouter(
-	connect(mapStateToProps, { updateEntityType })(EntityEditor)
+	connect(mapStateToProps, { updateEntityType, loadAllEntityTypes })(
+		EntityEditor
+	)
 );

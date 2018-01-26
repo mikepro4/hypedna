@@ -46,6 +46,7 @@ export const DELETE_VIDEO = "app/DELETE_VIDEO";
 
 export const UPDATE_BROWSER = "app/UPDATE_BROWSER";
 export const RESET_BROWSER = "app/RESET_BROWSER";
+export const UPDATE_BROWSER_GROUPS = "app/UPDATE_BROWSER_GROUPS";
 
 export const LOAD_ALL_ENTITY_TYPES = "app/LOAD_ALL_ENTITY_TYPES";
 export const LOAD_ALL_ENTITY_TYPES_SUCCESS =

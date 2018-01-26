@@ -11,7 +11,9 @@ import {
 	LOAD_ENTITY_TYPE_DETAILS_SUCCESS,
 	RESET_ENTITY_TYPE_SEARCH,
 	UPDATE_BROWSER,
-	RESET_BROWSER
+	UPDATE_BROWSER_GROUPS,
+	RESET_BROWSER,
+	RESET_BROWSER_GROUPS
 } from "./types";
 
 export const loadAllEntityTypes = success => async (
@@ -104,6 +106,18 @@ export const updateBrowser = browser => async (dispatch, getState, api) => {
 	dispatch({
 		type: UPDATE_BROWSER,
 		payload: browser
+	});
+};
+
+export const updateBrowserGroups = groups => async (
+	dispatch,
+	getState,
+	api
+) => {
+	console.log("update groups:", groups);
+	dispatch({
+		type: UPDATE_BROWSER_GROUPS,
+		payload: groups
 	});
 };
 
