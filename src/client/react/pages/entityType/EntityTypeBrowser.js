@@ -23,7 +23,9 @@ import EntityTypeBrowserGroup from "./EntityTypeBrowserGroup";
 
 class EntityTypeBrowser extends Component {
 	state = {
-		showNoChildren: false
+		showNoChildren: false,
+		showCustomSelectedEntity: false,
+		customSelectedEntityId: null
 	};
 
 	componentDidMount = () => {
@@ -64,6 +66,8 @@ class EntityTypeBrowser extends Component {
 		this.updateBrowser({
 			initial: "true",
 			loadedTopLevel: "false",
+			loadedCustom: "false",
+			loadedCustomId: "",
 			active: []
 		});
 	};
@@ -81,6 +85,32 @@ class EntityTypeBrowser extends Component {
 		});
 	};
 
+	getCustomSelectedEntityDetails = () => {
+		if (!_.isEmpty(this.state.customSelectedEntityId)) {
+			let selectedEntity = _.filter(this.props.allEntityTypes, entity => {
+				return entity._id == this.props.browser.loadedCustomId;
+			});
+			if (selectedEntity[0]) {
+				return selectedEntity[0].genericProperties.displayName;
+			} else return;
+		} else return;
+	};
+
+	loadCustomEntity = id => {
+		let active = [];
+		let selectedEntity = _.filter(this.props.allEntityTypes, entity => {
+			return entity._id == id;
+		});
+		active.push({ entityTypeId: selectedEntity[0]._id });
+
+		this.updateBrowser({
+			initial: "false",
+			loadedCustom: "true",
+			loadedCustomId: id,
+			active: active
+		});
+	};
+
 	renderBrowserContent = () => {
 		let activeGroups = this.props.pageEntityType.activeEntityTypeGroups;
 
@@ -90,6 +120,13 @@ class EntityTypeBrowser extends Component {
 			if (activeGroups && activeGroups.length > 0) {
 				return (
 					<div className="browser-groups-container">
+						{this.props.browser.loadedCustom ? (
+							<div className="custom-selected-entity">
+								{this.getCustomSelectedEntityDetails()}
+							</div>
+						) : (
+							""
+						)}
 						{activeGroups.map((group, i) => {
 							return (
 								<EntityTypeBrowserGroup
@@ -127,7 +164,9 @@ class EntityTypeBrowser extends Component {
 	renderInitialState = () => {
 		return (
 			<div>
-				<button onClick={() => this.loadCustomEntity()}>
+				<button
+					onClick={() => this.loadCustomEntity("5a6241e582a4f412ebe4d5c9")}
+				>
 					Load custom entity
 				</button>
 				<button onClick={() => this.loadTopLevelEntities()}>
@@ -144,9 +183,7 @@ class EntityTypeBrowser extends Component {
 		});
 	};
 
-	createEntyTypeGroup = (entities, parentId) => {
-		let activeEntityTypeId;
-
+	createEntyTypeGroup = (entities, parentId, single, activeEntityTypeId) => {
 		// check if any active idfs match any entities from the entity group
 		if (this.props.browser.active && this.props.browser.active.length > 0) {
 			let activeMatch;
@@ -169,14 +206,33 @@ class EntityTypeBrowser extends Component {
 			[entity => entity.genericProperties.displayName.toLowerCase()],
 			["asc"]
 		);
+		console.log("createEntyTypeGroup - entityTypes: ", sortedEntities, single);
 		return {
 			entityTypes: sortedEntities,
-			activeEntityTypeId: activeEntityTypeId,
-			parentId: parentId ? parentId : null
+			activeEntityTypeId: activeEntityTypeId ? activeEntityTypeId : null,
+			parentId: parentId ? parentId : null,
+			single: single
 		};
 	};
 
-	loadCustomEntity = () => {};
+	getOwnAsParent = entity => {
+		let ownAsParent = _.filter(this.props.allEntityTypes, entityType => {
+			if (entityType.parentEntityTypes) {
+				let containsAsParent = _.filter(
+					entityType.parentEntityTypes,
+					parentEntityType => {
+						return parentEntityType.entityTypeId == entity.entityTypeId;
+					}
+				);
+				if (containsAsParent && containsAsParent.length > 0) {
+					return true;
+				}
+			} else {
+				return false;
+			}
+		});
+		return ownAsParent;
+	};
 
 	computeGroups = () => {
 		let activeGroups = [];
@@ -193,26 +249,23 @@ class EntityTypeBrowser extends Component {
 			activeGroups.push(this.createEntyTypeGroup(topLevelEntities));
 		}
 
+		// Push Top Level Group
+		if (this.props.browser.loadedCustom == "true") {
+			if (this.props.allEntityTypes && this.props.allEntityTypes.length > 0) {
+				let entities = [];
+				let selectedEntity = _.filter(this.props.allEntityTypes, entity => {
+					return entity._id == this.props.browser.loadedCustomId;
+				});
+				entities.push(selectedEntity[0]);
+				//
+				activeGroups.push(this.createEntyTypeGroup(entities, null, true));
+			}
+		}
+
 		// Push All Active groups
 		if (this.props.browser.active && this.props.browser.active.length > 0) {
 			_.forEach(this.props.browser.active, activeEntityType => {
-				let ownAsParent = _.filter(this.props.allEntityTypes, entityType => {
-					if (entityType.parentEntityTypes) {
-						let containsAsParent = _.filter(
-							entityType.parentEntityTypes,
-							parentEntityType => {
-								return (
-									parentEntityType.entityTypeId == activeEntityType.entityTypeId
-								);
-							}
-						);
-						if (containsAsParent && containsAsParent.length > 0) {
-							return true;
-						}
-					} else {
-						return false;
-					}
-				});
+				let ownAsParent = this.getOwnAsParent(activeEntityType);
 
 				if (ownAsParent && ownAsParent.length > 0) {
 					let newGroup = this.createEntyTypeGroup(
@@ -245,6 +298,7 @@ class EntityTypeBrowser extends Component {
 			);
 
 			let newPosition = position + 1;
+
 			let newActiveUpdated = update(this.props.browser.active, {
 				$splice: [[position, 1, { entityTypeId: id }]]
 			});

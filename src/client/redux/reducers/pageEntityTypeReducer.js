@@ -26,7 +26,8 @@ export const initialState = {
 		active: [],
 		selectedEntityType: "",
 		loadedTopLevel: "false",
-		loadedCustom: "false"
+		loadedCustom: "false",
+		loadedCustomId: ""
 	},
 	editor: {},
 	isFetchingEditor: false,

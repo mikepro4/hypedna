@@ -71,6 +71,14 @@ class EntityTypeBrowserGroup extends Component {
 
 	render() {
 		let topLevel = _.isEmpty(this.props.group.parentId);
+		console.log(this.props.group);
+		if (this.props.group.single) {
+			return (
+				<div>
+					{this.props.group.entityTypes[0].genericProperties.displayName}
+				</div>
+			);
+		}
 		return (
 			<div
 				className="browser-single-group"
@@ -85,7 +93,9 @@ class EntityTypeBrowserGroup extends Component {
 					<div className="single-group-header">
 						<div className="header-left">
 							<div className="header-count">
-								{this.props.group.entityTypes.length}
+								{this.props.group.entityTypes
+									? this.props.group.entityTypes.length
+									: ""}
 							</div>
 							<div className="header-count-label">
 								<span className="entity-type-level">
@@ -122,7 +132,8 @@ class EntityTypeBrowserGroup extends Component {
 					</div>
 					<div className="single-group-search">search here</div>
 					<div className="single-group-results">
-						{this.props.group.entityTypes.length > 0
+						{this.props.group.entityTypes &&
+						this.props.group.entityTypes.length > 0
 							? this.props.group.entityTypes.map(entityType => {
 									return (
 										<div
