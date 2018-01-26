@@ -20,6 +20,7 @@ import AddCircleIcon from "material-ui-icons/AddCircle";
 import CloseIcon from "material-ui-icons/Close";
 
 import EntityTypeBrowserGroup from "./EntityTypeBrowserGroup";
+import EntityTypeSelector from "./EntityTypeSelector";
 
 class EntityTypeBrowser extends Component {
 	state = {
@@ -107,7 +108,8 @@ class EntityTypeBrowser extends Component {
 			initial: "false",
 			loadedCustom: "true",
 			loadedCustomId: id,
-			active: active
+			active: active,
+			selectedEntityType: id
 		});
 	};
 
@@ -164,11 +166,7 @@ class EntityTypeBrowser extends Component {
 	renderInitialState = () => {
 		return (
 			<div>
-				<button
-					onClick={() => this.loadCustomEntity("5a6241e582a4f412ebe4d5c9")}
-				>
-					Load custom entity
-				</button>
+				<EntityTypeSelector loadCustomEntity={this.loadCustomEntity} />
 				<button onClick={() => this.loadTopLevelEntities()}>
 					Load top level entities
 				</button>
