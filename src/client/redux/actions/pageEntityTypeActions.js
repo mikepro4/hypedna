@@ -16,7 +16,7 @@ import {
 	RESET_BROWSER_GROUPS
 } from "./types";
 
-export const loadAllEntityTypes = success => async (
+export const loadAllEntityTypes = (success, selectId) => async (
 	dispatch,
 	getState,
 	api
@@ -32,6 +32,18 @@ export const loadAllEntityTypes = success => async (
 	if (success) {
 		success(response.data);
 	}
+
+	if (selectId) {
+		selectId();
+	}
+
+	// if (response.status == 200 && selectId) {
+	// 	dispatch(
+	// 		updateBrowser({
+	// 			selectedEntityType: selectId
+	// 		})
+	// 	);
+	// }
 };
 
 export const searchEntityTypes = () => async (dispatch, getState, api) => {
@@ -91,10 +103,14 @@ export const addEntityType = (entityType, history, success) => async (
 	api
 		.post("/entity_type_add", entityType)
 		.then(response => {
-			dispatch(loadAllEntityTypes());
-			if (success) {
-				success(response.data);
-			}
+			dispatch(
+				loadAllEntityTypes(null, () => {
+					if (success) {
+						success(response.data);
+					}
+				})
+			);
+
 			// handleEntityTypeAdded(response, history, success);
 		})
 		.catch(() => {});

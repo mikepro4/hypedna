@@ -67,7 +67,7 @@ class EntityEditor extends Component {
 
 		console.log("positionOfActive: ", positionOfActive);
 
-		let newActive = this.props.browser.active.slice(0, -positionOfActive);
+		let newActive = this.props.browser.active.slice(0, -(positionOfActive - 1));
 
 		this.updateBrowser({
 			selectedEntityType: "",
