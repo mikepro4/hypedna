@@ -21,11 +21,18 @@ class EntityTypeEditorForm extends React.Component {
 					label="Display Name"
 					ref="displayName"
 				/>
+				<Field
+					name="description"
+					component={renderTextField}
+					placeholder="Entity Type Description..."
+					label="Description"
+					ref="description"
+				/>
 				<button
 					action="submit"
 					className="pt-button pt-intent-primary button_submit"
 				>
-					Add
+					update
 				</button>
 			</form>
 		);

@@ -27,9 +27,7 @@ class EntityPage extends Component {
 				{this.renderHead()}
 
 				<div className="entity-page-container">
-					<div className="entity-type-browser-container">
-						<EntityTypeBrowser />
-					</div>
+					<EntityTypeBrowser />
 
 					<div className="entity-type-editor-container">
 						<EntityTypeEditor />

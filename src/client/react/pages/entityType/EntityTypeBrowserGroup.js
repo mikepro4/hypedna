@@ -28,6 +28,9 @@ class EntityTypeBrowserGroup extends Component {
 	};
 
 	checkActive = id => {
+		return this.props.browser.selectedEntityType == id;
+	};
+	checkSubActive = id => {
 		return this.props.group.activeEntityTypeId == id;
 	};
 
@@ -77,7 +80,6 @@ class EntityTypeBrowserGroup extends Component {
 
 	render() {
 		let topLevel = _.isEmpty(this.props.group.parentId);
-		console.log(this.props.group);
 		if (this.props.group.single) {
 			return (
 				<div>
@@ -85,6 +87,11 @@ class EntityTypeBrowserGroup extends Component {
 				</div>
 			);
 		}
+		console.log(
+			this.props.group.activeEntityTypeId,
+			this.props.browser.selectedEntityType
+		);
+
 		return (
 			<div
 				className="browser-single-group"
@@ -92,8 +99,8 @@ class EntityTypeBrowserGroup extends Component {
 					"browser-single-group": true,
 					hasArrow: this.props.group.activeEntityTypeId ? true : false,
 					"browser-single-group-selected":
-						this.props.group.activeEntityTypeId ==
-						this.props.browser.selectedEntityType
+						this.props.browser.selectedEntityType ==
+						this.props.group.activeEntityTypeId
 				})}
 			>
 				<div className="entity-single-group-content">
@@ -146,7 +153,8 @@ class EntityTypeBrowserGroup extends Component {
 										<div
 											className={classNames({
 												"single-group-result": true,
-												selected: this.checkActive(entityType._id)
+												selected: this.checkActive(entityType._id),
+												"sub-selected": this.checkSubActive(entityType._id)
 											})}
 											onClick={() => {
 												this.toggleEntityType(entityType._id);

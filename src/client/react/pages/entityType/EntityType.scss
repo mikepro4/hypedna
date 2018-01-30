@@ -222,6 +222,15 @@
 								background: rgba($grey, 0.3);
 							}
 
+							&.sub-selected {
+								background: rgba($yellow, 0.3);
+								color: $black;
+
+								&:hover {
+									background: $yellow;
+								}
+							}
+
 							&.selected {
 								background: $yellow;
 								color: $black;
@@ -264,6 +273,27 @@
 		}
 	}
 
+	.entity-type-browser-collapsed {
+		background: $grey;
+		height: 50px;
+		flex-grow: 0;
+		display: flex;
+		justify-content: space-between;
+
+		.browser-collapsed-left {
+			display: flex;
+			align-items: center;
+
+			h1 {
+				margin: 0 20px 0 10px;
+			}
+
+			.select-container {
+				width: 400px;
+			}
+		}
+	}
+
 	.no-children-container {
 		height: calc(100% - 80px);
 		align-items: center;
@@ -274,5 +304,89 @@
 
 	.entity-type-editor-container {
 		flex-grow: 1;
+		position: relative;
+
+		.entity-editor {
+			display: flex;
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+
+			.editor-content {
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				display: flex;
+				align-items: stretch;
+
+				.editor-left {
+					width: 50%;
+					border-right: 1px solid $grey;
+				}
+
+				.editor-right {
+					width: 50%;
+					display: flex;
+					align-items: stretch;
+
+					.editor-parents {
+						width: 50%;
+						border-right: 1px solid $grey;
+					}
+
+					.editor-children {
+						width: 50%;
+					}
+				}
+
+				.editor-section {
+					display: flex;
+					flex-direction: column;
+					align-items: stretch;
+
+					.editor-section-header {
+						height: 50px;
+						flex-shrink: 0;
+						flex-grow: 0;
+						border-bottom: 1px solid $grey;
+						align-items: center;
+						justify-content: space-between;
+						padding: 0 20px 0 20px;
+						display: flex;
+
+						.editor-section-right {
+							display: flex;
+							height: 100%;
+						}
+
+						.editor-actions {
+							display: flex;
+							align-items: stretch;
+
+							li {
+								display: flex;
+								align-items: stretch;
+							}
+						}
+					}
+
+					.editor-section-content {
+						flex-grow: 1;
+						overflow-y: auto;
+						@include webkit-scrollbar-light();
+						padding: 20px;
+					}
+				}
+			}
+		}
 	}
+}
+
+.add-parent-container {
+	width: 350px;
+	padding: 20px;
 }

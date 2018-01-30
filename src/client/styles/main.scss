@@ -86,6 +86,10 @@ button {
 	user-select: none;
 	background: transparent;
 
+	&:hover {
+		background: $yellow;
+	}
+
 	.button-label {
 		margin: 0 0 0 3px;
 	}

@@ -165,19 +165,21 @@ class EntityTypeBrowser extends Component {
 	};
 
 	renderNewSubTypeButton = () => {
-		let lastActiveId = this.props.browser.active[
-			this.props.browser.active.length - 1
-		].entityTypeId;
-		let activeEntity = _.filter(this.props.allEntityTypes, entity => {
-			return entity._id == lastActiveId;
-		});
-		return (
-			<div className="no-children-container">
-				<Button onClick={() => this.createNewSubtype()} buttonBlack>
-					New Sub-Type of "{activeEntity[0].genericProperties.displayName}"
-				</Button>
-			</div>
-		);
+		if (this.props.browser.active && this.props.browser.active.length > 0) {
+			let lastActiveId = this.props.browser.active[
+				this.props.browser.active.length - 1
+			].entityTypeId;
+			let activeEntity = _.filter(this.props.allEntityTypes, entity => {
+				return entity._id == lastActiveId;
+			});
+			return (
+				<div className="no-children-container">
+					<Button onClick={() => this.createNewSubtype()} buttonBlack>
+						New Sub-Type of "{activeEntity[0].genericProperties.displayName}"
+					</Button>
+				</div>
+			);
+		}
 	};
 
 	renderInitialState = () => {
@@ -231,7 +233,7 @@ class EntityTypeBrowser extends Component {
 		);
 		return {
 			entityTypes: sortedEntities,
-			activeEntityTypeId: activeEntityTypeId ? activeEntityTypeId : null,
+			activeEntityTypeId: activeEntityTypeId,
 			parentId: parentId ? parentId : null,
 			single: single
 		};
@@ -307,41 +309,70 @@ class EntityTypeBrowser extends Component {
 	};
 
 	toggleEntityType = (id, group, position) => {
-		let activeEntities = [];
+		console.log(
+			id,
+			group,
+			position,
+			this.props.browser.selectedEntityType,
+			this.props.pageEntityType.activeEntityTypeGroups[position]._id
+		);
 
-		if (!this.props.browser.active || _.isEmpty(this.props.browser.active)) {
-			activeEntities.push({ entityTypeId: id });
-		} else {
-			let filteredEntities = _.filter(
-				this.props.browser.active,
-				activeEntity => {
-					return activeEntity.entityTypeId == id;
-				}
-			);
+		if (
+			id !==
+				this.props.pageEntityType.activeEntityTypeGroups[position]
+					.activeEntityTypeId ||
+			id !== this.props.browser.selectedEntityType
+		) {
+			let activeEntities = [];
 
-			let newPosition = position + 1;
-
-			let newActiveUpdated = update(this.props.browser.active, {
-				$splice: [[position, 1, { entityTypeId: id }]]
-			});
-			activeEntities = newActiveUpdated;
-
-			if (_.isEmpty(filteredEntities)) {
-				if (this.props.browser.active.length > newPosition) {
-					let diff = this.props.browser.active.length - newPosition;
-					activeEntities = activeEntities.slice(0, -diff);
-				}
+			if (!this.props.browser.active || _.isEmpty(this.props.browser.active)) {
+				activeEntities.push({ entityTypeId: id });
+				this.updateBrowser({
+					active: activeEntities,
+					selectedEntityType: id
+				});
 			} else {
-				let diff = this.props.browser.active.length - position;
-				let newActiveSliced = activeEntities.slice(0, -diff);
-				activeEntities = newActiveSliced;
+				if (
+					id ==
+					this.props.pageEntityType.activeEntityTypeGroups[position]
+						.activeEntityTypeId
+				) {
+					console.log("now this fires here");
+					this.updateBrowser({
+						selectedEntityType: id
+					});
+				} else {
+					let filteredEntities = _.filter(
+						this.props.browser.active,
+						activeEntity => {
+							return activeEntity.entityTypeId == id;
+						}
+					);
+
+					let newPosition = position + 1;
+
+					let newActiveUpdated = update(this.props.browser.active, {
+						$splice: [[position, 1, { entityTypeId: id }]]
+					});
+					activeEntities = newActiveUpdated;
+
+					if (_.isEmpty(filteredEntities)) {
+						if (this.props.browser.active.length > newPosition) {
+							let diff = this.props.browser.active.length - newPosition;
+							activeEntities = activeEntities.slice(0, -diff);
+						}
+					} else {
+						let diff = this.props.browser.active.length - position;
+						let newActiveSliced = activeEntities.slice(0, -diff);
+						activeEntities = newActiveSliced;
+					}
+					this.updateBrowser({
+						active: activeEntities,
+						selectedEntityType: id
+					});
+				}
 			}
 		}
-
-		this.updateBrowser({
-			active: activeEntities,
-			selectedEntityType: id
-		});
 	};
 
 	addEntityTypeToGroup = (id, group, position) => {
@@ -353,7 +384,9 @@ class EntityTypeBrowser extends Component {
 			{
 				genericProperties: {
 					displayName:
-						"New Entity Type " + (this.props.allEntityTypes.length + 1)
+						"New Entity Type " + (this.props.allEntityTypes.length + 1),
+					createdAt: Date.now(),
+					createdBy: this.props.auth._id
 				},
 				parentEntityTypes: parentEntityTypes
 			},
@@ -373,7 +406,9 @@ class EntityTypeBrowser extends Component {
 			{
 				genericProperties: {
 					displayName:
-						"New Entity Type " + (this.props.allEntityTypes.length + 1)
+						"New Entity Type " + (this.props.allEntityTypes.length + 1),
+					createdAt: Date.now(),
+					createdBy: this.props.auth._id
 				},
 				parentEntityTypes: parentEntityTypes
 			},
@@ -382,35 +417,80 @@ class EntityTypeBrowser extends Component {
 		);
 	};
 
+	collapseBrowser = () => {
+		this.updateBrowser({
+			collapsed: "true"
+		});
+	};
+
+	expandBrowser = () => {
+		this.updateBrowser({
+			collapsed: "false"
+		});
+	};
+
 	render() {
-		return (
-			<div className="entity-type-browser">
-				<div className="browser-header">
-					<div className="header-left">
-						<h1>Entity Types Browser</h1>
-						<ul className="browser-actions">
-							<li className="singleAction">
-								<button onClick={() => this.resetBrowser()}>
-									Reset Browser
-								</button>
-							</li>
-						</ul>
+		if (this.props.browser.collapsed == "true") {
+			return (
+				<div className="entity-type-browser-collapsed">
+					<div className="browser-collapsed-left">
+						<h1>Select Entity Type:</h1>
+						<div className="select-container">
+							<EntityTypeSelector onChange={this.loadCustomEntity} />
+						</div>
 					</div>
-					<div className="header-right">
-						<ul className="browser-actions">
-							<li className="singleAction">
-								<a>Hide Browser</a>
-							</li>
-						</ul>
-					</div>
+					<div className="browser-collapsed-right" />
+					<button onClick={() => this.expandBrowser()}>ExpandBrowser</button>
 				</div>
-				{this.renderBrowserContent()}
+			);
+		}
+		return (
+			<div
+				className={classNames({
+					"entity-type-browser-container": true,
+					collapsed: this.props.browser.collapsed == "true"
+				})}
+			>
+				<div className="entity-type-browser">
+					<div className="browser-header">
+						<div className="header-left">
+							<h1>Entity Types Browser</h1>
+							<ul className="browser-actions">
+								<li className="singleAction">
+									<button onClick={() => this.resetBrowser()}>
+										Reset Browser
+									</button>
+								</li>
+								<li className="singleAction">
+									<button>Delete all Entities</button>
+								</li>
+								<li className="singleAction">
+									<button>Create New Entity Type</button>
+								</li>
+								<li className="singleAction">
+									<button>Create New Entity</button>
+								</li>
+							</ul>
+						</div>
+						<div className="header-right">
+							<ul className="browser-actions">
+								<li className="singleAction">
+									<button onClick={() => this.collapseBrowser()}>
+										Hide Browser
+									</button>
+								</li>
+							</ul>
+						</div>
+					</div>
+					{this.renderBrowserContent()}
+				</div>
 			</div>
 		);
 	}
 }
 
 const mapStateToProps = state => ({
+	auth: state.auth,
 	pageEntityType: state.pageEntityType,
 	browser: state.pageEntityType.browser,
 	isFetchingBrowser: state.pageEntityType.isFetchingBrowser,

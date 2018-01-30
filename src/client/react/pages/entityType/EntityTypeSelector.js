@@ -8,10 +8,16 @@ import qs from "qs";
 import Select from "react-select";
 
 class EntityTypeSelector extends Component {
-	state = {};
-
+	state = {
+		value: ""
+	};
 	onChange = value => {
 		this.props.onChange(value);
+		this.setState({ value });
+	};
+
+	onNewOptionClick = value => {
+		console.log(value);
 	};
 
 	render() {
@@ -28,13 +34,15 @@ class EntityTypeSelector extends Component {
 		});
 		return (
 			<div>
-				<Select
+				<Select.Creatable
 					ref="citySelect"
 					options={entityTypes}
 					simpleValue
 					clearable
+					value={this.state.value}
 					name="select-city"
 					onChange={this.onChange}
+					onNewOptionClick={this.onNewOptionClick}
 					searchable
 					labelKey="name"
 					valueKey="id"

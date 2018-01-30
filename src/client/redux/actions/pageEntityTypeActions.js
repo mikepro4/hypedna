@@ -60,6 +60,25 @@ export const updateEntityType = (id, newEntityType, success) => async (
 	}
 };
 
+export const addParentEntityType = (
+	id,
+	newParentEntityTypeId,
+	success
+) => async (dispatch, getState, api) => {
+	const response = await api.post("/add_parent_entity_type", {
+		id,
+		newParentEntityTypeId
+	});
+	if (response.status === 200) {
+		if (success) {
+			success();
+		}
+		console.log("added parent id");
+	} else {
+		console.log("error");
+	}
+};
+
 export const addEntityType = (entityType, history, success) => async (
 	dispatch,
 	getState,
@@ -89,8 +108,17 @@ function handleEntityTypeAdded(response, history, success) {
 	}
 }
 
-export const deleteEntityType = () => async (dispatch, getState, api) => {
-	console.log("add entity type");
+export const deleteEntityType = id => async (dispatch, getState, api) => {
+	api
+		.post("/entity_type_delete", { id: id })
+		.then(response => {
+			dispatch(loadAllEntityTypes());
+			if (success) {
+				success(response.data);
+			}
+			// handleEntityTypeAdded(response, history, success);
+		})
+		.catch(() => {});
 };
 
 export const loadEntityTypeDetails = id => async (dispatch, getState, api) => {
