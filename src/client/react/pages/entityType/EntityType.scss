@@ -389,4 +389,54 @@
 .add-parent-container {
 	width: 350px;
 	padding: 20px;
+
+	h2 {
+		font-size: 14px;
+		margin: 0 0 10px 0;
+	}
+}
+
+.single-result-container {
+	display: flex;
+	height: calc(100% - 80px);
+	align-items: center;
+	justify-content: center;
+	padding: 0 0 0 20px;
+
+	.browser-arrow {
+		position: relative;
+		right: -7px;
+	}
+
+	.single-result {
+		font-size: 18px;
+		font-weight: bold;
+		background: #ffffff;
+		box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.05);
+		border-radius: 100px;
+		padding: 5px;
+
+		.result-name {
+			border-radius: 100px;
+			padding: 10px 20px;
+			cursor: pointer;
+			white-space: nowrap;
+		}
+
+		&.sub-selected {
+			.result-name {
+				background: rgba($yellow, 0.5);
+
+				&:hover {
+					background: $yellow;
+				}
+			}
+		}
+
+		&.selected {
+			.result-name {
+				background: $yellow;
+			}
+		}
+	}
 }

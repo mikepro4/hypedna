@@ -34,7 +34,7 @@ class EntityTypeSelector extends Component {
 		});
 		return (
 			<div>
-				<Select.Creatable
+				<Select
 					ref="citySelect"
 					options={entityTypes}
 					simpleValue

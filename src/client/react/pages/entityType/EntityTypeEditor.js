@@ -16,7 +16,8 @@ import {
 	loadAllEntityTypes,
 	deleteEntityType,
 	updateBrowser,
-	addParentEntityType
+	addParentEntityType,
+	removeParentEntityType
 } from "../../../redux/actions/pageEntityTypeActions";
 
 const styles = theme => ({
@@ -80,10 +81,30 @@ class EntityEditor extends Component {
 	};
 
 	addParentEntityType = id => {
-		console.log("add parent entity type: ", id);
 		this.handleAddParentClose();
+		let containsSameParent = _.filter(
+			this.getEntityType(this.props.browser.selectedEntityType)
+				.parentEntityTypes,
+			entityType => {
+				return entityType.entityTypeId == id;
+			}
+		);
 
-		this.props.addParentEntityType(
+		if (_.isEmpty(containsSameParent)) {
+			this.props.addParentEntityType(
+				this.props.browser.selectedEntityType,
+				id,
+				() => {
+					this.props.loadAllEntityTypes();
+				}
+			);
+		} else {
+			alert("parent already added");
+		}
+	};
+
+	removeParentEntityType = id => {
+		this.props.removeParentEntityType(
 			this.props.browser.selectedEntityType,
 			id,
 			() => {
@@ -129,9 +150,24 @@ class EntityEditor extends Component {
 			<ul className="parens-list">
 				{parentEntities && parentEntities.length > 0
 					? parentEntities.map(entityType => {
+							console.log(
+								"OLOLO here: ",
+								entityType._id,
+								this.props.browser.selectedEntityType,
+								entityType
+							);
 							return (
-								<li key={entityType._id}>
+								<li
+									key={entityType._id}
+									onClick={() => {
+										this.removeParentEntityType(
+											entityType._id,
+											this.props.browser.selectedEntityType
+										);
+									}}
+								>
 									{entityType.genericProperties.displayName}
+									<button>Delete</button>
 								</li>
 							);
 						})
@@ -223,6 +259,7 @@ class EntityEditor extends Component {
 													}}
 												>
 													<div className="add-parent-container">
+														<h2>Select Existing Entity Type:</h2>
 														<EntityTypeSelector
 															onChange={this.addParentEntityType}
 														/>
@@ -278,7 +315,8 @@ export default withStyles(styles)(
 			loadAllEntityTypes,
 			deleteEntityType,
 			updateBrowser,
-			addParentEntityType
+			addParentEntityType,
+			removeParentEntityType
 		})(EntityEditor)
 	)
 );

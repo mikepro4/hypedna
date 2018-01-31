@@ -6,6 +6,7 @@ import update from "immutability-helper";
 import classNames from "classnames";
 import qs from "qs";
 import ChevronRightIcon from "material-ui-icons/ChevronRight";
+import ReactDOM from "react-dom";
 
 import {
 	addEntityType,
@@ -18,6 +19,19 @@ import AddCircleIcon from "material-ui-icons/AddCircle";
 import CloseIcon from "material-ui-icons/Close";
 
 class EntityTypeBrowserGroup extends Component {
+	componentDidMount = () => {
+		this.scrollToSelectedElement();
+	};
+
+	scrollToSelectedElement = () => {
+		var selectedItem = this.refs.selected;
+		if (selectedItem) {
+			var domNode = ReactDOM.findDOMNode(selectedItem);
+			var parentNode = ReactDOM.findDOMNode(this.refs.scrollable_container);
+			parentNode.scrollTop = domNode.offsetTop;
+		}
+	};
+
 	resetBrowser = () => {
 		console.log("reset");
 		this.props.closeEntityType(
@@ -43,7 +57,10 @@ class EntityTypeBrowserGroup extends Component {
 		this.props.addEntityTypeToGroup(
 			this.props.group.parentId,
 			this.props.group,
-			this.props.position
+			this.props.position,
+			() => {
+				this.scrollToSelectedElement();
+			}
 		);
 	};
 
@@ -78,12 +95,36 @@ class EntityTypeBrowserGroup extends Component {
 		return ownAsParent.length;
 	};
 
+	getRefValue = id => {
+		const refValue =
+			this.props.group.activeEntityTypeId == id ? "selected" : "";
+		return refValue;
+	};
+
 	render() {
 		let topLevel = _.isEmpty(this.props.group.parentId);
 		if (this.props.group.single) {
+			let entityTypeId = this.props.group.entityTypes[0]._id;
 			return (
-				<div>
-					{this.props.group.entityTypes[0].genericProperties.displayName}
+				<div className="single-result-container">
+					<div
+						className={classNames({
+							"single-result": true,
+							selected: this.checkActive(entityTypeId),
+							"sub-selected": this.checkSubActive(entityTypeId)
+						})}
+						onClick={() => {
+							this.toggleEntityType(entityTypeId);
+						}}
+					>
+						<div className="result-name">
+							{this.props.group.entityTypes[0].genericProperties.displayName}
+						</div>
+					</div>
+
+					<div className="browser-arrow">
+						<ChevronRightIcon />
+					</div>
 				</div>
 			);
 		}
@@ -145,7 +186,7 @@ class EntityTypeBrowserGroup extends Component {
 						</div>
 					</div>
 					<div className="single-group-search">search here</div>
-					<div className="single-group-results">
+					<div className="single-group-results" ref="scrollable_container">
 						{this.props.group.entityTypes &&
 						this.props.group.entityTypes.length > 0
 							? this.props.group.entityTypes.map(entityType => {
@@ -156,6 +197,7 @@ class EntityTypeBrowserGroup extends Component {
 												selected: this.checkActive(entityType._id),
 												"sub-selected": this.checkSubActive(entityType._id)
 											})}
+											ref={this.getRefValue(entityType._id)}
 											onClick={() => {
 												this.toggleEntityType(entityType._id);
 											}}

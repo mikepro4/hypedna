@@ -36,14 +36,6 @@ export const loadAllEntityTypes = (success, selectId) => async (
 	if (selectId) {
 		selectId();
 	}
-
-	// if (response.status == 200 && selectId) {
-	// 	dispatch(
-	// 		updateBrowser({
-	// 			selectedEntityType: selectId
-	// 		})
-	// 	);
-	// }
 };
 
 export const searchEntityTypes = () => async (dispatch, getState, api) => {
@@ -86,6 +78,25 @@ export const addParentEntityType = (
 			success();
 		}
 		console.log("added parent id");
+	} else {
+		console.log("error");
+	}
+};
+
+export const removeParentEntityType = (
+	id,
+	removeParentEntityTypeId,
+	success
+) => async (dispatch, getState, api) => {
+	const response = await api.post("/remove_parent_entity_type", {
+		id,
+		removeParentEntityTypeId
+	});
+	if (response.status === 200) {
+		if (success) {
+			success();
+		}
+		console.log("deleted parent id");
 	} else {
 		console.log("error");
 	}

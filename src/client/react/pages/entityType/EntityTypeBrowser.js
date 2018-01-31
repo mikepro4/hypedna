@@ -4,7 +4,10 @@ import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import update from "immutability-helper";
 import classNames from "classnames";
+import { withStyles } from "material-ui/styles";
 import qs from "qs";
+
+import Popover from "material-ui/Popover";
 
 import {
 	addEntityType,
@@ -13,7 +16,8 @@ import {
 	loadEntityTypeDetails,
 	loadAllEntityTypes,
 	resetBrowser,
-	resetBrowserGroups
+	resetBrowserGroups,
+	addParentEntityType
 } from "../../../redux/actions/pageEntityTypeActions";
 
 import AddCircleIcon from "material-ui-icons/AddCircle";
@@ -24,11 +28,27 @@ import EntityTypeSelector from "./EntityTypeSelector";
 
 import Button from "../../components/common/button/Button";
 
+const styles = theme => ({
+	paper: {
+		"overflow-x": "visible",
+		"overflow-y": "visible"
+	}
+});
+
 class EntityTypeBrowser extends Component {
 	state = {
 		showNoChildren: false,
 		showCustomSelectedEntity: false,
-		customSelectedEntityId: null
+		customSelectedEntityId: null,
+		addParentOpen: false
+	};
+
+	handleAddParentOpen = event => {
+		this.setState({ addParentOpen: true, anchorEl: event.currentTarget });
+	};
+
+	handleAddParentClose = () => {
+		this.setState({ addParentOpen: false });
 	};
 
 	componentDidMount = () => {
@@ -177,9 +197,31 @@ class EntityTypeBrowser extends Component {
 			if (activeEntity[0] && activeEntity[0].genericProperties) {
 				return (
 					<div className="no-children-container">
-						<Button onClick={() => this.createNewSubtype()} buttonBlack>
-							New Sub-Type of "{activeEntity[0].genericProperties.displayName}"
-						</Button>
+						<button onClick={event => this.handleAddParentOpen(event)}>
+							Associate Entity Type
+						</button>
+
+						<Popover
+							open={this.state.addParentOpen}
+							anchorEl={this.state.anchorEl}
+							onClose={this.handleAddParentClose}
+							classes={{ paper: this.props.classes.paper }}
+							anchorOrigin={{
+								vertical: "bottom",
+								horizontal: "left"
+							}}
+						>
+							<Button
+								onClick={event => this.createNewSubtype(event)}
+								buttonBlack
+							>
+								New Sub-Type of "{activeEntity[0].genericProperties.displayName}"
+							</Button>
+							<div className="add-parent-container">
+								<h2>Select Existing Entity Type:</h2>
+								<EntityTypeSelector onChange={this.addParentEntityType} />
+							</div>
+						</Popover>
 					</div>
 				);
 			}
@@ -313,14 +355,6 @@ class EntityTypeBrowser extends Component {
 	};
 
 	toggleEntityType = (id, group, position) => {
-		console.log(
-			id,
-			group,
-			position,
-			this.props.browser.selectedEntityType,
-			this.props.pageEntityType.activeEntityTypeGroups[position]._id
-		);
-
 		if (
 			id !==
 				this.props.pageEntityType.activeEntityTypeGroups[position]
@@ -341,7 +375,6 @@ class EntityTypeBrowser extends Component {
 					this.props.pageEntityType.activeEntityTypeGroups[position]
 						.activeEntityTypeId
 				) {
-					console.log("now this fires here");
 					this.updateBrowser({
 						selectedEntityType: id
 					});
@@ -379,7 +412,7 @@ class EntityTypeBrowser extends Component {
 		}
 	};
 
-	addEntityTypeToGroup = (id, group, position, selectId) => {
+	addEntityTypeToGroup = (id, group, position, success) => {
 		let parentEntityTypes = [];
 		if (!_.isEmpty(id)) {
 			parentEntityTypes.push({ entityTypeId: id });
@@ -401,11 +434,16 @@ class EntityTypeBrowser extends Component {
 					this.props.pageEntityType.activeEntityTypeGroups[position],
 					position
 				);
+
+				if (success) {
+					success();
+				}
 			}
 		);
 	};
 
-	createNewSubtype = () => {
+	createNewSubtype = event => {
+		this.handleAddParentClose(event);
 		let arrayLength = this.props.browser.active.length;
 		let lastEntityTypeId = this.props.browser.active[arrayLength - 1]
 			.entityTypeId;
@@ -425,7 +463,6 @@ class EntityTypeBrowser extends Component {
 			},
 			this.props.history,
 			data => {
-				console.log("data here: ", data);
 				let updatedGroup = _.assign(
 					{},
 					this.props.pageEntityType.activeEntityTypeGroups[arrayLength],
@@ -459,11 +496,6 @@ class EntityTypeBrowser extends Component {
 				this.setState({
 					showNoChildren: true
 				});
-				// this.toggleEntityType(
-				// 	data._id,
-				// 	this.props.pageEntityType.activeEntityTypeGroups[newPosition],
-				// 	newPosition
-				// );
 			}
 		);
 	};
@@ -478,6 +510,41 @@ class EntityTypeBrowser extends Component {
 		this.updateBrowser({
 			collapsed: "false"
 		});
+	};
+
+	addParentEntityType = id => {
+		this.handleAddParentClose();
+		let arrayLength = this.props.browser.active.length;
+		let lastEntityTypeId = this.props.browser.active[arrayLength - 1]
+			.entityTypeId;
+
+		let containsSameParent = _.filter(
+			this.getEntityType(id).parentEntityTypes,
+			entityType => {
+				return entityType.entityTypeId == lastEntityTypeId;
+			}
+		);
+
+		if (_.isEmpty(containsSameParent)) {
+			this.props.addParentEntityType(id, lastEntityTypeId, () => {
+				this.props.loadAllEntityTypes(() => {
+					this.toggleEntityType(
+						id,
+						this.props.pageEntityType.activeEntityTypeGroups[arrayLength],
+						arrayLength
+					);
+				});
+			});
+		} else {
+			alert("parent already added");
+		}
+	};
+
+	getEntityType = id => {
+		let entityType = _.filter(this.props.allEntityTypes, entityType => {
+			return entityType._id == id;
+		});
+		return entityType[0];
 	};
 
 	render() {
@@ -548,13 +615,16 @@ const mapStateToProps = state => ({
 	allEntityTypes: state.pageEntityType.allEntityTypes
 });
 
-export default withRouter(
-	connect(mapStateToProps, {
-		addEntityType,
-		updateBrowser,
-		updateBrowserGroups,
-		loadEntityTypeDetails,
-		resetBrowser,
-		loadAllEntityTypes
-	})(EntityTypeBrowser)
+export default withStyles(styles)(
+	withRouter(
+		connect(mapStateToProps, {
+			addEntityType,
+			updateBrowser,
+			updateBrowserGroups,
+			loadEntityTypeDetails,
+			resetBrowser,
+			loadAllEntityTypes,
+			addParentEntityType
+		})(EntityTypeBrowser)
+	)
 );
