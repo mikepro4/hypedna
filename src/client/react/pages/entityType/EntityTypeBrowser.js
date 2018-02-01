@@ -25,6 +25,7 @@ import CloseIcon from "material-ui-icons/Close";
 
 import EntityTypeBrowserGroup from "./EntityTypeBrowserGroup";
 import EntityTypeSelector from "./EntityTypeSelector";
+import EntityTypeLinker from "./EntityTypeLinker";
 
 import Button from "../../components/common/button/Button";
 
@@ -222,6 +223,11 @@ class EntityTypeBrowser extends Component {
 								<EntityTypeSelector onChange={this.addParentEntityType} />
 							</div>
 						</Popover>
+						<EntityTypeLinker
+							intent="addChild"
+							idToLink={lastActiveId}
+							toggleEntityType={this.toggleEntityType}
+						/>
 					</div>
 				);
 			}

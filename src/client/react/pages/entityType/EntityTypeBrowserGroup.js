@@ -18,6 +18,8 @@ import {
 import AddCircleIcon from "material-ui-icons/AddCircle";
 import CloseIcon from "material-ui-icons/Close";
 
+import EntityTypeLinker from "./EntityTypeLinker";
+
 class EntityTypeBrowserGroup extends Component {
 	componentDidMount = () => {
 		this.scrollToSelectedElement();
@@ -101,6 +103,11 @@ class EntityTypeBrowserGroup extends Component {
 		return refValue;
 	};
 
+	toggleEntityType = id => {
+		this.props.toggleEntityType(id, this.props.group, this.props.position);
+		this.scrollToSelectedElement();
+	};
+
 	render() {
 		let topLevel = _.isEmpty(this.props.group.parentId);
 		if (this.props.group.single) {
@@ -128,10 +135,6 @@ class EntityTypeBrowserGroup extends Component {
 				</div>
 			);
 		}
-		console.log(
-			this.props.group.activeEntityTypeId,
-			this.props.browser.selectedEntityType
-		);
 
 		return (
 			<div
@@ -172,6 +175,14 @@ class EntityTypeBrowserGroup extends Component {
 										<AddCircleIcon />
 										<span className="button-label">New</span>
 									</button>
+								</li>
+
+								<li className="single-action">
+									<EntityTypeLinker
+										intent="addChild"
+										idToLink={this.props.group.parentId}
+										toggleEntityType={this.toggleEntityType}
+									/>
 								</li>
 
 								<li className="single-action">

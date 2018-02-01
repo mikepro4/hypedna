@@ -12,7 +12,7 @@ class EntityPage extends Component {
 		return store.dispatch(loadAllEntityTypes());
 	}
 	componentWillMount() {
-		// this.props.loadAllEntityTypes();
+		this.props.loadAllEntityTypes();
 	}
 	componentWillUnmount() {}
 	renderHead = () => (

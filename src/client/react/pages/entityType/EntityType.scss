@@ -440,3 +440,35 @@
 		}
 	}
 }
+
+ul.parents-list {
+	li {
+		display: flex;
+		align-items: center;
+		margin: 0 0 10px 0;
+		background: $grey;
+		border-radius: 100px;
+		padding: 3px;
+
+		.empty-type-name {
+			font-weight: 400;
+			font-size: 13px;
+			margin: 0 0 0 5px;
+		}
+
+		.simple-button {
+			cursor: pointer;
+
+			path {
+				transition: all 0.1s;
+				fill: rgba($black, 0.1);
+			}
+
+			&:hover {
+				path {
+					fill: rgba($black, 1);
+				}
+			}
+		}
+	}
+}

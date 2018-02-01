@@ -6,9 +6,13 @@ import { withStyles } from "material-ui/styles";
 import update from "immutability-helper";
 import qs from "qs";
 
+import Button from "../../components/common/button/Button";
+
 import Popover from "material-ui/Popover";
+import RemoveCircleIcon from "material-ui-icons/RemoveCircle";
 
 import EntityTypeSelector from "./EntityTypeSelector";
+import EntityTypeLinker from "./EntityTypeLinker";
 
 import EntityTypeEditorForm from "./EntityTypeEditorForm";
 import {
@@ -16,7 +20,6 @@ import {
 	loadAllEntityTypes,
 	deleteEntityType,
 	updateBrowser,
-	addParentEntityType,
 	removeParentEntityType
 } from "../../../redux/actions/pageEntityTypeActions";
 
@@ -28,19 +31,6 @@ const styles = theme => ({
 });
 
 class EntityEditor extends Component {
-	state = {
-		addParentOpen: false,
-		addChildOpen: false
-	};
-
-	handleAddParentOpen = event => {
-		this.setState({ addParentOpen: true, anchorEl: event.currentTarget });
-	};
-
-	handleAddParentClose = () => {
-		this.setState({ addParentOpen: false });
-	};
-
 	handleFormSubmit = values => {
 		let entityType = _.filter(this.props.allEntityTypes, entityType => {
 			return entityType._id == this.props.browser.selectedEntityType;
@@ -66,9 +56,9 @@ class EntityEditor extends Component {
 			return entity.entityTypeId == this.props.browser.selectedEntityType;
 		});
 
-		console.log("positionOfActive: ", positionOfActive);
+		let newActive;
 
-		let newActive = this.props.browser.active.slice(0, -(positionOfActive - 1));
+		newActive = this.props.browser.active.slice(0, -1);
 
 		this.updateBrowser({
 			selectedEntityType: "",
@@ -78,29 +68,6 @@ class EntityEditor extends Component {
 		});
 
 		this.props.deleteEntityType(this.props.browser.selectedEntityType);
-	};
-
-	addParentEntityType = id => {
-		this.handleAddParentClose();
-		let containsSameParent = _.filter(
-			this.getEntityType(this.props.browser.selectedEntityType)
-				.parentEntityTypes,
-			entityType => {
-				return entityType.entityTypeId == id;
-			}
-		);
-
-		if (_.isEmpty(containsSameParent)) {
-			this.props.addParentEntityType(
-				this.props.browser.selectedEntityType,
-				id,
-				() => {
-					this.props.loadAllEntityTypes();
-				}
-			);
-		} else {
-			alert("parent already added");
-		}
 	};
 
 	removeParentEntityType = id => {
@@ -113,8 +80,14 @@ class EntityEditor extends Component {
 		);
 	};
 
-	addChildEntityType = () => {
-		console.log("add child entity type");
+	removeParentEntityTypeFromChild = id => {
+		this.props.removeParentEntityType(
+			id,
+			this.props.browser.selectedEntityType,
+			() => {
+				this.props.loadAllEntityTypes();
+			}
+		);
 	};
 
 	updateBrowser = newState => {
@@ -146,28 +119,64 @@ class EntityEditor extends Component {
 			}
 		});
 
+		let sortedEntities = _.orderBy(
+			parentEntities,
+			[entity => entity.genericProperties.displayName.toLowerCase()],
+			["asc"]
+		);
+
 		return (
-			<ul className="parens-list">
-				{parentEntities && parentEntities.length > 0
-					? parentEntities.map(entityType => {
-							console.log(
-								"OLOLO here: ",
-								entityType._id,
-								this.props.browser.selectedEntityType,
-								entityType
-							);
+			<ul className="parents-list">
+				{sortedEntities && sortedEntities.length > 0
+					? sortedEntities.map(entityType => {
 							return (
-								<li
-									key={entityType._id}
-									onClick={() => {
-										this.removeParentEntityType(
-											entityType._id,
-											this.props.browser.selectedEntityType
-										);
-									}}
-								>
-									{entityType.genericProperties.displayName}
-									<button>Delete</button>
+								<li key={entityType._id}>
+									<RemoveCircleIcon
+										className="simple-button"
+										onClick={() => {
+											this.removeParentEntityType(
+												entityType._id,
+												this.props.browser.selectedEntityType
+											);
+										}}
+									/>
+									<span className="empty-type-name">
+										{entityType.genericProperties.displayName}
+									</span>
+								</li>
+							);
+						})
+					: ""}
+			</ul>
+		);
+	};
+
+	renderChildren = () => {
+		let childrenEntities = this.getOwnAsParent({
+			entityTypeId: this.props.browser.selectedEntityType
+		});
+
+		let sortedEntities = _.orderBy(
+			childrenEntities,
+			[entity => entity.genericProperties.displayName.toLowerCase()],
+			["asc"]
+		);
+
+		return (
+			<ul className="parents-list">
+				{sortedEntities && sortedEntities.length > 0
+					? sortedEntities.map(entityType => {
+							return (
+								<li key={entityType._id}>
+									<RemoveCircleIcon
+										className="simple-button"
+										onClick={() =>
+											this.removeParentEntityTypeFromChild(entityType._id)
+										}
+									/>
+									<span className="empty-type-name">
+										{entityType.genericProperties.displayName}
+									</span>
 								</li>
 							);
 						})
@@ -188,6 +197,25 @@ class EntityEditor extends Component {
 		return entityType[0];
 	};
 
+	getOwnAsParent = entity => {
+		let ownAsParent = _.filter(this.props.allEntityTypes, entityType => {
+			if (entityType && entityType.parentEntityTypes) {
+				let containsAsParent = _.filter(
+					entityType.parentEntityTypes,
+					parentEntityType => {
+						return parentEntityType.entityTypeId == entity.entityTypeId;
+					}
+				);
+				if (containsAsParent && containsAsParent.length > 0) {
+					return true;
+				}
+			} else {
+				return false;
+			}
+		});
+		return ownAsParent;
+	};
+
 	render() {
 		let entityType = _.filter(this.props.allEntityTypes, entityType => {
 			return entityType._id == this.props.browser.selectedEntityType;
@@ -200,6 +228,12 @@ class EntityEditor extends Component {
 					description: entityType[0].genericProperties.description
 				}
 			};
+		}
+
+		let entity = this.getEntityType(this.props.browser.selectedEntityType);
+		let ownAsParent = [];
+		if (entity) {
+			ownAsParent = this.getOwnAsParent({ entityTypeId: entity._id });
 		}
 
 		return (
@@ -237,34 +271,19 @@ class EntityEditor extends Component {
 							<div className="editor-parents editor-section">
 								<div className="editor-section-header">
 									<div className="editor-section-left">
-										<h1> Parents</h1>
+										<h1>
+											{
+												this.getEntityType(
+													this.props.browser.selectedEntityType
+												).parentEntityTypes.length
+											}{" "}
+											Parents
+										</h1>
 									</div>
 									<div className="editor-section-right">
 										<ul className="editor-actions">
 											<li>
-												<button
-													onClick={event => this.handleAddParentOpen(event)}
-												>
-													Associate Parent
-												</button>
-
-												<Popover
-													open={this.state.addParentOpen}
-													anchorEl={this.state.anchorEl}
-													onClose={this.handleAddParentClose}
-													classes={{ paper: this.props.classes.paper }}
-													anchorOrigin={{
-														vertical: "bottom",
-														horizontal: "left"
-													}}
-												>
-													<div className="add-parent-container">
-														<h2>Select Existing Entity Type:</h2>
-														<EntityTypeSelector
-															onChange={this.addParentEntityType}
-														/>
-													</div>
-												</Popover>
+												<EntityTypeLinker intent="addParent" />
 											</li>
 										</ul>
 									</div>
@@ -276,19 +295,19 @@ class EntityEditor extends Component {
 							<div className="editor-children editor-section">
 								<div className="editor-section-header">
 									<div className="editor-section-left">
-										<h1>0 Children</h1>
+										<h1>{ownAsParent.length} Children</h1>
 									</div>
 									<div className="editor-section-right">
 										<ul className="editor-actions">
 											<li>
-												<button onClick={() => this.addChildEntityType()}>
-													Add Child
-												</button>
+												<EntityTypeLinker intent="addChild" />
 											</li>
 										</ul>
 									</div>
 								</div>
-								<div className="editor-section-content">children here</div>
+								<div className="editor-section-content">
+									{this.renderChildren()}
+								</div>
 							</div>
 						</div>
 					</div>
@@ -301,6 +320,7 @@ class EntityEditor extends Component {
 }
 
 const mapStateToProps = state => ({
+	auth: state.auth,
 	form: state.form,
 	browser: state.pageEntityType.browser,
 	editor: state.pageEntityType.editor,
@@ -315,7 +335,6 @@ export default withStyles(styles)(
 			loadAllEntityTypes,
 			deleteEntityType,
 			updateBrowser,
-			addParentEntityType,
 			removeParentEntityType
 		})(EntityEditor)
 	)
