@@ -3,6 +3,9 @@ $navigationWidth: 74px;
 
 $break1: 1100px;
 
+@import "../../../node_modules/@blueprintjs/core/dist/blueprint.css";
+@import "../../../node_modules/@blueprintjs/core/dist/variables.scss";
+
 //imports
 @import "./imports/colors";
 @import "./imports/reset";
@@ -26,6 +29,24 @@ $break1: 1100px;
 @import "../react/pages/video/Clip";
 
 @import "../react/pages/entityType/EntityType";
+
+@font-face {
+	font-family: "Icons16";
+	font-style: normal;
+	font-weight: normal;
+	src: url("/fonts/icons/icons-16.eot?#iefix") format("embedded-opentype"),
+		url("/fonts/icons/icons-16.woff") format("woff"),
+		url("/fonts/icons/icons-16.ttf") format("truetype");
+}
+
+@font-face {
+	font-family: "Icons20";
+	font-style: normal;
+	font-weight: normal;
+	src: url("/fonts/icons/icons-20.eot?#iefix") format("embedded-opentype"),
+		url("/fonts/icons/icons-20.woff") format("woff"),
+		url("/fonts/icons/icons-20.ttf") format("truetype");
+}
 
 body {
 	margin: 0;

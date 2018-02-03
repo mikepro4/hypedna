@@ -83,6 +83,22 @@ class NavigationSidebar extends Component {
 					<li className="single-sidebar-link">
 						<IconButton
 							className={
+								this.props.location.pathname == "/ontology"
+									? this.props.classes.linkItemActive
+									: this.props.classes.linkItem
+							}
+							aria-label="Tags"
+							component={Link}
+							to="/ontology"
+						>
+							<DescriptionIcon />
+							<div className={this.props.classes.linkLabel}>Ontology</div>
+						</IconButton>
+					</li>
+
+					<li className="single-sidebar-link">
+						<IconButton
+							className={
 								this.props.location.pathname == "/collections"
 									? this.props.classes.linkItemActive
 									: this.props.classes.linkItem

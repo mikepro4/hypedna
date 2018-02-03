@@ -105,7 +105,7 @@ class EntityTypeBrowserGroup extends Component {
 
 	toggleEntityType = id => {
 		this.props.toggleEntityType(id, this.props.group, this.props.position);
-		this.scrollToSelectedElement();
+		// this.scrollToSelectedElement();
 	};
 
 	render() {

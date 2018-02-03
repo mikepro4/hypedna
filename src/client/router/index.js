@@ -10,6 +10,7 @@ import CreateVideoPage from "../react/pages/create/video";
 import SearchPage from "../react/pages/search";
 
 import EntityTypePage from "../react/pages/entityType";
+import OntologyPage from "../react/pages/ontology";
 
 export default [
 	{
@@ -70,6 +71,13 @@ export default [
 				// exact: true,
 				params: {
 					name: "entity_type_page"
+				}
+			},
+			{
+				...OntologyPage,
+				path: "/ontology",
+				params: {
+					name: "ontology"
 				}
 			}
 		]
