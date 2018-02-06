@@ -18,6 +18,7 @@
 
 	.ontology-editor-container {
 		flex-grow: 1;
+		position: relative;
 		@import "./OntologyEditor";
 	}
 
