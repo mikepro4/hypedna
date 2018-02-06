@@ -28,7 +28,7 @@
 	}
 
 	.pt-tree-node-content:hover {
-		background: $grey;
+		background: transparent;
 	}
 
 	.pt-tree-node-content {
@@ -44,25 +44,25 @@
 	}
 
 	.pt-tree-node.pt-tree-node-selected > .pt-tree-node-content {
-		background: $cobalt4;
+		background: rgba($cobalt4, 0.1);
+	}
+
+	.pt-tree-node.pt-tree-node-selected > .pt-tree-node-content,
+	.pt-tree-node.pt-tree-node-selected > .pt-tree-node-content .pt-icon,
+	.pt-tree-node.pt-tree-node-selected > .pt-tree-node-content .pt-icon-standard,
+	.pt-tree-node.pt-tree-node-selected > .pt-tree-node-content .pt-icon-large {
+		color: $cobalt4;
+		&:before {
+			color: $cobalt4;
+		}
 	}
 
 	// .pt-tree-node.pt-tree-node-selected > .pt-tree-node-content,
 	// .pt-tree-node.pt-tree-node-selected > .pt-tree-node-content .pt-icon,
 	// .pt-tree-node.pt-tree-node-selected > .pt-tree-node-content .pt-icon-standard,
 	// .pt-tree-node.pt-tree-node-selected > .pt-tree-node-content .pt-icon-large {
-	// 	color: $cobalt4;
-	// 	&:before {
-	// 		color: $cobalt4;
-	// 	}
+	// 	color: $white;
 	// }
-	//
-	.pt-tree-node.pt-tree-node-selected > .pt-tree-node-content,
-	.pt-tree-node.pt-tree-node-selected > .pt-tree-node-content .pt-icon,
-	.pt-tree-node.pt-tree-node-selected > .pt-tree-node-content .pt-icon-standard,
-	.pt-tree-node.pt-tree-node-selected > .pt-tree-node-content .pt-icon-large {
-		color: $white;
-	}
 
 	.pt-tree.pt-elevation-0 {
 		box-shadow: none;

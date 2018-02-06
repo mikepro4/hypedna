@@ -45,6 +45,8 @@ export const DELETE_VIDEO = "app/DELETE_VIDEO";
 // Page: Ontology
 
 export const SELECT_ENTITY_TYPE = "app/SELECT_ENTITY_TYPE";
+export const UPDATE_TREE = "app/UPDATE_TREE";
+export const UPDATE_TREE_SELECTION = "app/UPDATE_TREE_SELECTION";
 
 /////////////////////////////////////////////////
 

@@ -5,6 +5,7 @@ import { withRouter } from "react-router-dom";
 import { withStyles } from "material-ui/styles";
 import update from "immutability-helper";
 import qs from "qs";
+import * as objTraverse from "obj-traverse/lib/obj-traverse";
 
 import {
 	Button,
@@ -18,7 +19,11 @@ import {
 } from "@blueprintjs/core";
 
 import { updateQueryString } from "../../../redux/actions/";
-import { selectEntityType } from "../../../redux/actions/pageOntologyActions";
+import {
+	selectEntityType,
+	updateTree,
+	updateTreeSelection
+} from "../../../redux/actions/pageOntologyActions";
 
 import OntologySelector from "./OntologySelector";
 
@@ -46,13 +51,51 @@ class OntologyBrowser extends Component {
 			this.computeTree();
 		}
 		//
-		// if (prevProps.selectedEntityTypeId !== this.props.selectedEntityTypeId) {
-		// 	this.computeTree();
-		// }
+		if (prevProps.selectedEntityTypeId !== this.props.selectedEntityTypeId) {
+			this.computeTree();
+		}
 	};
 
 	getQueryParams = () => {
 		return qs.parse(this.props.location.search.substring(1));
+	};
+
+	updateTreeState = () => {
+		let expanded = objTraverse.findAll(
+			{ childNodes: this.state.nodes },
+			"childNodes",
+			{
+				isExpanded: true
+			}
+		);
+
+		let selected = objTraverse.findAll(
+			{ childNodes: this.state.nodes },
+			"childNodes",
+			{
+				isSelected: true
+			}
+		);
+
+		this.props.updateTreeSelection(expanded, selected);
+
+		// this.props.updateQueryString(
+		// 	this.getExpandedSelectedIds(expanded, selected),
+		// 	this.props.location,
+		// 	this.props.history
+		// );
+	};
+
+	getExpandedSelectedIds = (expanded, selected) => {
+		let expandedIds = _.map(expanded, item => {
+			id: item.id;
+		});
+
+		let selectedIds = _.map(selected, item => {
+			id: item.id;
+		});
+
+		return { expandedNodes: expandedIds, selectedNodes: selectedIds };
 	};
 
 	computeTree = () => {
@@ -70,7 +113,33 @@ class OntologyBrowser extends Component {
 			return this.generateNode(entity);
 		});
 
+		this.props.updateTree(nodes);
+
 		this.setState({ nodes: nodes });
+	};
+
+	checkExpanded = id => {
+		let expanded = _.filter(this.props.expandedNodes, expanded => {
+			return expanded.id == id;
+		});
+
+		if (expanded[0]) {
+			return true;
+		} else {
+			return false;
+		}
+	};
+
+	checkSelected = id => {
+		let selected = _.filter(this.props.selectedNodes, selected => {
+			return selected.id == id;
+		});
+
+		if (selected[0]) {
+			return true;
+		} else {
+			return false;
+		}
 	};
 
 	generateNode = entity => {
@@ -90,6 +159,8 @@ class OntologyBrowser extends Component {
 			hasCaret: entityChildren.length > 0,
 			id: entity._id,
 			iconName: entityChildren.length > 0 ? "folder-close" : "document",
+			isExpanded: this.checkExpanded(entity._id),
+			isSelected: this.checkSelected(entity._id),
 			label: (
 				<div>
 					{entity.genericProperties.displayName} ({
@@ -110,24 +181,29 @@ class OntologyBrowser extends Component {
 
 	handleNodeClick = (nodeData, _nodePath, e) => {
 		const originallySelected = nodeData.isSelected;
-		if (!e.shiftKey) {
-			this.forEachNode(this.state.nodes, n => (n.isSelected = false));
-		}
-		nodeData.isSelected = true;
-		nodeData.isExpanded = true;
+		if (!this.checkSelected(nodeData.id)) {
+			if (!e.shiftKey) {
+				this.forEachNode(this.state.nodes, n => (n.isSelected = false));
+			}
+			nodeData.isSelected = true;
+			nodeData.isExpanded = true;
 
-		this.setState(this.state);
-		this.updateSelectedEntityType(nodeData.id);
+			this.setState(this.state);
+			this.updateSelectedEntityType(nodeData.id);
+			this.updateTreeState();
+		}
 	};
 
 	handleNodeCollapse = nodeData => {
 		nodeData.isExpanded = false;
 		this.setState(this.state);
+		this.updateTreeState();
 	};
 
 	handleNodeExpand = nodeData => {
 		nodeData.isExpanded = true;
 		this.setState(this.state);
+		this.updateTreeState();
 	};
 
 	forEachNode = (nodes, callback) => {
@@ -142,11 +218,23 @@ class OntologyBrowser extends Component {
 	};
 
 	onSelectorChange = value => {
+		let node = objTraverse.findAll(
+			{ childNodes: this.state.nodes },
+			"childNodes",
+			{
+				id: value
+			}
+		);
+		this.props.updateTreeSelection(this.props.expandedNodes, node);
+		// this.props.updateQueryString(
+		// 	this.getExpandedSelectedIds(this.props.expandedNodes, node),
+		// 	this.props.location,
+		// 	this.props.history
+		// );
 		if (!_.isEmpty(value)) {
 			console.log("set custom value to: ", value);
 			this.updateSelectedEntityType(value);
-			this.forEachNode(this.state.nodes, n => (n.isSelected = false));
-			this.setState(this.state);
+			this.computeTree();
 		} else {
 			console.log("clear");
 		}
@@ -184,7 +272,7 @@ class OntologyBrowser extends Component {
 
 				<div className="browser-tree">
 					<Tree
-						contents={this.state.nodes}
+						contents={this.props.tree}
 						onNodeClick={this.handleNodeClick}
 						onNodeCollapse={this.handleNodeCollapse}
 						onNodeExpand={this.handleNodeExpand}
@@ -199,11 +287,17 @@ class OntologyBrowser extends Component {
 const mapStateToProps = state => ({
 	pageEntityType: state.pageEntityType,
 	allEntityTypes: state.pageEntityType.allEntityTypes,
-	selectedEntityTypeId: state.pageOntology.selectedEntityTypeId
+	selectedEntityTypeId: state.pageOntology.selectedEntityTypeId,
+	tree: state.pageOntology.tree,
+	expandedNodes: state.pageOntology.expandedNodes,
+	selectedNodes: state.pageOntology.selectedNodes
 });
 
 export default withRouter(
-	connect(mapStateToProps, { selectEntityType, updateQueryString })(
-		OntologyBrowser
-	)
+	connect(mapStateToProps, {
+		selectEntityType,
+		updateQueryString,
+		updateTree,
+		updateTreeSelection
+	})(OntologyBrowser)
 );
