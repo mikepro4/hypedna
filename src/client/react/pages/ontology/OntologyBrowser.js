@@ -135,7 +135,7 @@ class OntologyBrowser extends Component {
 			return selected.id == id;
 		});
 
-		if (selected[0]) {
+		if (selected[0] || this.props.selectedEntityTypeId == id) {
 			return true;
 		} else {
 			return false;
