@@ -10,11 +10,13 @@ const styles = theme => ({});
 
 class OntologyEditor extends Component {
 	render() {
-		return <div>editor lol</div>;
+		return <div>editor lol: {this.props.selectedEntityTypeId}</div>;
 	}
 }
 
-const mapStateToProps = state => ({});
+const mapStateToProps = state => ({
+	selectedEntityTypeId: state.pageOntology.selectedEntityTypeId
+});
 
 export default withStyles(styles)(
 	withRouter(connect(mapStateToProps, {})(OntologyEditor))

@@ -1,0 +1,27 @@
+.ontology-page-container {
+	display: flex;
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: -20px;
+	border-left: 1px solid $grey;
+	flex-direction: row;
+	align-items: stretch;
+
+	.ontology-browser-container {
+		width: 350px;
+		border-right: 1px solid $grey;
+		flex-grow: 0;
+		@import "./OntologyBrowser";
+	}
+
+	.ontology-editor-container {
+		flex-grow: 1;
+		@import "./OntologyEditor";
+	}
+
+	.section-title {
+		font-size: 16px;
+	}
+}

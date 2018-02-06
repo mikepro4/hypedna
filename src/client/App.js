@@ -7,6 +7,9 @@ import NavigationSidebar from "./react/components/navigation/NavigationSidebar";
 import keydown from "react-keydown";
 import { fetchCurrentUser } from "./redux/actions";
 import { selectClip, deleteClip } from "./redux/actions/objectVideoActions";
+import { FocusStyleManager } from "@blueprintjs/core";
+
+FocusStyleManager.onlyShowFocusOnTabs();
 
 class App extends Component {
 	static loadData(store, match) {

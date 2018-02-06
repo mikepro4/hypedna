@@ -42,6 +42,12 @@ export const DELETE_VIDEO = "app/DELETE_VIDEO";
 
 /////////////////////////////////////////////////
 
+// Page: Ontology
+
+export const SELECT_ENTITY_TYPE = "app/SELECT_ENTITY_TYPE";
+
+/////////////////////////////////////////////////
+
 // Page: EntityTypeBrowser
 
 export const UPDATE_BROWSER = "app/UPDATE_BROWSER";

@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import { Helmet } from "react-helmet";
+import classNames from "classnames";
 import { loadAllEntityTypes } from "../../../redux/actions/pageEntityTypeActions";
 
 import OntologyBrowser from "./OntologyBrowser";
@@ -27,7 +28,9 @@ class OntologyPage extends Component {
 				{this.renderHead()}
 
 				<div className="ontology-page-container">
-					<OntologyBrowser />
+					<div className="ontology-browser-container">
+						<OntologyBrowser />
+					</div>
 
 					<div className="ontology-editor-container">
 						<OntologyEditor />

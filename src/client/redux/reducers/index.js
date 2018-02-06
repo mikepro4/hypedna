@@ -4,6 +4,7 @@ import { youtubeVideoSearch } from "./youtubeVideoSearch";
 import { pageVideoReducer } from "./pageVideoReducer";
 import { pageSearchReducer } from "./pageSearchReducer";
 import { pageEntityTypeReducer } from "./pageEntityTypeReducer";
+import { pageOntologyReducer } from "./pageOntologyReducer";
 import { currentVideo } from "./currentVideo";
 import playerReducer from "./playerReducer";
 import { reducer as formReducer } from "redux-form";
@@ -18,6 +19,7 @@ const REDUCERS_OBJECT = {
 	pageVideo: pageVideoReducer,
 	pageSearch: pageSearchReducer,
 	pageEntityType: pageEntityTypeReducer,
+	pageOntology: pageOntologyReducer,
 	router: routerReducer
 };
 
