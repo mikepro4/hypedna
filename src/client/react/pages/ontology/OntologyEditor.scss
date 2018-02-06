@@ -33,13 +33,69 @@
 			.entity-type-info {
 				display: flex;
 				align-items: center;
+
+				.entity-type-title {
+					font-size: 30px;
+					font-weight: 600;
+					margin: 10px 0 5px 0;
+				}
+
+				.entity-type-description {
+					font-size: 16px;
+				}
+
+				.pt-editable-placeholder > .pt-editable-content {
+					color: rgba($black, 0.3);
+					font-weight: "Roboto";
+				}
 			}
 		}
 	}
 
 	.ontology-editor-tabs-container {
 		flex-grow: 1;
-		border-top: 1px solid $grey;
-		margin: 50px 0 0 0;
+		margin: 0px 0 0 0;
+		position: relative;
+
+		.pt-tabs {
+			display: flex;
+			flex-direction: column;
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+		}
+
+		.pt-tab-list {
+			border-bottom: 1px solid $grey;
+			padding: 20px 0 0 20px;
+			flex-grow: 0;
+			flex-shrink: 0;
+		}
+
+		.pt-tab-panel {
+			flex-grow: 1;
+			margin: 0;
+			padding: 20px;
+			overflow-y: scroll;
+			@include webkit-scrollbar-light();
+		}
+
+		.pt-tab {
+			font-size: 14px;
+			font-weight: 400;
+		}
+
+		.pt-tab-indicator {
+			bottom: -1px;
+			height: 1px;
+			background: $cobalt4;
+		}
+
+		.pt-tab[aria-selected="true"],
+		.pt-tab:not([aria-disabled="true"]):hover {
+			color: $cobalt4;
+		}
 	}
 }

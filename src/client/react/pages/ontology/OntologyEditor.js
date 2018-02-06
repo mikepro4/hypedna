@@ -6,6 +6,8 @@ import { withStyles } from "material-ui/styles";
 import update from "immutability-helper";
 import qs from "qs";
 
+import { Tab2, Tabs2 } from "@blueprintjs/core";
+
 import {
 	Classes,
 	EditableText,
@@ -25,7 +27,8 @@ class OntologyEditor extends Component {
 	state = {
 		title: "",
 		description: "",
-		edited: false
+		edited: false,
+		selectedTabId: "0"
 	};
 
 	handleTitleChange = title => {
@@ -105,6 +108,12 @@ class OntologyEditor extends Component {
 		this.handleFormSubmit();
 	};
 
+	handleTabChange = value => {
+		this.setState({
+			selectedTabId: value
+		});
+	};
+
 	render() {
 		return (
 			<div className="ontology-editor-content">
@@ -119,7 +128,8 @@ class OntologyEditor extends Component {
 									<EditableText
 										intent={Intent.DEFAULT}
 										maxLength="500"
-										placeholder="Edit title..."
+										placeholder="Edit entityType Title..."
+										className="entity-type-title"
 										selectAllOnFocus={true}
 										value={this.state.title}
 										confirmOnEnterKey="true"
@@ -131,7 +141,8 @@ class OntologyEditor extends Component {
 									<EditableText
 										intent={Intent.DEFAULT}
 										maxLength="500"
-										placeholder="Edit Description..."
+										placeholder="Type description here..."
+										className="entity-type-description"
 										selectAllOnFocus={true}
 										value={this.state.description}
 										confirmOnEnterKey="true"
@@ -150,7 +161,31 @@ class OntologyEditor extends Component {
 					</div>
 				</div>
 				<div className="ontology-editor-tabs-container">
-					<div />
+					<Tabs2
+						id="Tabs2Example"
+						onChange={this.handleTabChange}
+						selectedTabId={this.state.selectedTabId}
+						large={true}
+					>
+						<Tab2
+							id="0"
+							title="Overview"
+							panel={<div style={{ height: "3000px" }}>overview</div>}
+						/>
+						<Tab2
+							id="1"
+							title="Custom Properties"
+							panel={<div>custom Properties</div>}
+						/>
+						<Tab2
+							id="2"
+							title="Relations"
+							panel={<div>custom Properties</div>}
+						/>
+						<Tab2 id="3" title="Entities" panel={<div>entities</div>} />
+
+						<Tabs2.Expander />
+					</Tabs2>
 				</div>
 			</div>
 		);
