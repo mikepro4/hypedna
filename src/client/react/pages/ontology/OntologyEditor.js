@@ -8,7 +8,12 @@ import qs from "qs";
 
 import { Tab2, Tabs2 } from "@blueprintjs/core";
 
+import { updateQueryString } from "../../../redux/actions/";
+
+import OntologyEditorRelations from "./OntologyEditorRelations";
+
 import {
+	Button,
 	Classes,
 	EditableText,
 	Intent,
@@ -17,9 +22,11 @@ import {
 } from "@blueprintjs/core";
 
 import {
+	updateEntityType,
+	deleteEntityType,
 	loadAllEntityTypes,
-	updateEntityType
-} from "../../../redux/actions/pageEntityTypeActions";
+	selectEntityType
+} from "../../../redux/actions/pageOntologyActions";
 
 const styles = theme => ({});
 
@@ -64,6 +71,19 @@ class OntologyEditor extends Component {
 		);
 	};
 
+	componentDidMount = () => {
+		if (this.props.location.search) {
+			let queryParams = this.getQueryParams();
+			this.setState({
+				selectedTabId: queryParams.selectedTabId
+			});
+		}
+	};
+
+	getQueryParams = () => {
+		return qs.parse(this.props.location.search.substring(1));
+	};
+
 	componentDidUpdate = (prevProps, prevState) => {
 		let entityType = _.filter(this.props.allEntityTypes, entityType => {
 			return entityType._id == this.props.selectedEntityTypeId;
@@ -98,23 +118,35 @@ class OntologyEditor extends Component {
 		}
 	};
 
-	updateTitle = value => {
-		console.log("confirm: ", value);
-		this.handleFormSubmit();
-	};
-
-	updateDescription = value => {
-		console.log("confirm: ", value);
-		this.handleFormSubmit();
-	};
-
 	handleTabChange = value => {
 		this.setState({
 			selectedTabId: value
 		});
+
+		this.props.updateQueryString(
+			{ selectedTabId: value },
+			this.props.location,
+			this.props.history
+		);
+	};
+
+	getEntityType = () => {
+		let entityType = _.filter(this.props.allEntityTypes, entityType => {
+			return entityType._id == this.props.selectedEntityTypeId;
+		});
+
+		return entityType[0];
+	};
+
+	deleteEntityType = () => {
+		this.props.deleteEntityType(this.getEntityType()._id);
+		this.props.updateSelectedEntityType("");
 	};
 
 	render() {
+		if (!this.props.selectedEntityTypeId) {
+			return <div>Select entity Type</div>;
+		}
 		return (
 			<div className="ontology-editor-content">
 				<div className="ontology-editor-header">
@@ -134,7 +166,7 @@ class OntologyEditor extends Component {
 										value={this.state.title}
 										confirmOnEnterKey="true"
 										onChange={this.handleTitleChange}
-										onConfirm={this.updateTitle}
+										onConfirm={this.handleFormSubmit}
 									/>
 								</div>
 								<div>
@@ -147,7 +179,7 @@ class OntologyEditor extends Component {
 										value={this.state.description}
 										confirmOnEnterKey="true"
 										onChange={this.handleDescriptionChange}
-										onConfirm={this.updateDescription}
+										onConfirm={this.handleFormSubmit}
 									/>
 								</div>
 							</div>
@@ -156,7 +188,16 @@ class OntologyEditor extends Component {
 
 					<div className="header-right">
 						<ul className="actions">
-							<li>Delete Entity</li>
+							<li>
+								<Button
+									iconName="trash"
+									text="Delete Entity Type"
+									onClick={() => {
+										this.deleteEntityType();
+									}}
+									intent={Intent.DEFAULT}
+								/>
+							</li>
 						</ul>
 					</div>
 				</div>
@@ -180,11 +221,14 @@ class OntologyEditor extends Component {
 						<Tab2
 							id="2"
 							title="Relations"
-							panel={<div>custom Properties</div>}
+							panel={
+								<div>
+									<OntologyEditorRelations />
+								</div>
+							}
 						/>
-						<Tab2 id="3" title="Entities" panel={<div>entities</div>} />
 
-						<Tabs2.Expander />
+						<Tab2 id="3" title="Entities" panel={<div>entities</div>} />
 					</Tabs2>
 				</div>
 			</div>
@@ -199,8 +243,11 @@ const mapStateToProps = state => ({
 
 export default withStyles(styles)(
 	withRouter(
-		connect(mapStateToProps, { loadAllEntityTypes, updateEntityType })(
-			OntologyEditor
-		)
+		connect(mapStateToProps, {
+			loadAllEntityTypes,
+			updateEntityType,
+			deleteEntityType,
+			updateQueryString
+		})(OntologyEditor)
 	)
 );

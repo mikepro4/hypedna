@@ -5,7 +5,9 @@ import {
 	LOAD_ALL_ENTITY_TYPES_SUCCESS,
 	SELECT_ENTITY_TYPE,
 	UPDATE_TREE,
-	UPDATE_TREE_SELECTION
+	UPDATE_TREE_SELECTION,
+	SHOW_LINKER,
+	HIDE_LINKER
 } from "../actions/types";
 
 export const initialState = {
@@ -14,7 +16,10 @@ export const initialState = {
 	expandedNodes: [],
 	selectedNodes: [],
 	selectedEntityTypeId: null,
-	isFetchingEntityTypes: false
+	isFetchingEntityTypes: false,
+	linkerOpen: false,
+	linkToEntity: null,
+	linkIntent: null
 };
 
 export const pageOntologyReducer = (state = initialState, action) => {
@@ -36,11 +41,22 @@ export const pageOntologyReducer = (state = initialState, action) => {
 			return assign({}, state, {
 				tree: action.payload
 			});
-
 		case UPDATE_TREE_SELECTION:
 			return assign({}, state, {
 				expandedNodes: action.expanded,
 				selectedNodes: action.selected
+			});
+		case SHOW_LINKER:
+			return assign({}, state, {
+				linkerOpen: true,
+				linkToEntity: action.entityTypeId,
+				linkIntent: action.linkIntent
+			});
+		case HIDE_LINKER:
+			return assign({}, state, {
+				linkerOpen: false,
+				linkToEntity: null,
+				linkIntent: null
 			});
 		default:
 			return state;

@@ -1,4 +1,11 @@
 .ontology-browser-content {
+	position: absolute;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	overflow-y: auto;
+
 	.browser-header {
 		display: flex;
 		justify-content: space-between;
@@ -24,7 +31,7 @@
 	}
 
 	.browser-tree {
-		margin: 15px 20px 15px 20px;
+		margin: 15px 20px 55px 20px;
 	}
 
 	.pt-tree-node-content:hover {
@@ -37,6 +44,10 @@
 		margin: 0 0 3px 0;
 		font-size: 13px;
 		color: #747474;
+
+		&:hover {
+			color: $black;
+		}
 
 		.pt-tree-node-label {
 			font-weight: 400;
@@ -63,8 +74,4 @@
 	// .pt-tree-node.pt-tree-node-selected > .pt-tree-node-content .pt-icon-large {
 	// 	color: $white;
 	// }
-
-	.pt-tree.pt-elevation-0 {
-		box-shadow: none;
-	}
 }

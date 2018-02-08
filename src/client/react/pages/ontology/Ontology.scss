@@ -13,6 +13,7 @@
 		width: 350px;
 		border-right: 1px solid $grey;
 		flex-grow: 0;
+		position: relative;
 		@import "./OntologyBrowser";
 	}
 
@@ -24,5 +25,56 @@
 
 	.section-title {
 		font-size: 16px;
+	}
+}
+
+.ontology-loader {
+	position: fixed;
+	bottom: 20px;
+	right: 20px;
+	background: $black;
+	padding: 10px 20px;
+	font-size: 16px;
+	color: $white;
+}
+
+.entity-type-linker {
+	width: 600px;
+}
+
+.linker-dialog {
+	.dialog-header {
+		margin: 30px 30px 20px 30px;
+		display: flex;
+		align-items: center;
+
+		h1 {
+			font-size: 20px;
+			margin: 0 0 0 10px;
+		}
+	}
+	.dialog-content {
+		margin: 30px;
+
+		ul.dialog-form {
+			li.dialog-form-row {
+				display: flex;
+				align-items: center;
+				margin: 0 0 15px 0;
+
+				.dialog-input-label {
+					width: 160px;
+					flex-shrink: 0;
+					flex-grow: 0;
+					font-weight: 400;
+					color: #868686;
+					font-size: 13px;
+				}
+
+				.dialog-input-container {
+					flex-grow: 1;
+				}
+			}
+		}
 	}
 }

@@ -8,10 +8,15 @@ import qs from "qs";
 import * as objTraverse from "obj-traverse/lib/obj-traverse";
 
 import {
+	ContextMenu,
+	Menu,
+	MenuDivider,
+	MenuItem,
+	Popover,
+	PopoverInteractionKind,
 	Button,
 	Classes,
 	Intent,
-	AnchorButton,
 	Icon,
 	ITreeNode,
 	Tooltip,
@@ -19,10 +24,13 @@ import {
 } from "@blueprintjs/core";
 
 import { updateQueryString } from "../../../redux/actions/";
+
 import {
-	selectEntityType,
+	addEntityType,
 	updateTree,
-	updateTreeSelection
+	updateTreeSelection,
+	showLinker,
+	deleteEntityType
 } from "../../../redux/actions/pageOntologyActions";
 
 import OntologySelector from "./OntologySelector";
@@ -37,7 +45,7 @@ class OntologyBrowser extends Component {
 
 		if (this.props.location.search) {
 			let queryParams = this.getQueryParams();
-			this.updateSelectedEntityType(queryParams.selectedEntityTypeId);
+			this.props.updateSelectedEntityType(queryParams.selectedEntityTypeId);
 		}
 	};
 
@@ -50,7 +58,6 @@ class OntologyBrowser extends Component {
 		) {
 			this.computeTree();
 		}
-		//
 		if (prevProps.selectedEntityTypeId !== this.props.selectedEntityTypeId) {
 			this.computeTree();
 		}
@@ -78,21 +85,15 @@ class OntologyBrowser extends Component {
 		);
 
 		this.props.updateTreeSelection(expanded, selected);
-
-		// this.props.updateQueryString(
-		// 	this.getExpandedSelectedIds(expanded, selected),
-		// 	this.props.location,
-		// 	this.props.history
-		// );
 	};
 
 	getExpandedSelectedIds = (expanded, selected) => {
 		let expandedIds = _.map(expanded, item => {
-			id: item.id;
+			return { id: item.id };
 		});
 
 		let selectedIds = _.map(selected, item => {
-			id: item.id;
+			return { id: item.id };
 		});
 
 		return { expandedNodes: expandedIds, selectedNodes: selectedIds };
@@ -116,6 +117,11 @@ class OntologyBrowser extends Component {
 		this.props.updateTree(nodes);
 
 		this.setState({ nodes: nodes });
+	};
+
+	resetTree = () => {
+		this.props.updateSelectedEntityType("");
+		this.props.updateTreeSelection([{}], [{}]);
 	};
 
 	checkExpanded = id => {
@@ -168,8 +174,54 @@ class OntologyBrowser extends Component {
 					})
 				</div>
 			),
-			secondaryLabel: "Actions"
+			secondaryLabel: (
+				<Popover
+					content={this.renderMenu(entity)}
+					interactionKind={PopoverInteractionKind.CLICK}
+					className="au-no-expand"
+				>
+					<span className="pt-icon pt-icon-more au-no-expand" />
+				</Popover>
+			)
 		};
+	};
+
+	deleteEntity = id => {
+		this.props.deleteEntityType(id);
+		this.props.updateSelectedEntityType("");
+	};
+
+	renderMenu = entityType => {
+		return (
+			<Menu>
+				<MenuItem
+					iconName="pt-icon-plus"
+					key="0"
+					onClick={() => console.log(entityType)}
+					text="Create New Entity"
+				/>
+				<MenuDivider key="divider-1" />
+				<MenuItem
+					iconName="pt-icon-log-in"
+					key="1"
+					onClick={() => this.props.showLinker(entityType._id, "add_parent")}
+					text="Add Parent Entity Type"
+				/>
+				<MenuItem
+					iconName="pt-icon-log-out"
+					key="2"
+					onClick={() => this.props.showLinker(entityType._id, "add_child")}
+					text="Add Child Entity Type"
+				/>
+				<MenuDivider key="divider-2" />
+				<MenuItem
+					iconName="pt-icon-trash"
+					key="3"
+					onClick={() => this.deleteEntity(entityType._id)}
+					text="Delete Entity Type"
+				/>
+			</Menu>
+		);
 	};
 
 	getEntityType = id => {
@@ -189,7 +241,7 @@ class OntologyBrowser extends Component {
 			nodeData.isExpanded = true;
 
 			this.setState(this.state);
-			this.updateSelectedEntityType(nodeData.id);
+			this.props.updateSelectedEntityType(nodeData.id);
 			this.updateTreeState();
 		}
 	};
@@ -226,26 +278,33 @@ class OntologyBrowser extends Component {
 			}
 		);
 		this.props.updateTreeSelection(this.props.expandedNodes, node);
-		// this.props.updateQueryString(
-		// 	this.getExpandedSelectedIds(this.props.expandedNodes, node),
-		// 	this.props.location,
-		// 	this.props.history
-		// );
+
 		if (!_.isEmpty(value)) {
 			console.log("set custom value to: ", value);
-			this.updateSelectedEntityType(value);
+			this.props.updateSelectedEntityType(value);
 			this.computeTree();
 		} else {
 			console.log("clear");
 		}
 	};
 
-	updateSelectedEntityType = value => {
-		this.props.selectEntityType(value);
-		this.props.updateQueryString(
-			{ selectedEntityTypeId: value },
-			this.props.location,
-			this.props.history
+	createNewEntityType = () => {
+		this.props.addEntityType(
+			{
+				genericProperties: {
+					displayName:
+						"New Entity Type " + (this.props.allEntityTypes.length + 1),
+					createdAt: Date.now(),
+					createdBy: this.props.auth._id
+				},
+				parentEntityTypes: [],
+				childEntityTypes: []
+			},
+			data => {
+				console.log("added");
+				this.props.updateTreeSelection(this.props.expandedNodes, [{}]);
+				this.props.updateSelectedEntityType(data._id);
+			}
 		);
 	};
 
@@ -258,7 +317,7 @@ class OntologyBrowser extends Component {
 						<Button
 							className={Classes.MINIMAL}
 							text="Reset"
-							onClick={() => this.computeTree()}
+							onClick={() => this.resetTree()}
 						/>
 					</div>
 				</div>
@@ -267,7 +326,12 @@ class OntologyBrowser extends Component {
 					<div className="browser-search-form">
 						<OntologySelector onChange={this.onSelectorChange} />
 					</div>
-					<Button iconName="add" text="New" intent={Intent.SUCCESS} />
+					<Button
+						iconName="add"
+						text="New"
+						onClick={() => this.createNewEntityType()}
+						intent={Intent.PRIMARY}
+					/>
 				</div>
 
 				<div className="browser-tree">
@@ -276,7 +340,6 @@ class OntologyBrowser extends Component {
 						onNodeClick={this.handleNodeClick}
 						onNodeCollapse={this.handleNodeCollapse}
 						onNodeExpand={this.handleNodeExpand}
-						className={Classes.ELEVATION_0}
 					/>
 				</div>
 			</div>
@@ -285,6 +348,7 @@ class OntologyBrowser extends Component {
 }
 
 const mapStateToProps = state => ({
+	auth: state.auth,
 	pageEntityType: state.pageEntityType,
 	allEntityTypes: state.pageEntityType.allEntityTypes,
 	selectedEntityTypeId: state.pageOntology.selectedEntityTypeId,
@@ -295,9 +359,11 @@ const mapStateToProps = state => ({
 
 export default withRouter(
 	connect(mapStateToProps, {
-		selectEntityType,
-		updateQueryString,
 		updateTree,
-		updateTreeSelection
+		updateTreeSelection,
+		addEntityType,
+		updateQueryString,
+		showLinker,
+		deleteEntityType
 	})(OntologyBrowser)
 );

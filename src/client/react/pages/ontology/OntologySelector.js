@@ -20,6 +20,10 @@ class OntologySelector extends Component {
 		console.log(value);
 	};
 
+	shouldComponentUpdate = () => {
+		return true;
+	};
+
 	render() {
 		let sortedEntities = _.orderBy(
 			this.props.allEntityTypes,
@@ -33,22 +37,24 @@ class OntologySelector extends Component {
 			};
 		});
 		return (
-			<div>
-				<Select
-					ref="citySelect"
-					options={entityTypes}
-					simpleValue
-					clearable
-					value={this.state.value}
-					name="select-city"
-					onChange={this.onChange}
-					onNewOptionClick={this.onNewOptionClick}
-					searchable
-					labelKey="name"
-					valueKey="id"
-					placeholder={<span>Type Entity Name...</span>}
-				/>
-			</div>
+			<Select
+				ref="citySelect"
+				options={entityTypes}
+				simpleValue
+				clearable
+				value={
+					_.isEmpty(this.state.value)
+						? this.props.initialState
+						: this.state.value
+				}
+				name="select-city"
+				onChange={this.onChange}
+				onNewOptionClick={this.onNewOptionClick}
+				searchable
+				labelKey="name"
+				valueKey="id"
+				placeholder={<span>Type Entity Type Name...</span>}
+			/>
 		);
 	}
 }

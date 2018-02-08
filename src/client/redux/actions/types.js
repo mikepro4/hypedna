@@ -48,6 +48,13 @@ export const SELECT_ENTITY_TYPE = "app/SELECT_ENTITY_TYPE";
 export const UPDATE_TREE = "app/UPDATE_TREE";
 export const UPDATE_TREE_SELECTION = "app/UPDATE_TREE_SELECTION";
 
+export const LOAD_ALL_ENTITY_TYPES = "app/LOAD_ALL_ENTITY_TYPES";
+export const LOAD_ALL_ENTITY_TYPES_SUCCESS =
+	"app/LOAD_ALL_ENTITY_TYPES_SUCCESS";
+
+export const SHOW_LINKER = "app/SHOW_LINKER";
+export const HIDE_LINKER = "app/HIDE_LINKER";
+
 /////////////////////////////////////////////////
 
 // Page: EntityTypeBrowser
@@ -56,9 +63,6 @@ export const UPDATE_BROWSER = "app/UPDATE_BROWSER";
 export const RESET_BROWSER = "app/RESET_BROWSER";
 export const UPDATE_BROWSER_GROUPS = "app/UPDATE_BROWSER_GROUPS";
 
-export const LOAD_ALL_ENTITY_TYPES = "app/LOAD_ALL_ENTITY_TYPES";
-export const LOAD_ALL_ENTITY_TYPES_SUCCESS =
-	"app/LOAD_ALL_ENTITY_TYPES_SUCCESS";
 export const SEARCH_ENTITY_TYPES = "app/SEARCH_ENTITY_TYPES";
 export const SEARCH_ENTITY_TYPES_SUCCESS = "app/SEARCH_ENTITY_TYPES_SUCCESS";
 export const UPDATE_ENTITY_TYPE = "app/UPDATE_ENTITY_TYPE";

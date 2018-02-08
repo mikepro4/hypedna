@@ -31,6 +31,7 @@ $break1: 1100px;
 @import "../react/pages/entityType/EntityType";
 
 @import "../react/pages/ontology/Ontology";
+@import "../react/pages/ontology/OntologyEditorRelations";
 
 @font-face {
 	font-family: "Icons16";
@@ -76,18 +77,31 @@ h6 {
 
 a {
 	// color: $blue2;
+	color: $cobalt4;
 	text-decoration: none;
 	transition: color 0.15s ease-in-out;
 }
 
 a:hover {
 	// color: $blue4;
+	color: $cobalt3;
 	text-decoration: none;
 }
 
 a:active {
 	// color: $blue5;
+	color: $cobalt5;
 	text-decoration: none;
+}
+
+a.anchor-button {
+	user-select: none;
+	font-weight: 400;
+	font-size: 13px;
+
+	.pt-icon-standard {
+		margin: 0 5px 0 0;
+	}
 }
 
 button {
@@ -108,10 +122,6 @@ button {
 	justify-content: center;
 	user-select: none;
 	background: transparent;
-
-	&:hover {
-		background: $yellow;
-	}
 
 	.button-label {
 		margin: 0 0 0 3px;
@@ -347,10 +357,8 @@ button {
 	.time-list {
 		display: flex;
 		height: 45px;
-		// margin: 10px 0 0 0;
 		align-items: center;
 		position: absolute;
-		// width: 100%;
 		z-index: 1;
 
 		li {
@@ -379,4 +387,101 @@ button {
 			}
 		}
 	}
+}
+
+.pt-overlay-backdrop {
+	background: rgba($black, 0.4);
+}
+
+.pt-dialog-header {
+	box-shadow: none;
+	position: absolute;
+	top: 20px;
+	right: 25px;
+	padding: 0;
+	min-height: inherit;
+
+	.pt-icon-large,
+	h5 {
+		display: none;
+	}
+
+	.pt-dialog-close-button {
+		padding: 0;
+	}
+}
+
+.pt-dialog-body {
+	margin: 30px;
+}
+
+.pt-dialog-footer {
+	margin: 0 30px;
+}
+
+.pt-dialog-container .pt-dialog {
+	position: relative !important;
+	background: #ffffff;
+	box-shadow: 0 5px 14px 0 rgba(0, 0, 0, 0.08);
+	border-radius: 5px;
+	padding-bottom: 30px;
+}
+
+.pt-button:not([class*="pt-intent-"]) {
+	border: none;
+	box-shadow: none;
+	background: $grey;
+	background-image: none;
+	&:before {
+		color: $black;
+	}
+
+	&:hover,
+	&:active {
+		background: $grey;
+		border: none;
+		box-shadow: none;
+		background-image: none;
+	}
+}
+
+.pt-button.pt-intent-success,
+.pt-button.pt-intent-success:hover,
+.pt-button.pt-intent-success:active {
+	background: #43bf4d;
+	border: none;
+	box-shadow: none;
+	background-image: none;
+}
+
+.pt-button.pt-intent-primary,
+.pt-button.pt-intent-primary:hover,
+.pt-button.pt-intent-primary:active {
+	background: $cobalt4;
+	border: none;
+	box-shadow: none;
+	background-image: none;
+}
+
+.pt-button:not([class*="pt-intent-"]):active,
+.pt-button:not([class*="pt-intent-"]).pt-active {
+	background: $cobalt4;
+	color: $white;
+	box-shadow: none;
+
+	&:before {
+		color: $white;
+	}
+}
+
+.pt-button-group {
+	display: flex;
+
+	button.pt-button {
+		flex-grow: 1;
+	}
+}
+
+.Select.is-focused:not(.is-open) > .Select-control {
+	border-color: $cobalt4;
 }

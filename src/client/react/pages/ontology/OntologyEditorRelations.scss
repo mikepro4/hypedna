@@ -1,0 +1,66 @@
+.ontology-editor-relations {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	bottom: 20px;
+	left: 20px;
+	display: flex;
+	align-items: flex-start;
+
+	.relations-section {
+		background: $white;
+		border-radius: 6px;
+		max-height: 100%;
+		display: flex;
+		flex-direction: column;
+		width: 350px;
+		margin: 0 20px 0 0;
+
+		.relations-section-header {
+			height: 60px;
+			border-bottom: 1px solid $grey;
+			flex-grow: 0;
+			flex-shrink: 0;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0 20px;
+
+			.header-left {
+				display: flex;
+				align-items: center;
+
+				h1 {
+					font-size: 18px;
+					font-weight: 600;
+					margin: 0 0 0 10px;
+				}
+			}
+		}
+
+		.relations-section-content {
+			flex-grow: 1;
+			overflow-y: auto;
+			@include webkit-scrollbar-light();
+
+			.no-results {
+				height: 40px;
+				color: #747474;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.related-entity-types-list {
+				padding: 10px 0 10px 0;
+
+				li {
+					height: 40px;
+					display: flex;
+					align-items: center;
+					padding: 0 10px 0 20px;
+				}
+			}
+		}
+	}
+}
