@@ -36,6 +36,12 @@ class OntologySelector extends Component {
 				name: entityType.genericProperties.displayName
 			};
 		});
+
+		if (this.props.filter) {
+			entityTypes = _.filter(entityTypes, entityType => {
+				return entityType.id !== this.props.filter;
+			});
+		}
 		return (
 			<Select
 				ref="citySelect"

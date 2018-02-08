@@ -94,18 +94,18 @@ class OntologyLinker extends Component {
 		}
 
 		if (this.getEntityType(entityTypeId).childEntityTypes) {
-			let containsSameParent = _.filter(
+			let containsSameChild = _.filter(
 				this.getEntityType(entityTypeId).childEntityTypes,
 				entityType => {
 					return entityType.entityTypeId == id;
 				}
 			);
-			containsInChildren = _.isEmpty(containsSameParent);
+			containsInChildren = _.isEmpty(containsSameChild);
 		} else {
 			containsInChildren = true;
 		}
 
-		return containsInChildren || containsInChildren;
+		return containsInParents && containsInChildren;
 	};
 
 	getEntityType = id => {
@@ -206,7 +206,14 @@ class OntologyLinker extends Component {
 								<li className="dialog-form-row">
 									<div className="dialog-input-label">Entity Type To Link:</div>
 									<div className="dialog-input-container">
-										<OntologySelector onChange={this.onTargetSelectorChange} />
+										<OntologySelector
+											onChange={this.onTargetSelectorChange}
+											filter={
+												this.state.edited
+													? this.state.linkToEntity
+													: this.props.linkToEntity
+											}
+										/>
 									</div>
 								</li>
 							</ul>
