@@ -30,7 +30,9 @@ import {
 	updateTree,
 	updateTreeSelection,
 	showLinker,
-	deleteEntityType
+	deleteEntityType,
+	addParentEntityType,
+	loadAllEntityTypes
 } from "../../../redux/actions/pageOntologyActions";
 
 import OntologySelector from "./OntologySelector";
@@ -175,13 +177,19 @@ class OntologyBrowser extends Component {
 				</div>
 			),
 			secondaryLabel: (
-				<Popover
-					content={this.renderMenu(entity)}
-					interactionKind={PopoverInteractionKind.CLICK}
-					className="au-no-expand"
-				>
-					<span className="pt-icon pt-icon-more au-no-expand" />
-				</Popover>
+				<div>
+					<span
+						className="pt-icon-standard pt-icon-plus create-child no-expand"
+						onClick={() => this.createChild(entity._id)}
+					/>
+					<Popover
+						content={this.renderMenu(entity)}
+						interactionKind={PopoverInteractionKind.CLICK}
+						className="au-no-expand"
+					>
+						<span className="pt-icon-standard pt-icon-more au-no-expand no-expand" />
+					</Popover>
+				</div>
 			)
 		};
 	};
@@ -194,13 +202,6 @@ class OntologyBrowser extends Component {
 	renderMenu = entityType => {
 		return (
 			<Menu>
-				<MenuItem
-					iconName="pt-icon-plus"
-					key="0"
-					onClick={() => console.log(entityType)}
-					text="Create New Entity"
-				/>
-				<MenuDivider key="divider-1" />
 				<MenuItem
 					iconName="pt-icon-log-in"
 					key="1"
@@ -232,17 +233,21 @@ class OntologyBrowser extends Component {
 	};
 
 	handleNodeClick = (nodeData, _nodePath, e) => {
-		const originallySelected = nodeData.isSelected;
-		if (!this.checkSelected(nodeData.id)) {
-			if (!e.shiftKey) {
-				this.forEachNode(this.state.nodes, n => (n.isSelected = false));
-			}
-			nodeData.isSelected = true;
-			nodeData.isExpanded = true;
+		let noExpand = e.target.className.includes("no-expand");
 
-			this.setState(this.state);
-			this.props.updateSelectedEntityType(nodeData.id);
-			this.updateTreeState();
+		if (!noExpand) {
+			const originallySelected = nodeData.isSelected;
+			if (!this.checkSelected(nodeData.id)) {
+				if (!e.shiftKey) {
+					this.forEachNode(this.state.nodes, n => (n.isSelected = false));
+				}
+				nodeData.isSelected = true;
+				nodeData.isExpanded = true;
+
+				this.setState(this.state);
+				this.props.updateSelectedEntityType(nodeData.id);
+				this.updateTreeState();
+			}
 		}
 	};
 
@@ -308,6 +313,29 @@ class OntologyBrowser extends Component {
 		);
 	};
 
+	createChild = id => {
+		this.props.addEntityType(
+			{
+				genericProperties: {
+					displayName:
+						"New Entity Type " + (this.props.allEntityTypes.length + 1),
+					createdAt: Date.now(),
+					createdBy: this.props.auth._id
+				},
+				parentEntityTypes: [],
+				childEntityTypes: []
+			},
+			data => {
+				console.log("added");
+				this.props.addParentEntityType(data._id, id, () => {
+					this.props.loadAllEntityTypes();
+					this.props.updateTreeSelection(this.props.expandedNodes, [{}]);
+					this.props.updateSelectedEntityType(data._id);
+				});
+			}
+		);
+	};
+
 	render() {
 		console.log(this.props.tree);
 		return (
@@ -365,6 +393,8 @@ export default withRouter(
 		addEntityType,
 		updateQueryString,
 		showLinker,
-		deleteEntityType
+		deleteEntityType,
+		addParentEntityType,
+		loadAllEntityTypes
 	})(OntologyBrowser)
 );
