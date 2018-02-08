@@ -78,6 +78,9 @@ class OntologyLinker extends Component {
 	};
 
 	checkIfContains = (id, entityTypeId) => {
+		let containsInParents;
+		let containsInChildren;
+
 		if (this.getEntityType(entityTypeId).parentEntityTypes) {
 			let containsSameParent = _.filter(
 				this.getEntityType(entityTypeId).parentEntityTypes,
@@ -85,10 +88,24 @@ class OntologyLinker extends Component {
 					return entityType.entityTypeId == id;
 				}
 			);
-			return _.isEmpty(containsSameParent);
+			containsInParents = _.isEmpty(containsSameParent);
 		} else {
-			return true;
+			containsInParents = true;
 		}
+
+		if (this.getEntityType(entityTypeId).childEntityTypes) {
+			let containsSameParent = _.filter(
+				this.getEntityType(entityTypeId).childEntityTypes,
+				entityType => {
+					return entityType.entityTypeId == id;
+				}
+			);
+			containsInChildren = _.isEmpty(containsSameParent);
+		} else {
+			containsInChildren = true;
+		}
+
+		return containsInChildren || containsInChildren;
 	};
 
 	getEntityType = id => {
