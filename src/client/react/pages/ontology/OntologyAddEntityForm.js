@@ -24,10 +24,6 @@ import update from "immutability-helper";
 
 import DraggableField from "./DraggableField";
 
-const fieldTarget = {
-	drop() {}
-};
-
 @DragDropContext(HTML5Backend)
 class OntologyAddEntityForm extends React.Component {
 	state = {
@@ -152,18 +148,7 @@ class OntologyAddEntityForm extends React.Component {
 		);
 	};
 
-	findField = id => {
-		const fields = this.props.customProperties;
-		const field = fields.filter(field => field._id === id)[0];
-
-		return {
-			field,
-			index: fields.indexOf(field)
-		};
-	};
-
 	dragStart = () => {
-		console.log("drag start");
 		this.setState({
 			dragging: true,
 			fields: this.props.customProperties
@@ -238,7 +223,6 @@ class OntologyAddEntityForm extends React.Component {
 									key={property._id}
 									id={property._id}
 									moveField={this.moveField}
-									findField={this.findField}
 									index={i}
 									dragStart={this.dragStart}
 									dragEnd={this.dragEnd}

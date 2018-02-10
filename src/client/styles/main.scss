@@ -492,3 +492,23 @@ button {
 .pt-datepicker.pt-input {
 	height: auto;
 }
+
+.draggable-field {
+	position: relative;
+
+	.drag-handle {
+		position: absolute;
+		left: -18px;
+		top: 50%;
+		margin-top: -8px;
+		opacity: 0.3;
+		cursor: move;
+		&:hover {
+			opacity: 1;
+		}
+	}
+
+	&.dragging {
+		opacity: 0.4;
+	}
+}

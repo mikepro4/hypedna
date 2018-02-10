@@ -3,7 +3,6 @@ import * as _ from "lodash";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 import update from "immutability-helper";
-import qs from "qs";
 import classNames from "classnames";
 import { findDOMNode } from "react-dom";
 
@@ -67,19 +66,24 @@ const fieldTarget = {
 class DraggableField extends Component {
 	render() {
 		return this.props.connectDragPreview(
-			this.props.connectDragSource(
-				this.props.connectDropTarget(
-					<div
-						onDragStart={e => {
-							this.props.dragStart();
-						}}
-						onDragEnd={e => {
-							this.props.dragEnd();
-						}}
-					>
-						{this.props.children}
-					</div>
-				)
+			this.props.connectDropTarget(
+				<div
+					onDragStart={e => {
+						this.props.dragStart();
+					}}
+					onDragEnd={e => {
+						this.props.dragEnd();
+					}}
+					className={classNames({
+						"draggable-field": true,
+						dragging: this.props.isDragging
+					})}
+				>
+					{this.props.connectDragSource(
+						<span className="pt-icon-standard pt-icon-drag-handle-vertical drag-handle" />
+					)}
+					{this.props.children}
+				</div>
 			)
 		);
 	}
