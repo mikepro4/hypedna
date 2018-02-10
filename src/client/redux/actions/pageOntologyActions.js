@@ -81,6 +81,35 @@ export const updateCustomProperty = (id, propertyId, values, success) => async (
 
 /////////////////////////////////////////////////
 
+export const updateAllCustomProperties = (
+	id,
+	customProperties,
+	success
+) => async (dispatch, getState, api) => {
+	const response = await api.post("/update_all_custom_properties", {
+		id: id,
+		customProperties: customProperties
+	});
+	dispatch({
+		type: LOAD_ALL_ENTITY_TYPES
+	});
+
+	if (response.status === 200) {
+		dispatch(
+			loadAllEntityTypes(() => {
+				if (success) {
+					success();
+				}
+			})
+		);
+		console.log("added custom property ");
+	} else {
+		console.log("error");
+	}
+};
+
+/////////////////////////////////////////////////
+
 export const removeCustomProperty = (id, propertyId, success) => async (
 	dispatch,
 	getState,

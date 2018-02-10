@@ -6,9 +6,13 @@ import { connect } from "react-redux";
 
 import { Button, Intent } from "@blueprintjs/core";
 
+import { DropTarget, DragDropContext } from "react-dnd";
+import HTML5Backend from "react-dnd-html5-backend";
+
 import {
 	removeCustomProperty,
-	showPropertyCreator
+	showPropertyCreator,
+	updateAllCustomProperties
 } from "../../../redux/actions/pageOntologyActions";
 
 import Input from "../../components/common/form/Input";
@@ -16,8 +20,19 @@ import DateInput from "../../components/common/form/DateInput";
 import Textarea from "../../components/common/form/Textarea";
 import Checkbox from "../../components/common/form/Checkbox";
 import Select from "../../components/common/form/Select";
+import update from "immutability-helper";
 
+import DraggableField from "./DraggableField";
+
+const fieldTarget = {
+	drop() {}
+};
+
+@DragDropContext(HTML5Backend)
 class OntologyAddEntityForm extends React.Component {
+	state = {
+		dragging: false
+	};
 	renderInput = property => {
 		switch (property.propertyType) {
 			case "string":
@@ -124,62 +139,128 @@ class OntologyAddEntityForm extends React.Component {
 		);
 	};
 
+	moveField = (dragIndex, hoverIndex) => {
+		const { fields } = this.state;
+		const dragField = fields[dragIndex];
+
+		this.setState(
+			update(this.state, {
+				fields: {
+					$splice: [[dragIndex, 1], [hoverIndex, 0, dragField]]
+				}
+			})
+		);
+	};
+
+	findField = id => {
+		const fields = this.props.customProperties;
+		const field = fields.filter(field => field._id === id)[0];
+
+		return {
+			field,
+			index: fields.indexOf(field)
+		};
+	};
+
+	dragStart = () => {
+		console.log("drag start");
+		this.setState({
+			dragging: true,
+			fields: this.props.customProperties
+		});
+	};
+
+	dragEnd = () => {
+		this.props.updateAllCustomProperties(
+			this.props.selectedEntityTypeId,
+			this.state.fields,
+			() => {
+				this.setState({
+					dragging: false,
+					fields: []
+				});
+			}
+		);
+	};
+
 	render() {
 		const { handleSubmit } = this.props;
 
+		let fields;
+
+		if (this.state.dragging) {
+			fields = this.state.fields;
+		} else {
+			fields = this.props.customProperties;
+		}
+
 		return (
-			<Form
-				onSubmit={handleSubmit}
-				autoComplete="off"
-				role="presentation"
-				className=""
-			>
-				<h1 className="form-headline">Generic Properties</h1>
-				<div className="generic-properties">
-					<Field
-						name="displayName"
-						component={Input}
-						label="Display Name:"
-						placeholder="Enter display name..."
-						ref="displayName"
-					/>
+			<div>
+				<Form
+					onSubmit={handleSubmit}
+					autoComplete="off"
+					role="presentation"
+					className=""
+				>
+					<h1 className="form-headline">Generic Properties</h1>
+					<div className="generic-properties">
+						<Field
+							name="displayName"
+							component={Input}
+							label="Display Name:"
+							placeholder="Enter display name..."
+							ref="displayName"
+						/>
 
-					<Field
-						name="description"
-						component={Input}
-						label="Description:"
-						placeholder="Description here"
-						ref="description"
-					/>
+						<Field
+							name="description"
+							component={Input}
+							label="Description:"
+							placeholder="Description here"
+							ref="description"
+						/>
 
-					<Field
-						name="entityUrlName"
-						component={Input}
-						label="Entity Url Name:"
-						placeholder="Enter entity url name (english, no spaces)..."
-						ref="entityUrlName"
-					/>
-				</div>
+						<Field
+							name="entityUrlName"
+							component={Input}
+							label="Entity Url Name:"
+							placeholder="Enter entity url name (english, no spaces)..."
+							ref="entityUrlName"
+						/>
+					</div>
 
-				<div className="custom-properties">
-					<h1 className="form-headline">Custom Properties</h1>
+					<div className="custom-properties">
+						<h1 className="form-headline">Custom Properties</h1>
 
-					{this.props.customProperties.map(property => {
-						return this.renderProperty(property);
-					})}
-				</div>
+						{fields.map((property, i) => {
+							return (
+								<DraggableField
+									key={property._id}
+									id={property._id}
+									moveField={this.moveField}
+									findField={this.findField}
+									index={i}
+									dragStart={this.dragStart}
+									dragEnd={this.dragEnd}
+								>
+									{this.renderProperty(property)}
+								</DraggableField>
+							);
+						})}
+					</div>
 
-				<div className="form-footer">
-					<Button text="Clear Values" onClick={this.props.reset} />
+					<div className="form-footer">
+						<Button text="Clear Values" onClick={this.props.reset} />
 
-					<Button
-						intent={Intent.SUCCESS}
-						disabled={this.props.pristine}
-						type="submit"
-						text="create New Entity"
-					/>
-				</div>
-			</Form>
+						<Button
+							intent={Intent.SUCCESS}
+							disabled={this.props.pristine}
+							type="submit"
+							text="create New Entity"
+						/>
+					</div>
+				</Form>
+			</div>
 		);
 	}
 }
@@ -206,5 +287,6 @@ const mapStateToProps = state => ({
 
 export default connect(mapStateToProps, {
 	removeCustomProperty,
-	showPropertyCreator
+	showPropertyCreator,
+	updateAllCustomProperties
 })(OntologyAddEntityForm);
