@@ -1,0 +1,53 @@
+.input-group {
+	display: flex;
+	width: 100%;
+	margin: 0 0 20px 0;
+
+	&:last-child {
+		margin: 0;
+	}
+
+	.input-group-left {
+		width: 160px;
+		margin-right: 10px;
+		flex-grow: 0;
+		flex-shrink: 0;
+		display: flex;
+		align-items: center;
+		font-size: 13px;
+		font-weight: 400;
+		opacity: 0.6;
+	}
+
+	.input-group-right {
+		flex-grow: 1;
+		display: flex;
+		align-items: center;
+		position: relative;
+
+		.input-valid {
+			position: absolute;
+			right: 8px;
+			top: 8px;
+			color: $forest3;
+		}
+
+		.input-error {
+			display: block;
+			position: absolute;
+			top: -15px;
+			left: 0;
+			font-size: 11px;
+			color: $red3;
+		}
+
+		.pt-input,
+		select {
+			width: 100%;
+		}
+	}
+
+	.pt-control {
+		margin-bottom: 0;
+	}
+}

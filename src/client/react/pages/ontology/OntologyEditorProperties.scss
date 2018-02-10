@@ -1,0 +1,54 @@
+.ontology-editor-properties {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	bottom: 20px;
+	left: 20px;
+	display: flex;
+	align-items: flex-start;
+
+	.properties-section {
+		background: $white;
+		border-radius: 6px;
+		max-height: 100%;
+		display: flex;
+		flex-direction: column;
+		width: 700px;
+		margin: 0 20px 0 0;
+
+		.properties-section-header {
+			height: 60px;
+			border-bottom: 1px solid $grey;
+			flex-grow: 0;
+			flex-shrink: 0;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0 20px;
+
+			.header-left {
+				display: flex;
+				align-items: center;
+
+				.pt-icon-large {
+					&:before {
+						color: $orange4;
+					}
+				}
+
+				h1 {
+					font-size: 18px;
+					font-weight: 600;
+					margin: 0 0 0 10px;
+				}
+			}
+		}
+
+		.properties-section-content {
+			flex-grow: 1;
+			overflow-y: auto;
+			padding: 20px;
+			@include webkit-scrollbar-light();
+		}
+	}
+}

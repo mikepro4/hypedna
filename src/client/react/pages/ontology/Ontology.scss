@@ -42,7 +42,8 @@
 	width: 600px;
 }
 
-.linker-dialog {
+.linker-dialog,
+.property-creator-dialog {
 	.dialog-header {
 		margin: 30px 30px 20px 30px;
 		display: flex;
@@ -73,6 +74,73 @@
 
 				.dialog-input-container {
 					flex-grow: 1;
+				}
+			}
+		}
+	}
+}
+
+.form-headline {
+	font-size: 16px;
+	font-weight: bold;
+	margin: 5px 0 20px 0;
+}
+
+.generic-properties {
+	border-bottom: 1px solid $grey;
+	margin: 0 0 30px 0;
+	padding: 0 0 20px 0;
+}
+
+.custom-properties {
+	margin: 0 0 20px 0;
+
+	.single-form-row {
+		display: flex;
+		align-items: center;
+		margin: 0 0 20px 0;
+
+		.input-group {
+			flex-grow: 1;
+			padding: 0 10px 0 0;
+			margin: 0;
+		}
+
+		.anchor-button {
+			flex-grow: 0;
+			margin: 0 0px 0 10px;
+		}
+	}
+}
+
+.form-footer {
+	display: flex;
+	justify-content: flex-end;
+	position: relative;
+
+	button {
+		margin: 0 0 0 20px;
+	}
+}
+
+.property-creator {
+	width: 600px;
+
+	.dropdow-values-container {
+		margin: 20px 0 0 0;
+
+		.single-dropdown-value-container {
+			margin: 0 0 20px 0;
+			border-top: 1px solid $grey;
+			padding: 20px 0 0px 0;
+
+			.single-dropdown-value-header {
+				display: flex;
+				justify-content: space-between;
+				margin: 0 0 20px 0;
+
+				h1 {
+					font-size: 20px;
 				}
 			}
 		}

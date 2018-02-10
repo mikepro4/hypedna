@@ -7,7 +7,9 @@ import {
 	UPDATE_TREE,
 	UPDATE_TREE_SELECTION,
 	SHOW_LINKER,
-	HIDE_LINKER
+	HIDE_LINKER,
+	SHOW_PROPERTY_CREATOR,
+	HIDE_PROPERTY_CREATOR
 } from "../actions/types";
 
 export const initialState = {
@@ -19,7 +21,8 @@ export const initialState = {
 	isFetchingEntityTypes: false,
 	linkerOpen: false,
 	linkToEntity: null,
-	linkIntent: null
+	linkIntent: null,
+	propertyCreatorOpen: false
 };
 
 export const pageOntologyReducer = (state = initialState, action) => {
@@ -57,6 +60,14 @@ export const pageOntologyReducer = (state = initialState, action) => {
 				linkerOpen: false,
 				linkToEntity: null,
 				linkIntent: null
+			});
+		case SHOW_PROPERTY_CREATOR:
+			return assign({}, state, {
+				propertyCreatorOpen: true
+			});
+		case HIDE_PROPERTY_CREATOR:
+			return assign({}, state, {
+				propertyCreatorOpen: false
 			});
 		default:
 			return state;

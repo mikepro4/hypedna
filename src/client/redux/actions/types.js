@@ -55,6 +55,9 @@ export const LOAD_ALL_ENTITY_TYPES_SUCCESS =
 export const SHOW_LINKER = "app/SHOW_LINKER";
 export const HIDE_LINKER = "app/HIDE_LINKER";
 
+export const SHOW_PROPERTY_CREATOR = "app/SHOW_PROPERTY_CREATOR";
+export const HIDE_PROPERTY_CREATOR = "app/HIDE_PROPERTY_CREATOR";
+
 /////////////////////////////////////////////////
 
 // Page: EntityTypeBrowser

@@ -11,6 +11,7 @@ import { Tab2, Tabs2 } from "@blueprintjs/core";
 import { updateQueryString } from "../../../redux/actions/";
 
 import OntologyEditorRelations from "./OntologyEditorRelations";
+import OntologyEditorProperties from "./OntologyEditorProperties";
 
 import {
 	Button,
@@ -215,8 +216,12 @@ class OntologyEditor extends Component {
 						/>
 						<Tab2
 							id="1"
-							title="Custom Properties"
-							panel={<div>custom Properties</div>}
+							title="Properties"
+							panel={
+								<div>
+									<OntologyEditorProperties />
+								</div>
+							}
 						/>
 						<Tab2
 							id="2"

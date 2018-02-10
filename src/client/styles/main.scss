@@ -14,6 +14,7 @@ $break1: 1100px;
 
 //components
 @import "../react/components/common/button/Button";
+@import "../react/components/common/form/InputGroup";
 @import "../react/components/header/Header";
 @import "../react/components/navigation/NavigationSidebar";
 @import "../react/components/common/player/Player";
@@ -32,6 +33,7 @@ $break1: 1100px;
 
 @import "../react/pages/ontology/Ontology";
 @import "../react/pages/ontology/OntologyEditorRelations";
+@import "../react/pages/ontology/OntologyEditorProperties";
 
 @font-face {
 	font-family: "Icons16";

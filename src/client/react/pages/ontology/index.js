@@ -13,6 +13,7 @@ import {
 import OntologyBrowser from "./OntologyBrowser";
 import OntologyEditor from "./OntologyEditor";
 import OntologyLinker from "./OntologyLinker";
+import OntologyPropertyCreator from "./OntologyPropertyCreator";
 
 class OntologyPage extends Component {
 	static loadData(store, match, route, path, query) {
@@ -65,6 +66,7 @@ class OntologyPage extends Component {
 				)}
 
 				<OntologyLinker />
+				<OntologyPropertyCreator />
 			</div>
 		);
 	}

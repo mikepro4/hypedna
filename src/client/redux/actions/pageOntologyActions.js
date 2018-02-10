@@ -5,10 +5,80 @@ import {
 	LOAD_ALL_ENTITY_TYPES,
 	LOAD_ALL_ENTITY_TYPES_SUCCESS,
 	SHOW_LINKER,
-	HIDE_LINKER
+	HIDE_LINKER,
+	SHOW_PROPERTY_CREATOR,
+	HIDE_PROPERTY_CREATOR
 } from "./types";
 
 import * as _ from "lodash";
+
+/////////////////////////////////////////////////
+
+export const getEntityType = id => (dispatch, getState, api) => {
+	let entityType = _.filter(
+		getState().pageOntology.allEntityTypes,
+		entityType => {
+			return entityType._id == id;
+		}
+	);
+	return entityType[0];
+};
+
+/////////////////////////////////////////////////
+
+export const addCustomProperty = (id, values, success) => async (
+	dispatch,
+	getState,
+	api
+) => {
+	const response = await api.post("/add_custom_property", {
+		id: id,
+		customProperty: values
+	});
+	dispatch({
+		type: LOAD_ALL_ENTITY_TYPES
+	});
+
+	if (response.status === 200) {
+		dispatch(loadAllEntityTypes());
+
+		if (success) {
+			success();
+		}
+		console.log("added custom property ");
+	} else {
+		console.log("error");
+	}
+};
+
+/////////////////////////////////////////////////
+
+export const removeCustomProperty = (id, propertyId, success) => async (
+	dispatch,
+	getState,
+	api
+) => {
+	const response = await api.post("/remove_custom_property", {
+		id,
+		propertyId
+	});
+	dispatch({
+		type: LOAD_ALL_ENTITY_TYPES
+	});
+
+	if (response.status === 200) {
+		dispatch(loadAllEntityTypes());
+
+		if (success) {
+			success();
+		}
+		console.log("removed custom property");
+	} else {
+		console.log("error");
+	}
+};
+
+/////////////////////////////////////////////////
 
 export const removeParentEntityType = (
 	id,
@@ -27,44 +97,6 @@ export const removeParentEntityType = (
 	} else {
 		console.log("error");
 	}
-};
-
-/////////////////////////////////////////////////
-
-export const getEntityType = id => (dispatch, getState, api) => {
-	let entityType = _.filter(
-		getState().pageOntology.allEntityTypes,
-		entityType => {
-			return entityType._id == id;
-		}
-	);
-	return entityType[0];
-};
-
-/////////////////////////////////////////////////
-
-// can be removed
-
-export const getOwnAsParent = id => (dispatch, getState, api) => {
-	let ownAsParent = _.filter(
-		getState().pageOntology.allEntityTypes,
-		entityType => {
-			if (entityType && entityType.parentEntityTypes) {
-				let containsAsParent = _.filter(
-					entityType.parentEntityTypes,
-					parentEntityType => {
-						return parentEntityType.entityTypeId == id;
-					}
-				);
-				if (containsAsParent && containsAsParent.length > 0) {
-					return true;
-				}
-			} else {
-				return false;
-			}
-		}
-	);
-	return ownAsParent;
 };
 
 /////////////////////////////////////////////////
@@ -90,11 +122,23 @@ export const addParentEntityType = (
 
 /////////////////////////////////////////////////
 
-export const showLinker = (entityTypeId, linkIntent) => async (
-	dispatch,
-	getState,
-	api
-) => {
+export const showPropertyCreator = () => async dispatch => {
+	dispatch({
+		type: SHOW_PROPERTY_CREATOR
+	});
+};
+
+/////////////////////////////////////////////////
+
+export const hidePropertyCreator = () => async dispatch => {
+	dispatch({
+		type: HIDE_PROPERTY_CREATOR
+	});
+};
+
+/////////////////////////////////////////////////
+
+export const showLinker = (entityTypeId, linkIntent) => async dispatch => {
 	dispatch({
 		type: SHOW_LINKER,
 		entityTypeId,
@@ -104,7 +148,7 @@ export const showLinker = (entityTypeId, linkIntent) => async (
 
 /////////////////////////////////////////////////
 
-export const hideLinker = () => async (dispatch, getState, api) => {
+export const hideLinker = () => async dispatch => {
 	dispatch({
 		type: HIDE_LINKER
 	});
