@@ -13,7 +13,8 @@ import { Dialog, Button, Intent, ButtonGroup } from "@blueprintjs/core";
 import {
 	hidePropertyCreator,
 	loadAllEntityTypes,
-	addCustomProperty
+	addCustomProperty,
+	updateCustomProperty
 } from "../../../redux/actions/pageOntologyActions";
 
 import { submit } from "redux-form";
@@ -29,7 +30,15 @@ class OntologyPropertyCreator extends Component {
 
 	handleSubmit = values => {
 		this.onClose();
-		this.props.addCustomProperty(this.props.selectedEntityTypeId, values);
+		if (this.props.selectedProperty && this.props.selectedProperty._id) {
+			this.props.updateCustomProperty(
+				this.props.selectedEntityTypeId,
+				this.props.selectedProperty._id,
+				values
+			);
+		} else {
+			this.props.addCustomProperty(this.props.selectedEntityTypeId, values);
+		}
 	};
 
 	render() {
@@ -44,12 +53,21 @@ class OntologyPropertyCreator extends Component {
 					<div className="pt-dialog-body" className="property-creator-dialog">
 						<div className="dialog-header">
 							<span className="pt-icon-large pt-icon-form" />
-							<h1>New Custom Property</h1>
+							{this.props.selectedProperty &&
+							this.props.selectedProperty._id ? (
+								<h1>
+									Editing Property: {this.props.selectedProperty.displayName}
+								</h1>
+							) : (
+								<h1>New Custom Property</h1>
+							)}
 						</div>
 
 						<div className="dialog-content">
 							<PropertyEditorForm
 								ref="propertyForm"
+								initialValues={this.props.selectedProperty}
+								enableReinitialize={true}
 								onSubmit={this.handleSubmit.bind(this)}
 								onChange={values => this.setState(values)}
 							/>
@@ -65,13 +83,15 @@ const mapStateToProps = state => ({
 	auth: state.auth,
 	allEntityTypes: state.pageOntology.allEntityTypes,
 	propertyCreatorOpen: state.pageOntology.propertyCreatorOpen,
-	selectedEntityTypeId: state.pageOntology.selectedEntityTypeId
+	selectedEntityTypeId: state.pageOntology.selectedEntityTypeId,
+	selectedProperty: state.pageOntology.selectedProperty
 });
 
 export default withRouter(
 	connect(mapStateToProps, {
 		hidePropertyCreator,
 		loadAllEntityTypes,
-		addCustomProperty
+		addCustomProperty,
+		updateCustomProperty
 	})(OntologyPropertyCreator)
 );

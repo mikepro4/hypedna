@@ -59,7 +59,7 @@ class OntologyEditorProperties extends Component {
 			});
 		}
 
-		console.log(initialObject);
+		console.log(entityType);
 
 		return initialObject;
 	};
@@ -89,6 +89,7 @@ class OntologyEditorProperties extends Component {
 					<div className="properties-section-content">
 						<OntologyAddEntityForm
 							ref="addEntityForm"
+							enableReinitialize={true}
 							initialValues={this.getInitialValues(entityType)}
 							customProperties={entityType.customProperties}
 							onSubmit={this.handleSubmit.bind(this)}

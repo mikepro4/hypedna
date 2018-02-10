@@ -62,7 +62,6 @@ class PropertyEditorForm extends React.Component {
 
 	render() {
 		const { handleSubmit } = this.props;
-
 		return (
 			<Form
 				onSubmit={handleSubmit}
@@ -173,7 +172,11 @@ class PropertyEditorForm extends React.Component {
 						intent={Intent.SUCCESS}
 						disabled={this.props.pristine}
 						type="submit"
-						text="Create Property"
+						text={
+							this.props.selectedProperty && this.props.selectedProperty._id
+								? "Update Entity Type"
+								: "Create New Entity Type"
+						}
 					/>
 				</div>
 			</Form>
@@ -248,7 +251,8 @@ PropertyEditorForm = connect(state => {
 	const propertyTypeValue = selector(state, "propertyType");
 	return {
 		fieldTypeValue,
-		propertyTypeValue
+		propertyTypeValue,
+		selectedProperty: state.pageOntology.selectedProperty
 	};
 })(PropertyEditorForm);
 

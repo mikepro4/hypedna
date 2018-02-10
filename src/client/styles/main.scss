@@ -5,6 +5,7 @@ $break1: 1100px;
 
 @import "../../../node_modules/@blueprintjs/core/dist/blueprint.css";
 @import "../../../node_modules/@blueprintjs/core/dist/variables.scss";
+@import "../../../node_modules/@blueprintjs/datetime/lib/css/blueprint-datetime.css";
 
 //imports
 @import "./imports/colors";
@@ -486,4 +487,8 @@ button {
 
 .Select.is-focused:not(.is-open) > .Select-control {
 	border-color: $cobalt4;
+}
+
+.pt-datepicker.pt-input {
+	height: auto;
 }

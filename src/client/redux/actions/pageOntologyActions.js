@@ -53,6 +53,34 @@ export const addCustomProperty = (id, values, success) => async (
 
 /////////////////////////////////////////////////
 
+export const updateCustomProperty = (id, propertyId, values, success) => async (
+	dispatch,
+	getState,
+	api
+) => {
+	const response = await api.post("/update_custom_property", {
+		id: id,
+		propertyId: propertyId,
+		newValues: values
+	});
+	dispatch({
+		type: LOAD_ALL_ENTITY_TYPES
+	});
+
+	if (response.status === 200) {
+		dispatch(loadAllEntityTypes());
+
+		if (success) {
+			success();
+		}
+		console.log("added custom property ");
+	} else {
+		console.log("error");
+	}
+};
+
+/////////////////////////////////////////////////
+
 export const removeCustomProperty = (id, propertyId, success) => async (
 	dispatch,
 	getState,
@@ -122,9 +150,10 @@ export const addParentEntityType = (
 
 /////////////////////////////////////////////////
 
-export const showPropertyCreator = () => async dispatch => {
+export const showPropertyCreator = property => async dispatch => {
 	dispatch({
-		type: SHOW_PROPERTY_CREATOR
+		type: SHOW_PROPERTY_CREATOR,
+		property
 	});
 };
 

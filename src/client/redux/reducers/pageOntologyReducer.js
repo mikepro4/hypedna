@@ -63,11 +63,13 @@ export const pageOntologyReducer = (state = initialState, action) => {
 			});
 		case SHOW_PROPERTY_CREATOR:
 			return assign({}, state, {
-				propertyCreatorOpen: true
+				propertyCreatorOpen: true,
+				selectedProperty: action.property
 			});
 		case HIDE_PROPERTY_CREATOR:
 			return assign({}, state, {
-				propertyCreatorOpen: false
+				propertyCreatorOpen: false,
+				selectedProperty: null
 			});
 		default:
 			return state;

@@ -6,17 +6,21 @@ import { connect } from "react-redux";
 
 import { Button, Intent } from "@blueprintjs/core";
 
-import { removeCustomProperty } from "../../../redux/actions/pageOntologyActions";
+import {
+	removeCustomProperty,
+	showPropertyCreator
+} from "../../../redux/actions/pageOntologyActions";
 
 import Input from "../../components/common/form/Input";
+import DateInput from "../../components/common/form/DateInput";
 import Textarea from "../../components/common/form/Textarea";
 import Checkbox from "../../components/common/form/Checkbox";
 import Select from "../../components/common/form/Select";
 
 class OntologyAddEntityForm extends React.Component {
-	renderField = property => {
-		switch (property.fieldType) {
-			case "input":
+	renderInput = property => {
+		switch (property.propertyType) {
+			case "string":
 				return (
 					<Field
 						name={property.propertyName}
@@ -26,6 +30,37 @@ class OntologyAddEntityForm extends React.Component {
 						ref={property.propertyName}
 					/>
 				);
+			case "number":
+				return (
+					<Field
+						name={property.propertyName}
+						component={Input}
+						type="number"
+						label={property.displayName}
+						placeholder={property.description}
+						ref={property.propertyName}
+					/>
+				);
+
+			case "date":
+				return (
+					<Field
+						name={property.propertyName}
+						component={DateInput}
+						label={property.displayName}
+						placeholder={property.description}
+						ref={property.propertyName}
+					/>
+				);
+			default:
+				return;
+		}
+	};
+
+	renderField = property => {
+		switch (property.fieldType) {
+			case "input":
+				return this.renderInput(property);
 			case "dropdown":
 				return (
 					<Field
@@ -67,7 +102,7 @@ class OntologyAddEntityForm extends React.Component {
 					{this.renderField(property)}
 					<a
 						className="anchor-button"
-						onClick={() => this.removeCustomProperty(property._id)}
+						onClick={() => this.props.showPropertyCreator(property)}
 					>
 						<span className="pt-icon-standard pt-icon-cog" />
 					</a>
@@ -136,11 +171,12 @@ class OntologyAddEntityForm extends React.Component {
 
 				<div className="form-footer">
 					<Button text="Clear Values" onClick={this.props.reset} />
+
 					<Button
 						intent={Intent.SUCCESS}
 						disabled={this.props.pristine}
 						type="submit"
-						text="Create New Entity"
+						text="create New Entity"
 					/>
 				</div>
 			</Form>
@@ -164,9 +200,11 @@ OntologyAddEntityForm = reduxForm({
 })(OntologyAddEntityForm);
 
 const mapStateToProps = state => ({
-	selectedEntityTypeId: state.pageOntology.selectedEntityTypeId
+	selectedEntityTypeId: state.pageOntology.selectedEntityTypeId,
+	selectedProperty: state.pageOntology.selectedProperty
 });
 
-export default connect(mapStateToProps, { removeCustomProperty })(
-	OntologyAddEntityForm
-);
+export default connect(mapStateToProps, {
+	removeCustomProperty,
+	showPropertyCreator
+})(OntologyAddEntityForm);
