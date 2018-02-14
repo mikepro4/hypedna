@@ -65,12 +65,12 @@ $select-loading-color-bg: $select-input-border-color !default;
 
 // multi-select item
 $select-item-border-radius: 2px !default;
-$select-item-gutter: 5px !default;
+$select-item-gutter: 3px !default;
 $select-item-padding-vertical: 2px !default;
 $select-item-padding-horizontal: 5px !default;
 $select-item-font-size: 0.9em !default;
-$select-item-color: #08c !default; // pale blue
-$select-item-bg: #f8ff00 !default;
+$select-item-color: $white !default; // pale blue
+$select-item-bg: $cobalt4 !default;
 $select-item-border-color: darken($select-item-bg, 10%) !default;
 $select-item-hover-color: darken($select-item-color, 5%) !default; // pale blue
 $select-item-hover-bg: darken($select-item-bg, 5%) !default;

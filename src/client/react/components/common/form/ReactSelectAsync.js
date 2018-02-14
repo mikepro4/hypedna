@@ -1,15 +1,15 @@
 import React, { PropTypes } from "react";
 import classnames from "classnames";
-import { DateInput } from "@blueprintjs/datetime";
+import Select from "react-select";
 
-const Date = ({
+const ReactSelect = ({
 	input,
 	label,
 	placeholder,
-	icon,
 	large,
 	type,
 	minDate,
+	loadOptions,
 	meta: { touched, error }
 }) => {
 	let containerClassName = classnames({
@@ -32,11 +32,15 @@ const Date = ({
 			</div>
 
 			<div className="input-group-right">
-				<DateInput
-					minDate={minDate}
+				<Select.Async
 					{...input}
-					className={inputClassName}
-					type={type}
+					onChange={value => input.onChange(value)}
+					onBlur={() => input.onBlur(input.value)}
+					loadOptions={loadOptions}
+					autoload={false}
+					simpleValue
+					clearable
+					searchable
 				/>
 
 				{touched && error ? (
@@ -46,17 +50,9 @@ const Date = ({
 				) : (
 					""
 				)}
-
-				{touched && !error ? (
-					<div className="input-valid">
-						<span className="pt-icon pt-icon-small-tick" />
-					</div>
-				) : (
-					""
-				)}
 			</div>
 		</div>
 	);
 };
 
-export default Date;
+export default ReactSelect;

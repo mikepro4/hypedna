@@ -51,17 +51,19 @@ class OntologyPropertyCreator extends Component {
 					className="property-creator"
 				>
 					<div className="pt-dialog-body" className="property-creator-dialog">
-						<div className="dialog-header">
-							<span className="pt-icon-large pt-icon-form" />
-							{this.props.selectedProperty &&
-							this.props.selectedProperty._id ? (
+						{this.props.selectedProperty && this.props.selectedProperty._id ? (
+							<div className="dialog-header">
+								<span className="pt-icon-large pt-icon-edit" />
 								<h1>
 									Editing Property: {this.props.selectedProperty.displayName}
 								</h1>
-							) : (
+							</div>
+						) : (
+							<div className="dialog-header">
+								<span className="pt-icon-large pt-icon-add" />
 								<h1>New Custom Property</h1>
-							)}
-						</div>
+							</div>
+						)}
 
 						<div className="dialog-content">
 							<PropertyEditorForm
@@ -69,7 +71,6 @@ class OntologyPropertyCreator extends Component {
 								initialValues={this.props.selectedProperty}
 								enableReinitialize={true}
 								onSubmit={this.handleSubmit.bind(this)}
-								onChange={values => this.setState(values)}
 							/>
 						</div>
 					</div>

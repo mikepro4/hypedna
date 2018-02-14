@@ -12,9 +12,11 @@ import HTML5Backend from "react-dnd-html5-backend";
 import {
 	removeCustomProperty,
 	showPropertyCreator,
-	updateAllCustomProperties
+	updateAllCustomProperties,
+	searchEntities
 } from "../../../redux/actions/pageOntologyActions";
 
+import ReactSelectAsync from "../../components/common/form/ReactSelectAsync";
 import Input from "../../components/common/form/Input";
 import DateInput from "../../components/common/form/DateInput";
 import Textarea from "../../components/common/form/Textarea";
@@ -29,6 +31,7 @@ class OntologyAddEntityForm extends React.Component {
 	state = {
 		dragging: false
 	};
+
 	renderInput = property => {
 		switch (property.propertyType) {
 			case "string":
@@ -36,7 +39,7 @@ class OntologyAddEntityForm extends React.Component {
 					<Field
 						name={property.propertyName}
 						component={Input}
-						label={property.displayName}
+						label={property.displayName + ":"}
 						placeholder={property.description}
 						ref={property.propertyName}
 					/>
@@ -47,7 +50,7 @@ class OntologyAddEntityForm extends React.Component {
 						name={property.propertyName}
 						component={Input}
 						type="number"
-						label={property.displayName}
+						label={property.displayName + ":"}
 						placeholder={property.description}
 						ref={property.propertyName}
 					/>
@@ -58,7 +61,8 @@ class OntologyAddEntityForm extends React.Component {
 					<Field
 						name={property.propertyName}
 						component={DateInput}
-						label={property.displayName}
+						minDate={new Date("01/01/1100")}
+						label={property.displayName + ":"}
 						placeholder={property.description}
 						ref={property.propertyName}
 					/>
@@ -77,7 +81,7 @@ class OntologyAddEntityForm extends React.Component {
 					<Field
 						name={property.propertyName}
 						component={Select}
-						label={property.displayName}
+						label={property.displayName + ":"}
 						placeholder={property.description}
 						ref={property.propertyName}
 					>
@@ -97,7 +101,21 @@ class OntologyAddEntityForm extends React.Component {
 						name={property.propertyName}
 						component={Checkbox}
 						type="checkbox"
-						label={property.displayName}
+						label={property.displayName + ":"}
+						placeholder={property.description}
+						ref={property.propertyName}
+					/>
+				);
+
+			case "entitySelector":
+				return (
+					<Field
+						name={property.propertyName}
+						component={ReactSelectAsync}
+						loadOptions={(input, callback) =>
+							this.getOptions(input, callback, property.entityType)
+						}
+						label={property.displayName + ":"}
 						placeholder={property.description}
 						ref={property.propertyName}
 					/>
@@ -106,6 +124,26 @@ class OntologyAddEntityForm extends React.Component {
 				return;
 		}
 	};
+
+	getOptions = (input, callback, entityType) => {
+		this.props.searchEntities(
+			{ displayName: input, entityType: entityType },
+			"displayName",
+			0,
+			20,
+			data => {
+				console.log(data.all);
+				callback(null, {
+					options: data.all.map(entity => ({
+						value: entity._id,
+						label: entity.properties.displayName
+					})),
+					complete: true
+				});
+			}
+		);
+	};
+
 	renderProperty = property => {
 		if (property) {
 			return (
@@ -115,7 +153,7 @@ class OntologyAddEntityForm extends React.Component {
 						className="anchor-button"
 						onClick={() => this.props.showPropertyCreator(property)}
 					>
-						<span className="pt-icon-standard pt-icon-cog" />
+						<span className="pt-icon-standard pt-icon-edit" />
 					</a>
 					<a
 						className="anchor-button"
@@ -198,19 +236,19 @@ class OntologyAddEntityForm extends React.Component {
 						/>
 
 						<Field
+							name="entityUrlName"
+							component={Input}
+							label="Entity Url Name:"
+							placeholder="Enter entity url name (no spaces)..."
+							ref="entityUrlName"
+						/>
+
+						<Field
 							name="description"
 							component={Input}
 							label="Description:"
 							placeholder="Description here"
 							ref="description"
-						/>
-
-						<Field
-							name="entityUrlName"
-							component={Input}
-							label="Entity Url Name:"
-							placeholder="Enter entity url name (english, no spaces)..."
-							ref="entityUrlName"
 						/>
 					</div>
 
@@ -240,7 +278,7 @@ class OntologyAddEntityForm extends React.Component {
 							intent={Intent.SUCCESS}
 							disabled={this.props.pristine}
 							type="submit"
-							text="create New Entity"
+							text="Create New Entity"
 						/>
 					</div>
 				</Form>
@@ -249,11 +287,26 @@ class OntologyAddEntityForm extends React.Component {
 	}
 }
 
+function hasWhiteSpace(s) {
+	return s;
+}
+
 const validate = values => {
 	const errors = {};
 
 	if (!values.displayName) {
 		errors.displayName = "Display name is required";
+	}
+
+	if (!values.entityUrlName) {
+		errors.entityUrlName = "Entity URL name is required";
+	}
+
+	if (values.entityUrlName) {
+		let containsSpaces = values.entityUrlName.indexOf(" ") >= 0;
+		if (containsSpaces) {
+			errors.entityUrlName = "Can't contain spaces";
+		}
 	}
 
 	return errors;
@@ -272,5 +325,6 @@ const mapStateToProps = state => ({
 export default connect(mapStateToProps, {
 	removeCustomProperty,
 	showPropertyCreator,
-	updateAllCustomProperties
+	updateAllCustomProperties,
+	searchEntities
 })(OntologyAddEntityForm);

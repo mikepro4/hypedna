@@ -9,7 +9,10 @@ import {
 	SHOW_LINKER,
 	HIDE_LINKER,
 	SHOW_PROPERTY_CREATOR,
-	HIDE_PROPERTY_CREATOR
+	HIDE_PROPERTY_CREATOR,
+	ENTITY_RESULTS_SEARCH,
+	ENTITY_RESULTS_SEARCH_SUCCESS,
+	ENTITY_RESULTS_SEARCH_LOAD_MORE
 } from "../actions/types";
 
 export const initialState = {
@@ -22,7 +25,14 @@ export const initialState = {
 	linkerOpen: false,
 	linkToEntity: null,
 	linkIntent: null,
-	propertyCreatorOpen: false
+	propertyCreatorOpen: false,
+	entitySearchResults: {
+		fetchingEntityResults: false,
+		offset: 0,
+		limit: 20,
+		count: null,
+		all: []
+	}
 };
 
 export const pageOntologyReducer = (state = initialState, action) => {
@@ -70,6 +80,32 @@ export const pageOntologyReducer = (state = initialState, action) => {
 			return assign({}, state, {
 				propertyCreatorOpen: false,
 				selectedProperty: null
+			});
+
+		case ENTITY_RESULTS_SEARCH:
+			return assign({}, state, {
+				entitySearchResults: {
+					fetchingEntityResults: true
+				}
+			});
+
+		case ENTITY_RESULTS_SEARCH_SUCCESS:
+			return assign({}, state, {
+				entitySearchResults: {
+					fetchingEntityResults: false,
+					offset: action.offset,
+					limit: action.limit,
+					count: action.count,
+					all: action.all
+				}
+			});
+
+		case ENTITY_RESULTS_SEARCH_LOAD_MORE:
+			return assign({}, state, {
+				entitySearchResults: {
+					fetchingEntityResults: true,
+					limit: payload.limit
+				}
 			});
 		default:
 			return state;

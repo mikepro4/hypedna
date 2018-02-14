@@ -7,10 +7,106 @@ import {
 	SHOW_LINKER,
 	HIDE_LINKER,
 	SHOW_PROPERTY_CREATOR,
-	HIDE_PROPERTY_CREATOR
+	HIDE_PROPERTY_CREATOR,
+	CREATE_ENTITY,
+	CREATE_ENTITY_SUCCESS,
+	ENTITY_RESULTS_SEARCH,
+	ENTITY_RESULTS_SEARCH_SUCCESS,
+	ENTITY_RESULTS_SEARCH_LOAD_MORE
 } from "./types";
 
 import * as _ from "lodash";
+
+/////////////////////////////////////////////////
+
+export const searchEntityResults = (
+	criteria,
+	sortProperty,
+	offset = 0,
+	limit = 0,
+	success
+) => async (dispatch, getState, api) => {
+	dispatch({
+		type: ENTITY_RESULTS_SEARCH
+	});
+
+	const response = await api.post("/search/entity_results", {
+		criteria,
+		sortProperty,
+		offset,
+		limit
+	});
+
+	if (response.status === 200) {
+		dispatch({
+			type: ENTITY_RESULTS_SEARCH_SUCCESS,
+			offset: response.data.offsset,
+			limit: response.data.limit,
+			all: response.data.all,
+			count: response.data.count
+		});
+
+		if (success) {
+			success();
+		}
+	}
+};
+
+/////////////////////////////////////////////////
+
+export const searchEntities = (
+	criteria,
+	sortProperty,
+	offset = 0,
+	limit = 0,
+	success
+) => async (dispatch, getState, api) => {
+	const response = await api.post("/search/entities", {
+		criteria,
+		sortProperty,
+		offset,
+		limit
+	});
+
+	if (success) {
+		success(response.data);
+	}
+};
+
+/////////////////////////////////////////////////
+
+export const createEntity = (entityTypeId, properties, success) => async (
+	dispatch,
+	getState,
+	api
+) => {
+	let associatedEntityTypes = [];
+	associatedEntityTypes.push({
+		entityTypeId: entityTypeId
+	});
+
+	console.log({
+		associatedEntityTypes: associatedEntityTypes,
+		properties: properties
+	});
+	const response = await api.post("/create_entity", {
+		associatedEntityTypes: associatedEntityTypes,
+		properties: properties
+	});
+
+	dispatch({
+		type: CREATE_ENTITY
+	});
+
+	if (response.status === 200) {
+		if (success) {
+			success(response.data._id);
+		}
+		console.log("added custom property ");
+	} else {
+		console.log("error");
+	}
+};
 
 /////////////////////////////////////////////////
 

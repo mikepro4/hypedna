@@ -10,7 +10,8 @@ import {
 	loadAllEntityTypes,
 	getEntityType,
 	showPropertyCreator,
-	removeCustomProperty
+	removeCustomProperty,
+	createEntity
 } from "../../../redux/actions/pageOntologyActions";
 
 import Input from "../../components/common/form/Input";
@@ -19,6 +20,8 @@ import Checkbox from "../../components/common/form/Checkbox";
 import Select from "../../components/common/form/Select";
 
 import OntologyAddEntityForm from "./OntologyAddEntityForm";
+
+import { Position, Toaster, Classes, Intent } from "@blueprintjs/core";
 
 class OntologyEditorProperties extends Component {
 	state = {};
@@ -32,6 +35,21 @@ class OntologyEditorProperties extends Component {
 
 	handleSubmit = values => {
 		console.log(values);
+		this.props.createEntity(this.props.selectedEntityTypeId, values, id => {
+			this.showSuccessToast("Entity Created", id);
+		});
+	};
+
+	showSuccessToast = (message, id) => {
+		this.refs.toaster.show({
+			action: {
+				onClick: () => console.log("added entity: ", id),
+				text: "View"
+			},
+			message: message,
+			intent: Intent.SUCCESS,
+			iconName: "tick"
+		});
 	};
 
 	getInitialValues = entityType => {
@@ -73,12 +91,17 @@ class OntologyEditorProperties extends Component {
 					<div className="properties-section-header">
 						<div className="header-left">
 							<span className="pt-icon-large pt-icon-form" />
-							<h1>10 Properties</h1>
+							<h1>
+								{entityType.customProperties.length
+									? 3 + entityType.customProperties.length
+									: "3"}{" "}
+								Properties
+							</h1>
 						</div>
 						<div className="header-right">
 							<a
 								className="anchor-button"
-								onClick={this.props.showPropertyCreator}
+								onClick={() => this.props.showPropertyCreator()}
 							>
 								<span className="pt-icon-standard pt-icon-add" />Create New
 								Property
@@ -94,6 +117,7 @@ class OntologyEditorProperties extends Component {
 							customProperties={entityType.customProperties}
 							onSubmit={this.handleSubmit.bind(this)}
 						/>
+						<Toaster position={Position.BOTTOM_RIGHT} ref="toaster" />
 					</div>
 				</div>
 			</div>
@@ -111,6 +135,7 @@ export default withRouter(
 		loadAllEntityTypes,
 		getEntityType,
 		showPropertyCreator,
-		removeCustomProperty
+		removeCustomProperty,
+		createEntity
 	})(OntologyEditorProperties)
 );

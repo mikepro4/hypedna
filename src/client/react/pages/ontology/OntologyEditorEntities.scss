@@ -1,0 +1,82 @@
+.ontology-entities-properties {
+	position: absolute;
+	top: 20px;
+	right: 20px;
+	bottom: 20px;
+	left: 20px;
+	display: flex;
+	align-items: stretch;
+	background: $white;
+	border-radius: 6px;
+
+	.properties-section {
+		&.property-section-filters {
+			width: 380px;
+			flex-grow: 0;
+			flex-shrink: 0;
+			border-right: 1px solid $grey;
+			flex-direction: column;
+		}
+
+		&.property-section-results {
+			flex-grow: 1;
+		}
+
+		.properties-section-header {
+			height: 60px;
+			border-bottom: 1px solid $grey;
+			flex-grow: 0;
+			flex-shrink: 0;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 0 20px;
+
+			.header-left {
+				display: flex;
+				align-items: center;
+
+				.pt-icon-large {
+					&:before {
+						color: $orange5;
+					}
+				}
+
+				h1 {
+					font-size: 18px;
+					font-weight: 600;
+					margin: 0 0 0 10px;
+				}
+			}
+		}
+
+		.properties-section-content {
+			flex-grow: 1;
+		}
+
+		&.property-section-filters {
+			display: flex;
+
+			.properties-section-header {
+				flex-grow: 0;
+				flex-shrink: 0;
+			}
+
+			.properties-section-content {
+				padding: 20px;
+				flex-grow: 1;
+				overflow-y: auto;
+				@include webkit-scrollbar-light();
+			}
+		}
+
+		.sort-container {
+			font-size: 13px;
+
+			.sort-label {
+				margin: 0 5px 0 0;
+				opacity: 0.5;
+			}
+		}
+	}
+}

@@ -58,6 +58,16 @@ export const HIDE_LINKER = "app/HIDE_LINKER";
 export const SHOW_PROPERTY_CREATOR = "app/SHOW_PROPERTY_CREATOR";
 export const HIDE_PROPERTY_CREATOR = "app/HIDE_PROPERTY_CREATOR";
 
+export const CREATE_ENTITY = "app/CREATE_ENTITY";
+export const CREATE_ENTITY_SUCCESS = "app/CREATE_ENTITY_SUCCESS";
+
+export const ENTITY_RESULTS_SEARCH = "app/ENTITY_RESULTS_SEARCH";
+export const ENTITY_RESULTS_SEARCH_SUCCESS =
+	"app/ENTITY_RESULTS_SEARCH_SUCCESS";
+
+export const ENTITY_RESULTS_SEARCH_LOAD_MORE =
+	"app/ENTITY_RESULTS_SEARCH_LOAD_MORE";
+
 /////////////////////////////////////////////////
 
 // Page: EntityTypeBrowser

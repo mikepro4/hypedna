@@ -7,6 +7,7 @@ import { connect } from "react-redux";
 import { Button, Intent } from "@blueprintjs/core";
 
 import Input from "../../components/common/form/Input";
+import ReactSelect from "../../components/common/form/ReactSelect";
 import Textarea from "../../components/common/form/Textarea";
 import Checkbox from "../../components/common/form/Checkbox";
 import Select from "../../components/common/form/Select";
@@ -62,13 +63,21 @@ class PropertyEditorForm extends React.Component {
 
 	render() {
 		const { handleSubmit } = this.props;
+
+		let sortedEntities = _.orderBy(
+			this.props.allEntityTypes,
+			[entity => entity.genericProperties.displayName.toLowerCase()],
+			["asc"]
+		);
+		let entityTypes = _.map(sortedEntities, entityType => {
+			return {
+				value: entityType._id,
+				label: entityType.genericProperties.displayName
+			};
+		});
+
 		return (
-			<Form
-				onSubmit={handleSubmit}
-				autoComplete="off"
-				role="presentation"
-				className=""
-			>
+			<Form onSubmit={handleSubmit} autoComplete="off">
 				<Field
 					name="displayName"
 					component={Input}
@@ -87,10 +96,10 @@ class PropertyEditorForm extends React.Component {
 
 				<Field
 					name="description"
-					component={Textarea}
-					label="Property Description:"
-					placeholder="Enter description..."
-					ref="textarea"
+					component={Input}
+					label="Property Placeholder:"
+					placeholder="Enter placeholder text..."
+					ref="description"
 				/>
 
 				<Field
@@ -103,6 +112,7 @@ class PropertyEditorForm extends React.Component {
 					<option value="input">Input</option>
 					<option value="dropdown">Dropdown</option>
 					<option value="checkbox">Checkbox</option>
+					<option value="entitySelector">Entity Selector</option>
 				</Field>
 
 				{this.props.fieldTypeValue == "input" ? (
@@ -166,6 +176,18 @@ class PropertyEditorForm extends React.Component {
 				) : (
 					""
 				)}
+
+				{this.props.fieldTypeValue == "entitySelector" ? (
+					<Field
+						name="entityType"
+						options={entityTypes}
+						component={ReactSelect}
+						label="Slect Entities of Type:"
+					/>
+				) : (
+					""
+				)}
+
 				<div className="form-footer">
 					<Button text="Clear Values" onClick={this.props.reset} />
 					<Button
@@ -231,6 +253,13 @@ const validate = values => {
 		}
 	}
 
+	if (values.propertyName) {
+		let containsSpaces = values.propertyName.indexOf(" ") >= 0;
+		if (containsSpaces) {
+			errors.propertyName = "Can't contain spaces";
+		}
+	}
+
 	return errors;
 };
 //
@@ -252,6 +281,7 @@ PropertyEditorForm = connect(state => {
 	return {
 		fieldTypeValue,
 		propertyTypeValue,
+		allEntityTypes: state.pageOntology.allEntityTypes,
 		selectedProperty: state.pageOntology.selectedProperty
 	};
 })(PropertyEditorForm);

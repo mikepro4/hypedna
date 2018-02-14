@@ -80,6 +80,16 @@
 	}
 }
 
+.property-creator-dialog {
+	.dialog-header {
+		.pt-icon-large {
+			&:before {
+				color: $orange4;
+			}
+		}
+	}
+}
+
 .form-headline {
 	font-size: 16px;
 	font-weight: bold;
@@ -145,4 +155,8 @@
 			}
 		}
 	}
+}
+
+.pt-dialog-container .pt-dialog.property-creator {
+	padding-bottom: 0;
 }

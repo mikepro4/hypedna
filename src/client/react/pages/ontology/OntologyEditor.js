@@ -12,6 +12,7 @@ import { updateQueryString } from "../../../redux/actions/";
 
 import OntologyEditorRelations from "./OntologyEditorRelations";
 import OntologyEditorProperties from "./OntologyEditorProperties";
+import OntologyEditorEntities from "./OntologyEditorEntities";
 
 import {
 	Button,
@@ -36,7 +37,7 @@ class OntologyEditor extends Component {
 		title: "",
 		description: "",
 		edited: false,
-		selectedTabId: "0"
+		selectedTabId: "1"
 	};
 
 	handleTitleChange = title => {
@@ -210,11 +211,6 @@ class OntologyEditor extends Component {
 						large={true}
 					>
 						<Tab2
-							id="0"
-							title="Overview"
-							panel={<div style={{ height: "3000px" }}>overview</div>}
-						/>
-						<Tab2
 							id="1"
 							title="Properties"
 							panel={
@@ -233,7 +229,15 @@ class OntologyEditor extends Component {
 							}
 						/>
 
-						<Tab2 id="3" title="Entities" panel={<div>entities</div>} />
+						<Tab2
+							id="3"
+							title="Entities"
+							panel={
+								<div>
+									<OntologyEditorEntities />
+								</div>
+							}
+						/>
 					</Tabs2>
 				</div>
 			</div>
