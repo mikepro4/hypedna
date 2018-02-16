@@ -1,7 +1,13 @@
 import React, { PropTypes } from "react";
 import classnames from "classnames";
 
-const Checkbox = ({ input, label, large, meta: { touched, error } }) => {
+const Checkbox = ({
+	input,
+	label,
+	large,
+	inline,
+	meta: { touched, error }
+}) => {
 	let containerClassName = classnames({
 		"input-group": true,
 		"pt-large": large,
@@ -11,14 +17,19 @@ const Checkbox = ({ input, label, large, meta: { touched, error } }) => {
 
 	return (
 		<div className={containerClassName}>
-			<div className="input-group-left">
-				{label ? <div className="input-label">{label}</div> : ""}
-			</div>
+			{label && !inline ? (
+				<div className="input-group-left">
+					<div className="input-label">{label}</div>
+				</div>
+			) : (
+				""
+			)}
 
 			<div className="input-group-right">
 				<label className="pt-checkbox pt-control">
 					<input {...input} type="checkbox" />
 					<span className="pt-control-indicator" />
+					{inline && label ? <div className="input-label">{label}</div> : ""}
 				</label>
 
 				{touched && error ? (

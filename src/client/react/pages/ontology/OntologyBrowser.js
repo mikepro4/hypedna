@@ -337,7 +337,6 @@ class OntologyBrowser extends Component {
 	};
 
 	render() {
-		console.log(this.props.tree);
 		return (
 			<div className="ontology-browser-content">
 				<div className="browser-header">

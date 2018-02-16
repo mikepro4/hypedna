@@ -25,9 +25,13 @@ const Input = ({
 
 	return (
 		<div className={containerClassName}>
-			<div className="input-group-left">
-				{label ? <div className="input-label">{label}</div> : ""}
-			</div>
+			{label ? (
+				<div className="input-group-left">
+					<div className="input-label">{label}</div>
+				</div>
+			) : (
+				""
+			)}
 
 			<div className="input-group-right">
 				{icon ? <span className={`pt-icon pt-icon-${icon}`} /> : ""}

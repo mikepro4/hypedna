@@ -13,21 +13,56 @@ import { searchEntityResults } from "../../../redux/actions/pageOntologyActions"
 class OntologyEditorEntities extends Component {
 	state = {};
 
-	handleSubmit = values => {
-		console.log(values);
-
+	componentDidMount = () => {
 		this.props.searchEntityResults(
 			{
-				displayName: values.displayName[0].label,
 				entityType: this.props.selectedEntityTypeId
 			},
 			"displayName",
 			0,
-			20,
-			data => {
-				console.log("loaded");
-			}
+			20
 		);
+	};
+
+	componentDidUpdate = prevProps => {
+		if (this.props.selectedEntityTypeId !== prevProps.selectedEntityTypeId) {
+			this.props.searchEntityResults(
+				{
+					entityType: this.props.selectedEntityTypeId
+				},
+				"displayName",
+				0,
+				20
+			);
+		}
+	};
+
+	handleSubmit = values => {
+		console.log(values);
+
+		// if (values.displayName.length > 0) {
+		// 	this.props.searchEntityResults(
+		// 		{
+		// 			displayName: values.displayName[0].label,
+		// 			entityType: this.props.selectedEntityTypeId
+		// 		},
+		// 		"displayName",
+		// 		0,
+		// 		20,
+		// 		data => {
+		// 			console.log("loaded");
+		// 		}
+		// 	);
+		// } else {
+		// 	this.props.searchEntityResults(
+		// 		{
+		// 			entityType: this.props.selectedEntityTypeId
+		// 		},
+		// 		"displayName",
+		// 		0,
+		// 		20
+		// 	);
+		// }
 	};
 
 	render() {
@@ -52,6 +87,7 @@ class OntologyEditorEntities extends Component {
 					<div className="properties-section-content">
 						<EntitySearchForm
 							onSubmit={this.handleSubmit.bind(this)}
+							onChange={this.handleSubmit.bind(this)}
 							enableReinitialize={true}
 						/>
 					</div>
@@ -60,7 +96,12 @@ class OntologyEditorEntities extends Component {
 				<div className="properties-section property-section-results">
 					<div className="properties-section-header">
 						<div className="header-left">
-							<h2 className="result-count">1,500 Results</h2>
+							<h2 className="result-count">
+								{this.props.entitySearchResults.all
+									? this.props.entitySearchResults.all.length
+									: "0"}{" "}
+								Results
+							</h2>
 						</div>
 						<div className="header-right">
 							<div className="sort-container">
@@ -80,7 +121,7 @@ class OntologyEditorEntities extends Component {
 						{this.props.entitySearchResults.all &&
 						this.props.entitySearchResults.all.length > 0
 							? this.props.entitySearchResults.all.map((entity, i) => {
-									return <div>{entity.properties.displayName}</div>;
+									return <div key={i}>{entity.properties.displayName}</div>;
 								})
 							: ""}
 					</div>

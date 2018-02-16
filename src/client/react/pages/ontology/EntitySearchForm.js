@@ -8,42 +8,89 @@ import { Button, Intent } from "@blueprintjs/core";
 import update from "immutability-helper";
 
 import InputFilter from "../../components/common/filter/InputFilter";
+import StringFilter from "../../components/common/filter/StringFilter";
+import DateFilter from "../../components/common/filter/DateFilter";
+import NumberFilter from "../../components/common/filter/NumberFilter";
+import DropdownFilter from "../../components/common/filter/DropdownFilter";
+import CheckboxFilter from "../../components/common/filter/CheckboxFilter";
+import Input from "../../components/common/form/Input";
+import Checkbox from "../../components/common/form/Checkbox";
 
-import { searchEntities } from "../../../redux/actions/pageOntologyActions";
+import {
+	searchEntities,
+	getEntityType
+} from "../../../redux/actions/pageOntologyActions";
 
 import ReactSelectAsync from "../../components/common/form/ReactSelectAsync";
 
 class EntitySearchForm extends React.Component {
 	state = {};
 
-	componentDidUpdate = prevProps => {
-		if (this.props.selectedEntityTypeId !== prevProps.selectedEntityTypeId) {
-			console.log(this.props);
-			this.props.reset();
+	renderInputFilter = property => {
+		switch (property.propertyType) {
+			case "string":
+				return this.renderStringFilter(property);
+			case "number":
+				return this.renderNumberFilter(property);
+			case "date":
+				return this.renderDateFilter(property);
+			default:
+				return;
 		}
 	};
 
-	getOptions = (input, callback) => {
-		this.props.searchEntities(
-			{ displayName: input, entityType: this.props.selectedEntityTypeId },
-			"displayName",
-			0,
-			20,
-			data => {
-				console.log(data.all);
-				callback(null, {
-					options: data.all.map(entity => ({
-						value: entity._id,
-						label: entity.properties.displayName
-					})),
-					complete: true
-				});
-			}
+	renderStringFilter = property => {
+		return <StringFilter property={property} key={property.propertyName} />;
+	};
+
+	renderNumberFilter = property => {
+		return <NumberFilter property={property} key={property.propertyName} />;
+	};
+
+	renderDateFilter = property => {
+		return <DateFilter property={property} key={property.propertyName} />;
+	};
+
+	renderDropdownFilter = property => {
+		return <DropdownFilter property={property} key={property.propertyName} />;
+	};
+
+	renderCheckboxFilter = property => {
+		return <CheckboxFilter property={property} key={property.propertyName} />;
+	};
+
+	renderEntitySelectorFilter = property => {
+		return (
+			<StringFilter
+				property={property}
+				key={property.propertyName}
+				searchDisplayName="true"
+				entityTypeToSearch={property.entityType}
+			/>
 		);
+	};
+
+	renderPropertyFilter = property => {
+		switch (property.fieldType) {
+			case "input":
+				return this.renderInputFilter(property);
+			case "dropdown":
+				return this.renderDropdownFilter(property);
+			case "checkbox":
+				return this.renderCheckboxFilter(property);
+			case "entitySelector":
+				return this.renderEntitySelectorFilter(property);
+			default:
+				return;
+		}
 	};
 
 	render() {
 		const { handleSubmit } = this.props;
+
+		const customProperties = this.props.getEntityType(
+			this.props.selectedEntityTypeId
+		).customProperties;
 
 		return (
 			<div className="entity-search-form">
@@ -53,15 +100,16 @@ class EntitySearchForm extends React.Component {
 					role="presentation"
 					className=""
 				>
-					<Field
-						name="displayName"
-						type="text"
-						component={InputFilter}
-						loadOptions={(input, callback) => this.getOptions(input, callback)}
-						label="Display Name:"
-						placeholder="Type value display name..."
-						key={this.props.selectedEntityTypeId}
-					/>
+					{this.renderPropertyFilter({
+						displayName: "Display Name ",
+						fieldType: "input",
+						propertyName: "displayName",
+						propertyType: "string"
+					})}
+
+					{customProperties.map((property, i) => {
+						return this.renderPropertyFilter(property);
+					})}
 
 					<div className="form-footer">
 						<Button text="Clear Values" onClick={this.props.reset} />
@@ -99,5 +147,6 @@ const mapStateToProps = state => ({
 });
 
 export default connect(mapStateToProps, {
-	searchEntities
+	searchEntities,
+	getEntityType
 })(EntitySearchForm);
