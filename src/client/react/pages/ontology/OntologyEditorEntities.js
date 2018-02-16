@@ -8,7 +8,10 @@ import classNames from "classnames";
 
 import EntitySearchForm from "./EntitySearchForm";
 
-import { searchEntityResults } from "../../../redux/actions/pageOntologyActions";
+import {
+	searchEntityResults,
+	getEntityType
+} from "../../../redux/actions/pageOntologyActions";
 
 class OntologyEditorEntities extends Component {
 	state = {};
@@ -40,29 +43,16 @@ class OntologyEditorEntities extends Component {
 	handleSubmit = values => {
 		console.log(values);
 
-		// if (values.displayName.length > 0) {
-		// 	this.props.searchEntityResults(
-		// 		{
-		// 			displayName: values.displayName[0].label,
-		// 			entityType: this.props.selectedEntityTypeId
-		// 		},
-		// 		"displayName",
-		// 		0,
-		// 		20,
-		// 		data => {
-		// 			console.log("loaded");
-		// 		}
-		// 	);
-		// } else {
-		// 	this.props.searchEntityResults(
-		// 		{
-		// 			entityType: this.props.selectedEntityTypeId
-		// 		},
-		// 		"displayName",
-		// 		0,
-		// 		20
-		// 	);
-		// }
+		let newValues = _.assign(values, {
+			entityType: this.props.selectedEntityTypeId
+		});
+		this.props.searchEntityResults(
+			newValues,
+			"displayName",
+			0,
+			20,
+			this.props.getEntityType(this.props.selectedEntityTypeId).customProperties
+		);
 	};
 
 	render() {
@@ -138,5 +128,7 @@ const mapStateToProps = state => ({
 });
 
 export default withRouter(
-	connect(mapStateToProps, { searchEntityResults })(OntologyEditorEntities)
+	connect(mapStateToProps, { searchEntityResults, getEntityType })(
+		OntologyEditorEntities
+	)
 );

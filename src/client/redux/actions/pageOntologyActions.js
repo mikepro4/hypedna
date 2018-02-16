@@ -24,7 +24,7 @@ export const searchEntityResults = (
 	sortProperty,
 	offset = 0,
 	limit = 0,
-	success
+	customProperties
 ) => async (dispatch, getState, api) => {
 	dispatch({
 		type: ENTITY_RESULTS_SEARCH
@@ -34,7 +34,8 @@ export const searchEntityResults = (
 		criteria,
 		sortProperty,
 		offset,
-		limit
+		limit,
+		customProperties
 	});
 
 	if (response.status === 200) {
@@ -45,10 +46,6 @@ export const searchEntityResults = (
 			all: response.data.all,
 			count: response.data.count
 		});
-
-		if (success) {
-			success();
-		}
 	}
 };
 
