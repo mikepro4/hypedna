@@ -68,6 +68,8 @@ export const ENTITY_RESULTS_SEARCH_SUCCESS =
 export const ENTITY_RESULTS_SEARCH_LOAD_MORE =
 	"app/ENTITY_RESULTS_SEARCH_LOAD_MORE";
 
+export const UPDATE_RESULTS_STATS = "app/UPDATE_RESULTS_STATS";
+
 /////////////////////////////////////////////////
 
 // Page: EntityTypeBrowser

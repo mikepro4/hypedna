@@ -19,15 +19,9 @@ class InputFilter extends React.Component {
 		} = this.props;
 
 		let containerClassName = classnames({
-			"filter-input-group": true,
+			"input-group": true,
 			"input-valid": touched && !error,
 			"input-invalid": touched && error
-		});
-
-		let inputClassName = classnames({
-			"filter-input": true,
-			"filter-intent-success": touched && !error,
-			"filter-intent-danger": touched && error
 		});
 
 		return (

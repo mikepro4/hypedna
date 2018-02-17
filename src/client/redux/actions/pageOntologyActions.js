@@ -12,10 +12,47 @@ import {
 	CREATE_ENTITY_SUCCESS,
 	ENTITY_RESULTS_SEARCH,
 	ENTITY_RESULTS_SEARCH_SUCCESS,
-	ENTITY_RESULTS_SEARCH_LOAD_MORE
+	ENTITY_RESULTS_SEARCH_LOAD_MORE,
+	UPDATE_RESULTS_STATS
 } from "./types";
 
 import * as _ from "lodash";
+
+/////////////////////////////////////////////////
+
+export const getPropertyStats = (
+	criteria,
+	property,
+	customProperties,
+	success
+) => async (dispatch, getState, api) => {
+	const response = await api.post("/search/get_property_stats", {
+		criteria,
+		property,
+		customProperties
+	});
+
+	if (response.status === 200) {
+		let stats = {};
+
+		if (!_.isEmpty(getState().pageOntology.searchResultsStats)) {
+			stats = getState().pageOntology.searchResultsStats;
+		}
+
+		stats = _.assign(stats, {
+			[property]: response.data.all
+		});
+
+		dispatch({
+			type: UPDATE_RESULTS_STATS,
+			stats: stats
+		});
+
+		if (success) {
+			success(response.data);
+		}
+	}
+};
 
 /////////////////////////////////////////////////
 

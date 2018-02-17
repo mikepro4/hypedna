@@ -12,7 +12,8 @@ import {
 	HIDE_PROPERTY_CREATOR,
 	ENTITY_RESULTS_SEARCH,
 	ENTITY_RESULTS_SEARCH_SUCCESS,
-	ENTITY_RESULTS_SEARCH_LOAD_MORE
+	ENTITY_RESULTS_SEARCH_LOAD_MORE,
+	UPDATE_RESULTS_STATS
 } from "../actions/types";
 
 export const initialState = {
@@ -32,7 +33,8 @@ export const initialState = {
 		limit: 20,
 		count: null,
 		all: []
-	}
+	},
+	searchResultsStats: {}
 };
 
 export const pageOntologyReducer = (state = initialState, action) => {
@@ -82,30 +84,41 @@ export const pageOntologyReducer = (state = initialState, action) => {
 				selectedProperty: null
 			});
 
-		case ENTITY_RESULTS_SEARCH:
-			return assign({}, state, {
-				entitySearchResults: {
-					fetchingEntityResults: true
-				}
+		case ENTITY_RESULTS_SEARCH: {
+			let updatedResults = assign({}, state.entitySearchResults, {
+				fetchingEntityResults: true
 			});
-
-		case ENTITY_RESULTS_SEARCH_SUCCESS:
 			return assign({}, state, {
-				entitySearchResults: {
-					fetchingEntityResults: false,
-					offset: action.offset,
-					limit: action.limit,
-					count: action.count,
-					all: action.all
-				}
+				entitySearchResults: updatedResults
 			});
+		}
 
-		case ENTITY_RESULTS_SEARCH_LOAD_MORE:
+		case ENTITY_RESULTS_SEARCH_SUCCESS: {
+			let updatedResults = assign({}, state.entitySearchResults, {
+				fetchingEntityResults: false,
+				offset: action.offset,
+				limit: action.limit,
+				count: action.count,
+				all: action.all
+			});
 			return assign({}, state, {
-				entitySearchResults: {
-					fetchingEntityResults: true,
-					limit: payload.limit
-				}
+				entitySearchResults: updatedResults
+			});
+		}
+
+		case ENTITY_RESULTS_SEARCH_LOAD_MORE: {
+			let updatedResults = assign({}, state.entitySearchResults, {
+				fetchingEntityResults: true,
+				limit: payload.limit
+			});
+			return assign({}, state, {
+				entitySearchResults: updatedResults
+			});
+		}
+
+		case UPDATE_RESULTS_STATS:
+			return assign({}, state, {
+				searchResultsStats: action.stats
 			});
 		default:
 			return state;

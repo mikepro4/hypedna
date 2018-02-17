@@ -12,33 +12,39 @@ import Input from "../form/Input";
 class NumberFilter extends React.Component {
 	render() {
 		let containerClassName = classnames({
-			"filter-input-group": true
+			"filter-container": true
 		});
 
 		return (
 			<div className={containerClassName}>
 				{this.props.property ? (
-					<div>
-						<h1>{this.props.property.displayName}</h1>
-						<Field
-							name={`${this.props.property.propertyName}.from`}
-							type="number"
-							component={Input}
-							key={
-								this.props.selectedEntityTypeId +
-								this.props.property._id +
-								"from"
-							}
-						/>
+					<div className="filter-number-container">
+						<h1 className="filter-title">{this.props.property.displayName}</h1>
+						<div className="filter-options-container">
+							<Field
+								name={`${this.props.property.propertyName}.from`}
+								type="number"
+								component={Input}
+								key={
+									this.props.selectedEntityTypeId +
+									this.props.property._id +
+									"from"
+								}
+							/>
 
-						<Field
-							name={`${this.props.property.propertyName}.to`}
-							type="number"
-							component={Input}
-							key={
-								this.props.selectedEntityTypeId + this.props.property._id + "to"
-							}
-						/>
+							<span className="range-divider">TO</span>
+
+							<Field
+								name={`${this.props.property.propertyName}.to`}
+								type="number"
+								component={Input}
+								key={
+									this.props.selectedEntityTypeId +
+									this.props.property._id +
+									"to"
+								}
+							/>
+						</div>
 					</div>
 				) : (
 					""

@@ -20,6 +20,8 @@
 
 		&.property-section-results {
 			flex-grow: 1;
+			display: flex;
+			flex-direction: column;
 		}
 
 		.properties-section-header {
@@ -50,10 +52,6 @@
 			}
 		}
 
-		.properties-section-content {
-			flex-grow: 1;
-		}
-
 		&.property-section-filters {
 			display: flex;
 
@@ -66,6 +64,32 @@
 				padding: 20px;
 				flex-grow: 1;
 				overflow-y: auto;
+				@include webkit-scrollbar-light();
+			}
+		}
+
+		.properties-section-content {
+			flex-grow: 1;
+			position: relative;
+
+			.entities-loader {
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.entities-list {
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 0;
+				overflow-y: scroll;
 				@include webkit-scrollbar-light();
 			}
 		}

@@ -1,0 +1,100 @@
+.filter-container {
+	margin: 0 0 20px 0;
+
+	.input-group {
+		margin: 0;
+	}
+
+	h1.filter-title {
+		font-size: 12px;
+		margin: 0 0 5px 0;
+	}
+
+	.filter-checkbox-container,
+	.filter-dropdown-container {
+		.filter-options-container {
+			border: 1px solid $grey;
+			padding: 10px;
+			border-radius: 3px;
+
+			.input-group {
+				margin: 0 0 5px 0;
+
+				&:last-child {
+					margin: 0;
+				}
+			}
+
+			.pt-control {
+				padding-left: 22px;
+
+				.input-label {
+					font-size: 13px;
+				}
+			}
+		}
+	}
+
+	.filter-date-container {
+		.filter-options-container {
+			display: flex;
+
+			.range-divider {
+				flex-grow: 0;
+				flex-shrink: 0;
+			}
+		}
+	}
+
+	.filter-number-container {
+		.filter-options-container {
+			display: flex;
+
+			.range-divider {
+				flex-grow: 0;
+				flex-shrink: 0;
+			}
+		}
+	}
+}
+
+.property-container {
+	display: flex;
+
+	.property-stats {
+		width: 125px;
+		flex-grow: 0;
+		flex-shrink: 0;
+		text-align: right;
+		font-size: 13px;
+		display: flex;
+		align-items: center;
+		justify-content: flex-end;
+
+		.property-count {
+			width: 40px;
+			flex-grow: 0;
+			flex-shrink: 0;
+			margin: 0 10px 0 0;
+		}
+	}
+}
+
+.filter-histogram-container {
+	width: 75px;
+	height: 7px;
+	background: $grey;
+	border-radius: 100px;
+	position: relative;
+	flex-grow: 0;
+	flex-shrink: 0;
+
+	.filter-histogram {
+		position: absolute;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		background: $cobalt4;
+		border-radius: 100px;
+	}
+}

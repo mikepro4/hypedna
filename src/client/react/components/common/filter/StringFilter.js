@@ -34,7 +34,7 @@ class StringFilter extends React.Component {
 				});
 
 				callback(null, {
-					options: filteredOptions,
+					options: _.uniqBy(filteredOptions, "label"),
 					complete: true
 				});
 			}
@@ -42,7 +42,7 @@ class StringFilter extends React.Component {
 	};
 	render() {
 		let containerClassName = classnames({
-			"filter-input-group": true
+			"filter-container": true
 		});
 
 		let entityTypeToSearch;
@@ -56,8 +56,8 @@ class StringFilter extends React.Component {
 		return (
 			<div className={containerClassName}>
 				{this.props.property ? (
-					<div>
-						<h1>{this.props.property.displayName}</h1>
+					<div className="filter-string-container">
+						<h1 className="filter-title">{this.props.property.displayName}</h1>
 						<Field
 							name={this.props.property.propertyName}
 							type="text"

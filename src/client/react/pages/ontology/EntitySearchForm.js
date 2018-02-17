@@ -18,7 +18,8 @@ import Checkbox from "../../components/common/form/Checkbox";
 
 import {
 	searchEntities,
-	getEntityType
+	getEntityType,
+	getPropertyStats
 } from "../../../redux/actions/pageOntologyActions";
 
 import ReactSelectAsync from "../../components/common/form/ReactSelectAsync";
@@ -52,11 +53,25 @@ class EntitySearchForm extends React.Component {
 	};
 
 	renderDropdownFilter = property => {
-		return <DropdownFilter property={property} key={property.propertyName} />;
+		return (
+			<DropdownFilter
+				property={property}
+				key={property.propertyName}
+				updateStats={this.updateStats}
+				searchResultsStats={this.props.searchResultsStats}
+			/>
+		);
 	};
 
 	renderCheckboxFilter = property => {
-		return <CheckboxFilter property={property} key={property.propertyName} />;
+		return (
+			<CheckboxFilter
+				property={property}
+				key={property.propertyName}
+				updateStats={this.updateStats}
+				searchResultsStats={this.props.searchResultsStats}
+			/>
+		);
 	};
 
 	renderEntitySelectorFilter = property => {
@@ -83,6 +98,21 @@ class EntitySearchForm extends React.Component {
 			default:
 				return;
 		}
+	};
+
+	updateStats = property => {
+		const customProperties = this.props.getEntityType(
+			this.props.selectedEntityTypeId
+		).customProperties;
+
+		let values = { entityType: this.props.selectedEntityTypeId };
+
+		if (this.props.entitySearchForm && this.props.entitySearchForm.values) {
+			values = this.props.entitySearchForm.values;
+		}
+		this.props.getPropertyStats(values, property, customProperties, () => {
+			this.props.blur();
+		});
 	};
 
 	render() {
@@ -143,10 +173,13 @@ EntitySearchForm = reduxForm({
 })(EntitySearchForm);
 
 const mapStateToProps = state => ({
-	selectedEntityTypeId: state.pageOntology.selectedEntityTypeId
+	selectedEntityTypeId: state.pageOntology.selectedEntityTypeId,
+	entitySearchForm: state.form.entitySearchForm,
+	searchResultsStats: state.pageOntology.searchResultsStats
 });
 
 export default connect(mapStateToProps, {
 	searchEntities,
-	getEntityType
+	getEntityType,
+	getPropertyStats
 })(EntitySearchForm);

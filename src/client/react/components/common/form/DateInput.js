@@ -1,6 +1,7 @@
 import React, { PropTypes } from "react";
 import classnames from "classnames";
 import { DateInput } from "@blueprintjs/datetime";
+import { Position } from "@blueprintjs/core";
 
 const Date = ({
 	input,
@@ -37,6 +38,8 @@ const Date = ({
 
 			<div className="input-group-right">
 				<DateInput
+					popoverPosition={Position.TOP}
+					inline={false}
 					minDate={minDate}
 					{...input}
 					className={inputClassName}

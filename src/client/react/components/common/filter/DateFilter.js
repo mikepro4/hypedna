@@ -12,33 +12,40 @@ import DateInput from "../form/DateInput";
 class DateFilter extends React.Component {
 	render() {
 		let containerClassName = classnames({
-			"filter-input-group": true
+			"filter-container": true
 		});
 
 		return (
 			<div className={containerClassName}>
 				{this.props.property ? (
-					<div>
-						<h1>{this.props.property.displayName}</h1>
-						<Field
-							name={`${this.props.property.propertyName}.from`}
-							type="text"
-							component={DateInput}
-							key={
-								this.props.selectedEntityTypeId +
-								this.props.property._id +
-								"from"
-							}
-						/>
+					<div className="filter-date-container">
+						<h1 className="filter-title">{this.props.property.displayName}</h1>
 
-						<Field
-							name={`${this.props.property.propertyName}.to`}
-							type="text"
-							component={DateInput}
-							key={
-								this.props.selectedEntityTypeId + this.props.property._id + "to"
-							}
-						/>
+						<div className="filter-options-container">
+							<Field
+								name={`${this.props.property.propertyName}.from`}
+								type="date"
+								component={DateInput}
+								key={
+									this.props.selectedEntityTypeId +
+									this.props.property._id +
+									"from"
+								}
+							/>
+
+							<span className="range-divider">TO</span>
+
+							<Field
+								name={`${this.props.property.propertyName}.to`}
+								type="date"
+								component={DateInput}
+								key={
+									this.props.selectedEntityTypeId +
+									this.props.property._id +
+									"to"
+								}
+							/>
+						</div>
 					</div>
 				) : (
 					""
