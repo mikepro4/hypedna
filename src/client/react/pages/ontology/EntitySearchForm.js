@@ -141,7 +141,7 @@ class EntitySearchForm extends React.Component {
 						return this.renderPropertyFilter(property);
 					})}
 
-					<div className="form-footer">
+					<div className="form-footer" style={{ display: "none" }}>
 						<Button text="Clear Values" onClick={this.props.reset} />
 
 						<Button

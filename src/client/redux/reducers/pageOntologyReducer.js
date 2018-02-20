@@ -1,4 +1,4 @@
-import { assign } from "lodash";
+import { assign, merge, difference } from "lodash";
 
 import {
 	LOAD_ALL_ENTITY_TYPES,
@@ -12,7 +12,7 @@ import {
 	HIDE_PROPERTY_CREATOR,
 	ENTITY_RESULTS_SEARCH,
 	ENTITY_RESULTS_SEARCH_SUCCESS,
-	ENTITY_RESULTS_SEARCH_LOAD_MORE,
+	ENTITY_RESULTS_SEARCH_MORE,
 	UPDATE_RESULTS_STATS
 } from "../actions/types";
 
@@ -29,6 +29,7 @@ export const initialState = {
 	propertyCreatorOpen: false,
 	entitySearchResults: {
 		fetchingEntityResults: false,
+		fetchingEntityResultsMore: false,
 		offset: 0,
 		limit: 20,
 		count: null,
@@ -86,7 +87,19 @@ export const pageOntologyReducer = (state = initialState, action) => {
 
 		case ENTITY_RESULTS_SEARCH: {
 			let updatedResults = assign({}, state.entitySearchResults, {
-				fetchingEntityResults: true
+				fetchingEntityResults: true,
+				all: []
+			});
+			return assign({}, state, {
+				entitySearchResults: updatedResults
+			});
+		}
+
+		case ENTITY_RESULTS_SEARCH_MORE: {
+			let updatedResults = assign({}, state.entitySearchResults, {
+				fetchingEntityResultsMore: true,
+				offset: action.offset,
+				limit: action.limit
 			});
 			return assign({}, state, {
 				entitySearchResults: updatedResults
@@ -94,22 +107,15 @@ export const pageOntologyReducer = (state = initialState, action) => {
 		}
 
 		case ENTITY_RESULTS_SEARCH_SUCCESS: {
+			let newArray = state.entitySearchResults.all.concat(action.all);
+
 			let updatedResults = assign({}, state.entitySearchResults, {
 				fetchingEntityResults: false,
+				fetchingEntityResultsMore: false,
 				offset: action.offset,
 				limit: action.limit,
 				count: action.count,
-				all: action.all
-			});
-			return assign({}, state, {
-				entitySearchResults: updatedResults
-			});
-		}
-
-		case ENTITY_RESULTS_SEARCH_LOAD_MORE: {
-			let updatedResults = assign({}, state.entitySearchResults, {
-				fetchingEntityResults: true,
-				limit: payload.limit
+				all: newArray
 			});
 			return assign({}, state, {
 				entitySearchResults: updatedResults

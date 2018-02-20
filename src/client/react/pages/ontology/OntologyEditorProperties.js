@@ -35,9 +35,17 @@ class OntologyEditorProperties extends Component {
 
 	handleSubmit = values => {
 		console.log(values);
-		this.props.createEntity(this.props.selectedEntityTypeId, values, id => {
-			this.showSuccessToast("Entity Created", id);
+		let updatedValues = _.assign({}, values, {
+			createdAt: new Date(),
+			createdBy: this.props.auth._id
 		});
+		this.props.createEntity(
+			this.props.selectedEntityTypeId,
+			updatedValues,
+			id => {
+				this.showSuccessToast("Entity Created", id);
+			}
+		);
 	};
 
 	showSuccessToast = (message, id) => {
@@ -126,6 +134,7 @@ class OntologyEditorProperties extends Component {
 }
 
 const mapStateToProps = state => ({
+	auth: state.auth,
 	allEntityTypes: state.pageOntology.allEntityTypes,
 	selectedEntityTypeId: state.pageOntology.selectedEntityTypeId
 });

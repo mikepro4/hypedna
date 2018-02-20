@@ -219,22 +219,23 @@ class OntologyEditor extends Component {
 								</div>
 							}
 						/>
+
 						<Tab2
 							id="2"
-							title="Relations"
+							title="Entities"
 							panel={
 								<div>
-									<OntologyEditorRelations />
+									<OntologyEditorEntities />
 								</div>
 							}
 						/>
 
 						<Tab2
 							id="3"
-							title="Entities"
+							title="Relations"
 							panel={
 								<div>
-									<OntologyEditorEntities />
+									<OntologyEditorRelations />
 								</div>
 							}
 						/>

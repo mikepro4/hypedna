@@ -12,11 +12,42 @@ import {
 	CREATE_ENTITY_SUCCESS,
 	ENTITY_RESULTS_SEARCH,
 	ENTITY_RESULTS_SEARCH_SUCCESS,
-	ENTITY_RESULTS_SEARCH_LOAD_MORE,
+	ENTITY_RESULTS_SEARCH_MORE,
+	ENTITY_RESULTS_SEARCH_MORE_SUCCESS,
 	UPDATE_RESULTS_STATS
 } from "./types";
 
 import * as _ from "lodash";
+
+import { reset, submit } from "redux-form";
+
+/////////////////////////////////////////////////
+
+export const deleteEntity = (id, success) => async (
+	dispatch,
+	getState,
+	api
+) => {
+	const response = await api.post("/entity_delete", {
+		id
+	});
+
+	if (response.status === 200) {
+		if (success) {
+			success();
+		}
+	}
+};
+
+/////////////////////////////////////////////////
+
+export const resetForm = formName => dispatch => {
+	dispatch(reset(formName));
+};
+
+export const submitForm = formName => dispatch => {
+	dispatch(submit(formName));
+};
 
 /////////////////////////////////////////////////
 
@@ -56,11 +87,46 @@ export const getPropertyStats = (
 
 /////////////////////////////////////////////////
 
+export const loadMoreEntityResults = (
+	criteria,
+	sortProperty,
+	offset,
+	limit,
+	customProperties
+) => async (dispatch, getState, api) => {
+	dispatch({
+		type: ENTITY_RESULTS_SEARCH_MORE,
+		offset,
+		limit
+	});
+
+	const response = await api.post("/search/entity_results", {
+		criteria,
+		sortProperty,
+		offset,
+		limit,
+		customProperties
+	});
+
+	if (response.status === 200) {
+		console.log(response.data.all);
+		dispatch({
+			type: ENTITY_RESULTS_SEARCH_SUCCESS,
+			offset: response.data.offset,
+			limit: response.data.limit,
+			all: response.data.all,
+			count: response.data.count
+		});
+	}
+};
+
+/////////////////////////////////////////////////
+
 export const searchEntityResults = (
 	criteria,
 	sortProperty,
 	offset = 0,
-	limit = 0,
+	limit = 20,
 	customProperties
 ) => async (dispatch, getState, api) => {
 	dispatch({
@@ -78,7 +144,7 @@ export const searchEntityResults = (
 	if (response.status === 200) {
 		dispatch({
 			type: ENTITY_RESULTS_SEARCH_SUCCESS,
-			offset: response.data.offsset,
+			offset: response.data.offset,
 			limit: response.data.limit,
 			all: response.data.all,
 			count: response.data.count

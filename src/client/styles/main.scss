@@ -3,6 +3,40 @@ $navigationWidth: 74px;
 
 $break1: 1100px;
 
+@mixin keyframes($animation-name) {
+	@-webkit-keyframes #{$animation-name} {
+		@content;
+	}
+	@-moz-keyframes #{$animation-name} {
+		@content;
+	}
+	@-ms-keyframes #{$animation-name} {
+		@content;
+	}
+	@-o-keyframes #{$animation-name} {
+		@content;
+	}
+	@keyframes #{$animation-name} {
+		@content;
+	}
+}
+
+@mixin animation($str) {
+	-webkit-animation: #{$str};
+	-moz-animation: #{$str};
+	-ms-animation: #{$str};
+	-o-animation: #{$str};
+	animation: #{$str};
+}
+
+@mixin transition($args...) {
+	-webkit-transition: $args;
+	-moz-transition: $args;
+	-ms-transition: $args;
+	-o-transition: $args;
+	transition: $args;
+}
+
 @import "../../../node_modules/@blueprintjs/core/dist/blueprint.css";
 @import "../../../node_modules/@blueprintjs/core/dist/variables.scss";
 @import "../../../node_modules/@blueprintjs/datetime/lib/css/blueprint-datetime.css";
@@ -38,6 +72,7 @@ $break1: 1100px;
 @import "../react/pages/ontology/OntologyEditorProperties";
 @import "../react/pages/ontology/OntologyEditorEntities";
 @import "../react/pages/ontology/EntitySearchForm";
+@import "../react/pages/ontology/EntityResult";
 
 @font-face {
 	font-family: "Icons16";
