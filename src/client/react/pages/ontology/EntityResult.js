@@ -33,8 +33,17 @@ class EntityResult extends Component {
 							</h1>
 							<ul className="entity-metadata-list">
 								<li className="entity-single-metadata-option">
-									{this.props.entity.properties.entityUrlName}
+									<span>{this.props.entity.properties.entityUrlName}</span>
 								</li>
+
+								{this.props.entity.properties.description ? (
+									<li className="entity-single-metadata-option">
+										<span>{this.props.entity.properties.description}</span>
+									</li>
+								) : (
+									""
+								)}
+
 								<li className="entity-single-metadata-option">
 									Added{" "}
 									{moment(this.props.entity.properties.createdAt).fromNow()}

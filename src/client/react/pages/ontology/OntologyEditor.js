@@ -6,7 +6,7 @@ import { withStyles } from "material-ui/styles";
 import update from "immutability-helper";
 import qs from "qs";
 
-import { Tab2, Tabs2 } from "@blueprintjs/core";
+import { Tab2, Tabs2, NonIdealState } from "@blueprintjs/core";
 
 import { updateQueryString } from "../../../redux/actions/";
 
@@ -147,7 +147,17 @@ class OntologyEditor extends Component {
 
 	render() {
 		if (!this.props.selectedEntityTypeId) {
-			return <div>Select entity Type</div>;
+			return (
+				<NonIdealState
+					visual="document"
+					title="Select Entity Type"
+					description={
+						<div>
+							Browse and create entity types and it’s associated entities.
+						</div>
+					}
+				/>
+			);
 		}
 		return (
 			<div className="ontology-editor-content">

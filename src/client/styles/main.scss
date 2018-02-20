@@ -169,6 +169,28 @@ button {
 	}
 }
 
+.pt-non-ideal-state-title {
+	font-size: 36px;
+	font-weight: 600;
+}
+
+.pt-non-ideal-state-description {
+	font-size: 16px;
+}
+
+.pt-non-ideal-state {
+	max-width: 500px;
+	margin-top: -20px;
+}
+
+.pt-non-ideal-state > :not(:last-child) {
+	margin-bottom: 25px;
+}
+
+.pt-non-ideal-state-icon .pt-icon {
+	color: #e6e6e6;
+}
+
 .app-container {
 	display: block;
 	position: absolute;

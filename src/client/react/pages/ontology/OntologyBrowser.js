@@ -342,8 +342,9 @@ class OntologyBrowser extends Component {
 				<div className="browser-header">
 					<h1 className="section-title">Ontology Manager</h1>
 					<div className="browser-reset">
-
-						<a className="anchor-button" onClick={() => this.resetTree()}>Reset</a>
+						<a className="anchor-button" onClick={() => this.resetTree()}>
+							Reset
+						</a>
 					</div>
 				</div>
 

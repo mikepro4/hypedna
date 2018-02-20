@@ -7,7 +7,7 @@ import qs from "qs";
 import classNames from "classnames";
 import moment from "moment";
 
-import { Classes, Spinner } from "@blueprintjs/core";
+import { Classes, Spinner, NonIdealState } from "@blueprintjs/core";
 
 import EntitySearchForm from "./EntitySearchForm";
 import EntityResult from "./EntityResult";
@@ -207,16 +207,27 @@ class OntologyEditorEntities extends Component {
 						) : (
 							<div className="entities-list">
 								{this.props.entitySearchResults.all &&
-								this.props.entitySearchResults.all.length > 0
-									? this.props.entitySearchResults.all.map((entity, i) => {
-											return (
-												<div key={entity._id + i}>
-													<EntityResult entity={entity} />
-												</div>
-											);
-											return this.renderEntityResult(entity, i);
-										})
-									: "No results found"}
+								this.props.entitySearchResults.all.length > 0 ? (
+									this.props.entitySearchResults.all.map((entity, i) => {
+										return (
+											<div key={entity._id + i}>
+												<EntityResult entity={entity} />
+											</div>
+										);
+										return this.renderEntityResult(entity, i);
+									})
+								) : (
+									<NonIdealState
+										visual="search"
+										title={`No entities found`}
+										description={
+											<div>
+												Adjust filters or create new entities that match this
+												criteria.
+											</div>
+										}
+									/>
+								)}
 								{this.renderLoadMoreButton()}
 							</div>
 						)}
