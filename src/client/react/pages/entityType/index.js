@@ -7,7 +7,7 @@ import { loadAllEntityTypes } from "../../../redux/actions/pageEntityTypeActions
 import EntityTypeBrowser from "./EntityTypeBrowser";
 import EntityTypeEditor from "./EntityTypeEditor";
 
-class EntityPage extends Component {
+class EntityTypePage extends Component {
 	static loadData(store, match, route, path, query) {
 		return store.dispatch(loadAllEntityTypes());
 	}
@@ -42,6 +42,6 @@ const mapStateToProps = state => ({});
 
 export default {
 	component: withRouter(
-		connect(mapStateToProps, { loadAllEntityTypes })(EntityPage)
+		connect(mapStateToProps, { loadAllEntityTypes })(EntityTypePage)
 	)
 };

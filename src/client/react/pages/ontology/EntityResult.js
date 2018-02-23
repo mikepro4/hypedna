@@ -31,9 +31,19 @@ class EntityResult extends Component {
 						</div>
 
 						<div className="entity-result-description">
-							<h1 className="entity-title">
-								{this.props.entity.properties.displayName}
-							</h1>
+							<a
+								onClick={() =>
+									this.props.history.push(
+										`/${
+											this.props.entity.properties.entityUrlName
+										}?selectedTabId=1`
+									)
+								}
+							>
+								<h1 className="entity-title">
+									{this.props.entity.properties.displayName}
+								</h1>
+							</a>
 							<ul className="entity-metadata-list">
 								<li className="entity-single-metadata-option">
 									<span>{this.props.entity.properties.entityUrlName}</span>

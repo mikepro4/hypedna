@@ -1,3 +1,14 @@
+/////////////////////////////////////////////////
+
+// Page: Entity
+
+export const LOAD_ENTITY_DETAILS = "app/LOAD_ENTITY_DETAILS";
+export const LOAD_ENTITY_DETAILS_SUCCESS = "app/LOAD_ENTITY_DETAILS_SUCCESS";
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+
 export const FETCH_AUTH = "FETCH_AUTH";
 
 export const LOAD_YOUTUBE_VIDEO_DETAILS = "app/LOAD_YOUTUBE_VIDEO_DETAILS";

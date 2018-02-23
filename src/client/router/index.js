@@ -12,6 +12,8 @@ import SearchPage from "../react/pages/search";
 import EntityTypePage from "../react/pages/entityType";
 import OntologyPage from "../react/pages/ontology";
 
+import EntityPage from "../react/pages/entity";
+
 export default [
 	{
 		...App,
@@ -78,6 +80,13 @@ export default [
 				path: "/ontology",
 				params: {
 					name: "ontology"
+				}
+			},
+			{
+				...EntityPage,
+				path: "/:entityUrlName",
+				params: {
+					name: "entity"
 				}
 			}
 		]
