@@ -137,6 +137,13 @@ class EntitySearchForm extends React.Component {
 						propertyType: "string"
 					})}
 
+					{this.renderPropertyFilter({
+						displayName: "Entity URL Name:",
+						fieldType: "input",
+						propertyName: "entityUrlName",
+						propertyType: "string"
+					})}
+
 					{customProperties.map((property, i) => {
 						return this.renderPropertyFilter(property);
 					})}

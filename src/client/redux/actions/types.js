@@ -71,6 +71,8 @@ export const ENTITY_RESULTS_SEARCH_MORE_SUCCESS =
 
 export const UPDATE_RESULTS_STATS = "app/UPDATE_RESULTS_STATS";
 
+export const ENTITY_REMOVE = "app/ENTITY_REMOVE";
+
 /////////////////////////////////////////////////
 
 // Page: EntityTypeBrowser

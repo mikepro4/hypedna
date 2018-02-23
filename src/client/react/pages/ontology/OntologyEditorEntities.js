@@ -141,6 +141,11 @@ class OntologyEditorEntities extends Component {
 	};
 
 	render() {
+		if (
+			qs.parse(this.props.location.search.substring(1)).selectedTabId !== "2"
+		) {
+			return "";
+		}
 		return (
 			<div className="ontology-entities-properties">
 				<div className="properties-section property-section-filters">

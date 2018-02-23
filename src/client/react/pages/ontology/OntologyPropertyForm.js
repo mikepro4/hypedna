@@ -159,11 +159,14 @@ class PropertyEditorForm extends React.Component {
 				{this.props.fieldTypeValue == "checkbox" ? (
 					<Field
 						name="defaultValue"
+						component={Select}
+						label="Defaul Type:"
 						ref="defaultValue"
-						type="checkbox"
-						component={Checkbox}
-						label="Default Value:"
-					/>
+					>
+						<option />
+						<option value="false">false</option>
+						<option value="true">true</option>
+					</Field>
 				) : (
 					""
 				)}
@@ -257,6 +260,12 @@ const validate = values => {
 		let containsSpaces = values.propertyName.indexOf(" ") >= 0;
 		if (containsSpaces) {
 			errors.propertyName = "Can't contain spaces";
+		}
+	}
+
+	if (values.fieldType == "checkbox") {
+		if (_.isEmpty(values.defaultValue)) {
+			errors.defaultValue = "Please select default value";
 		}
 	}
 

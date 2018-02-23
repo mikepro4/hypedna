@@ -23,7 +23,6 @@ class StringFilter extends React.Component {
 			0,
 			20,
 			data => {
-				console.log(data.all);
 				let options = data.all.map(entity => ({
 					value: entity._id,
 					label: entity.properties[propertyToSearch]

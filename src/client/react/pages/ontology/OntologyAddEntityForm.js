@@ -13,7 +13,8 @@ import {
 	removeCustomProperty,
 	showPropertyCreator,
 	updateAllCustomProperties,
-	searchEntities
+	searchEntities,
+	validateUrlName
 } from "../../../redux/actions/pageOntologyActions";
 
 import ReactSelectAsync from "../../components/common/form/ReactSelectAsync";
@@ -314,7 +315,9 @@ const validate = values => {
 
 OntologyAddEntityForm = reduxForm({
 	form: "addEntityForm",
-	validate
+	validate,
+	asyncValidate: validateUrlName,
+	asyncBlurFields: ["entityUrlName"]
 })(OntologyAddEntityForm);
 
 const mapStateToProps = state => ({

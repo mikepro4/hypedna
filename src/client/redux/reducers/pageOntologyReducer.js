@@ -1,4 +1,5 @@
-import { assign, merge, difference } from "lodash";
+import { assign, merge, difference, findIndex } from "lodash";
+import update from "immutability-helper";
 
 import {
 	LOAD_ALL_ENTITY_TYPES,
@@ -13,7 +14,8 @@ import {
 	ENTITY_RESULTS_SEARCH,
 	ENTITY_RESULTS_SEARCH_SUCCESS,
 	ENTITY_RESULTS_SEARCH_MORE,
-	UPDATE_RESULTS_STATS
+	UPDATE_RESULTS_STATS,
+	ENTITY_REMOVE
 } from "../actions/types";
 
 export const initialState = {
@@ -126,6 +128,24 @@ export const pageOntologyReducer = (state = initialState, action) => {
 			return assign({}, state, {
 				searchResultsStats: action.stats
 			});
+
+		case ENTITY_REMOVE: {
+			let entityToRemoveIndex = findIndex(state.entitySearchResults.all, {
+				_id: action.payload
+			});
+
+			let newEntitiesArray = update(state.entitySearchResults.all, {
+				$splice: [[entityToRemoveIndex, 1]]
+			});
+
+			let updatedResults = assign({}, state.entitySearchResults, {
+				all: newEntitiesArray,
+				count: state.entitySearchResults.count - 1
+			});
+			return assign({}, state, {
+				entitySearchResults: updatedResults
+			});
+		}
 		default:
 			return state;
 	}

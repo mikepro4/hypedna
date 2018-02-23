@@ -14,12 +14,37 @@ import {
 	ENTITY_RESULTS_SEARCH_SUCCESS,
 	ENTITY_RESULTS_SEARCH_MORE,
 	ENTITY_RESULTS_SEARCH_MORE_SUCCESS,
-	UPDATE_RESULTS_STATS
+	UPDATE_RESULTS_STATS,
+	ENTITY_REMOVE
 } from "./types";
 
 import * as _ from "lodash";
+import axios from "axios";
 
 import { reset, submit } from "redux-form";
+
+export const removeEntity = id => dispatch => {
+	dispatch({
+		type: ENTITY_REMOVE,
+		payload: id
+	});
+};
+
+/////////////////////////////////////////////////
+
+export const validateUrlName = values => {
+	return axios
+		.post("/api//validate_entity_url_name", {
+			entityUrlName: values.entityUrlName
+		})
+		.then(response => {
+			if (response.status === 200) {
+			}
+		})
+		.catch(error => {
+			throw { entityUrlName: "Already Exists" };
+		});
+};
 
 /////////////////////////////////////////////////
 
@@ -32,7 +57,8 @@ export const deleteEntity = (id, success) => async (
 		id
 	});
 
-	if (response.status === 200) {
+	if (response.status == 200) {
+		dispatch(removeEntity(id));
 		if (success) {
 			success();
 		}

@@ -16,6 +16,13 @@ class DropdownFilter extends React.Component {
 		if (!_.isEqual(prevprops.form.values, this.props.form.values)) {
 			this.props.updateStats(this.props.property.propertyName);
 		}
+
+		if (
+			prevprops.entitySearchResults.count !==
+			this.props.entitySearchResults.count
+		) {
+			this.props.updateStats(this.props.property.propertyName);
+		}
 	};
 
 	componentDidMount = () => {

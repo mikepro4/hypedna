@@ -9,7 +9,10 @@ import moment from "moment";
 
 import { Classes, Spinner } from "@blueprintjs/core";
 
-import { deleteEntity } from "../../../redux/actions/pageOntologyActions";
+import {
+	deleteEntity,
+	removeEntity
+} from "../../../redux/actions/pageOntologyActions";
 
 class EntityResult extends Component {
 	state = {
@@ -55,27 +58,12 @@ class EntityResult extends Component {
 					<div className="entity-result-right">
 						<ul className="entity-result-actions">
 							<li className="entity-single-result-action">
-								<a className="anchor-button">
-									<span className="pt-icon-standard pt-icon-edit" />
-								</a>
-							</li>
-							<li className="entity-single-result-action">
 								<a
 									className="anchor-button"
-									onClick={() =>
-										this.props.deleteEntity(this.props.entity._id, () => {
-											this.setState({
-												deleted: true
-											});
-										})
-									}
+									onClick={() => this.props.deleteEntity(this.props.entity._id)}
 								>
 									<span className="pt-icon-standard pt-icon-trash" />
-								</a>
-							</li>
-							<li className="entity-single-result-action">
-								<a className="anchor-button">
-									<span className="pt-icon-standard pt-icon-chevron-right" />
+									Delete
 								</a>
 							</li>
 						</ul>
@@ -95,6 +83,7 @@ const mapStateToProps = state => ({
 
 export default withRouter(
 	connect(mapStateToProps, {
-		deleteEntity
+		deleteEntity,
+		removeEntity
 	})(EntityResult)
 );
