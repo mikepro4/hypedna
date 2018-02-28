@@ -17,13 +17,10 @@ import {
 	validateUrlName
 } from "../../../redux/actions/pageOntologyActions";
 
-import ReactSelectAsync from "../../components/common/form/ReactSelectAsync";
-import Input from "../../components/common/form/Input";
-import DateInput from "../../components/common/form/DateInput";
-import Textarea from "../../components/common/form/Textarea";
-import Checkbox from "../../components/common/form/Checkbox";
-import Select from "../../components/common/form/Select";
 import update from "immutability-helper";
+
+import Input from "../../components/common/form/Input";
+import RenderField from "../../components/common/form/RenderField";
 
 import DraggableField from "./DraggableField";
 
@@ -33,123 +30,11 @@ class OntologyAddEntityForm extends React.Component {
 		dragging: false
 	};
 
-	renderInput = property => {
-		switch (property.propertyType) {
-			case "string":
-				return (
-					<Field
-						name={property.propertyName}
-						component={Input}
-						label={property.displayName + ":"}
-						placeholder={property.description}
-						ref={property.propertyName}
-					/>
-				);
-			case "number":
-				return (
-					<Field
-						name={property.propertyName}
-						component={Input}
-						type="number"
-						label={property.displayName + ":"}
-						placeholder={property.description}
-						ref={property.propertyName}
-					/>
-				);
-
-			case "date":
-				return (
-					<Field
-						name={property.propertyName}
-						component={DateInput}
-						minDate={new Date("01/01/1100")}
-						label={property.displayName + ":"}
-						placeholder={property.description}
-						ref={property.propertyName}
-					/>
-				);
-			default:
-				return;
-		}
-	};
-
-	renderField = property => {
-		switch (property.fieldType) {
-			case "input":
-				return this.renderInput(property);
-			case "dropdown":
-				return (
-					<Field
-						name={property.propertyName}
-						component={Select}
-						label={property.displayName + ":"}
-						placeholder={property.description}
-						ref={property.propertyName}
-					>
-						<option />
-						{property.dropdownValues.map(value => {
-							return (
-								<option key={value._id} value={value.valuePropertyName}>
-									{value.valueDisplayName}
-								</option>
-							);
-						})}
-					</Field>
-				);
-			case "checkbox":
-				return (
-					<Field
-						name={property.propertyName}
-						component={Checkbox}
-						type="checkbox"
-						label={property.displayName + ":"}
-						placeholder={property.description}
-						ref={property.propertyName}
-					/>
-				);
-
-			case "entitySelector":
-				return (
-					<Field
-						name={property.propertyName}
-						component={ReactSelectAsync}
-						loadOptions={(input, callback) =>
-							this.getOptions(input, callback, property.entityType)
-						}
-						label={property.displayName + ":"}
-						placeholder={property.description}
-						ref={property.propertyName}
-					/>
-				);
-			default:
-				return;
-		}
-	};
-
-	getOptions = (input, callback, entityType) => {
-		this.props.searchEntities(
-			{ displayName: input, entityType: entityType },
-			"displayName",
-			0,
-			20,
-			data => {
-				console.log(data.all);
-				callback(null, {
-					options: data.all.map(entity => ({
-						value: entity._id,
-						label: entity.properties.displayName
-					})),
-					complete: true
-				});
-			}
-		);
-	};
-
 	renderProperty = property => {
 		if (property) {
 			return (
 				<div key={property._id} className="single-form-row">
-					{this.renderField(property)}
+					{<RenderField property={property} />}
 					<a
 						className="anchor-button"
 						onClick={() => this.props.showPropertyCreator(property)}
@@ -228,28 +113,40 @@ class OntologyAddEntityForm extends React.Component {
 				>
 					<h1 className="form-headline">Generic Properties</h1>
 					<div className="generic-properties">
-						<Field
-							name="displayName"
-							component={Input}
-							label="Display Name:"
-							placeholder="Enter display name..."
-							ref="displayName"
+						<RenderField
+							key="1"
+							property={{
+								description: "Enter Display Name...",
+								defaultValue: "",
+								displayName: "Display Name",
+								propertyName: "displayName",
+								fieldType: "input",
+								propertyType: "string"
+							}}
 						/>
 
-						<Field
-							name="entityUrlName"
-							component={Input}
-							label="Entity Url Name:"
-							placeholder="Enter entity url name (no spaces)..."
-							ref="entityUrlName"
+						<RenderField
+							key="2"
+							property={{
+								description: "Enter Entity URL Name...",
+								defaultValue: "",
+								displayName: "Entity URL Name",
+								propertyName: "entityUrlName",
+								fieldType: "input",
+								propertyType: "string"
+							}}
 						/>
 
-						<Field
-							name="description"
-							component={Input}
-							label="Description:"
-							placeholder="Description here"
-							ref="description"
+						<RenderField
+							key="3"
+							property={{
+								description: "description",
+								defaultValue: "",
+								displayName: "Description",
+								propertyName: "description",
+								fieldType: "input",
+								propertyType: "string"
+							}}
 						/>
 					</div>
 

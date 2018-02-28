@@ -5,6 +5,9 @@ import { Helmet } from "react-helmet";
 import qs from "qs";
 import * as _ from "lodash";
 
+import Dropzone from "react-dropzone";
+import axios from "axios";
+
 import {
 	Button,
 	Classes,
@@ -20,11 +23,16 @@ import { getEntityType } from "../../../redux/actions/pageOntologyActions";
 
 import { updateQueryString } from "../../../redux/actions/";
 
-import { loadEntityDetails } from "../../../redux/actions/pageEntityActions";
+import {
+	loadEntityDetails,
+	updateEntity
+} from "../../../redux/actions/pageEntityActions";
 
 class EntityDetails extends Component {
 	state = {
 		entityTitle: "",
+		imageUrl: "",
+		editedAvatar: false,
 		edited: false,
 		selectedTabId: "1"
 	};
@@ -78,26 +86,111 @@ class EntityDetails extends Component {
 	};
 
 	handleFormSubmit = () => {
-		console.log(this.state);
+		let newEntityProperties = _.assign({}, this.props.entity.properties, {
+			displayName: this.state.entityTitle,
+			imageUrl: this.state.imageUrl
+		});
+
+		let newEntity = _.assign({}, this.props.entity, {
+			properties: newEntityProperties
+		});
+
+		this.props.updateEntity(this.props.entity._id, newEntity);
+	};
+
+	handleDrop = files => {
+		const uploaders = files.map(file => {
+			// Progress
+			var config = {
+				onUploadProgress: function(progressEvent) {
+					let percentCompleted = Math.round(
+						progressEvent.loaded * 100 / progressEvent.total
+					);
+					console.log(
+						"onUploadProgress called with",
+						arguments,
+						"Percent Completed:" + percentCompleted
+					);
+				}
+			};
+			// Initial FormData
+			const formData = new FormData();
+			formData.append("file", file);
+			formData.append("tags", `jamdna`);
+			formData.append("upload_preset", "iidugxde"); // Replace the preset name with your own
+			formData.append("api_key", "DhgKXiXYQqQj0nEB74w_70HfPWI"); // Replace API key with your own Cloudinary key
+			formData.append("timestamp", (Date.now() / 1000) | 0);
+
+			// Make an AJAX upload request using Axios (replace Cloudinary URL below with your own)
+			return axios
+				.post(
+					"https://api.cloudinary.com/v1_1/dcdnt/image/upload",
+					formData,
+					config
+				)
+				.then(response => {
+					const data = response.data;
+					const fileURL = data.secure_url; // You should store this URL for future references in your app
+					this.setState({
+						imageUrl: data.secure_url,
+						editedAvatar: false
+					});
+				});
+		});
+
+		// Once all the files are uploaded
+		axios.all(uploaders).then(() => {
+			this.handleFormSubmit();
+			// ... perform after upload is successful operation
+		});
 	};
 
 	render() {
-		console.log(this.props.history);
 		return (
 			<div className="entity-details-container">
 				<div className="entity-details-header">
 					<div className="header-left">
 						<div className="header-left">
 							<div className="entity-avatar">
-								<img src="http://via.placeholder.com/100x100" />
+								<Dropzone
+									onDrop={this.handleDrop}
+									multiple
+									accept="image/*"
+									style={{ width: "50px", height: "50px", background: "red" }}
+								>
+									<img
+										src={
+											this.state.editedAvatar
+												? this.state.imageUrl
+												: this.props.entity.properties.imageUrl
+										}
+									/>
+								</Dropzone>
 							</div>
 							<div className="entity-info">
 								<div className="entity-info-element">
-									<div>{
-										this.props.getEntityType(
-											this.props.entity.associatedEntityTypes[0].entityTypeId
-										).genericProperties.displayName
-									}</div>
+									<div>
+										<a
+											className="entity-type-link anchor-button"
+											onClick={() =>
+												this.props.history.push(
+													`/ontology?selectedTabId=2&selectedEntityTypeId=${
+														this.props.entity.associatedEntityTypes[0]
+															.entityTypeId
+													}`
+												)
+											}
+										>
+											{this.props.getEntityType(
+												this.props.entity.associatedEntityTypes[0].entityTypeId
+											)
+												? this.props.getEntityType(
+														this.props.entity.associatedEntityTypes[0]
+															.entityTypeId
+													).genericProperties.displayName
+												: ""}
+										</a>
+									</div>
 									{this.props.match.params.entityUrlName ==
 									this.props.entity.properties.entityUrlName ? (
 										<EditableText
@@ -112,7 +205,7 @@ class EntityDetails extends Component {
 											onConfirm={this.handleFormSubmit}
 										/>
 									) : (
-										"Loading..."
+										<div className="entity-loading">Loading...</div>
 									)}
 									<div />
 								</div>
@@ -132,6 +225,7 @@ class EntityDetails extends Component {
 							<Tab2 id="1" title="Timeline" panel={<div>Timeline</div>} />
 
 							<Tab2 id="2" title="Properties" panel={<div>Properties</div>} />
+							<Tab2 id="3" title="Relations" panel={<div>Relations</div>} />
 						</Tabs2>
 					</div>
 				</div>
@@ -149,6 +243,7 @@ export default withRouter(
 	connect(mapStateToProps, {
 		loadEntityDetails,
 		updateQueryString,
-		getEntityType
+		getEntityType,
+		updateEntity
 	})(EntityDetails)
 );

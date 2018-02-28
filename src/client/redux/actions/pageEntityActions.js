@@ -10,6 +10,25 @@ import {
 
 /////////////////////////////////////////////////
 
+export const updateEntity = (id, newEntity, success) => async (
+	dispatch,
+	getState,
+	api
+) => {
+	const response = await api.post("/entity_update", {
+		id,
+		newEntity
+	});
+	if (response.data) {
+		dispatch({
+			type: LOAD_ENTITY_DETAILS_SUCCESS,
+			payload: response.data
+		});
+	}
+};
+
+/////////////////////////////////////////////////
+
 export const loadEntityDetails = entityUrlName => async (
 	dispatch,
 	getState,

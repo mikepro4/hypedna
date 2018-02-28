@@ -34,7 +34,7 @@ export const removeEntity = id => dispatch => {
 
 export const validateUrlName = values => {
 	return axios
-		.post("/api//validate_entity_url_name", {
+		.post("/api/validate_entity_url_name", {
 			entityUrlName: values.entityUrlName
 		})
 		.then(response => {

@@ -27,7 +27,13 @@ class EntityResult extends Component {
 				<div className="entity-result-container">
 					<div className="entity-result-left">
 						<div className="entity-avatar">
-							<img src="http://via.placeholder.com/88x88" />
+							<img
+								src={
+									this.props.entity.properties.imageUrl
+										? this.props.entity.properties.imageUrl
+										: "http://via.placeholder.com/88x88"
+								}
+							/>
 						</div>
 
 						<div className="entity-result-description">

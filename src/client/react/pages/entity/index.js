@@ -13,7 +13,14 @@ class EntityPage extends Component {
 	componentWillMount() {
 		this.props.loadEntityDetails(this.props.match.params.entityUrlName);
 	}
-	componentWillUnmount() {}
+	componentDidUpdate = (prevProps, prevState) => {
+		if (
+			prevProps.match.params.entityUrlName !==
+			this.props.match.params.entityUrlName
+		) {
+			this.props.loadEntityDetails(this.props.match.params.entityUrlName);
+		}
+	};
 	renderHead = () => (
 		<Helmet>
 			<title>Entity Page</title>

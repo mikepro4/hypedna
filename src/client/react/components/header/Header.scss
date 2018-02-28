@@ -17,11 +17,22 @@
 
 	.search-placeholder {
 		display: flex;
-		height: 40px;
-		background: rgba(grey, 0.1);
+		height: 30px;
 		max-width: 500px;
 		margin: 0 50px 0 50px;
 		flex-grow: 1;
+
+		form {
+			width: 100%;
+		}
+
+		.input-group-left {
+			display: none;
+		}
+
+		.input-group-right {
+			width: 100%;
+		}
 	}
 
 	.app-menu {

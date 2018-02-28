@@ -19,6 +19,8 @@ import AddCircleIcon from "material-ui-icons/AddCircle";
 import { withRouter } from "react-router-dom";
 import { ListItemIcon, ListItemText } from "material-ui/List";
 
+import EntitySearchForm from "./EntitySearchForm";
+
 const styles = theme => ({
 	avatar: {
 		borderRadius: "50px",
@@ -201,6 +203,12 @@ class Header extends Component {
 		);
 	}
 
+	handleSubmit = values => {
+		if (!_.isEmpty(values.entityUrlName)) {
+			this.props.history.push(`/${values.entityUrlName}?selectedTabId=1`);
+		}
+	};
+
 	render() {
 		return (
 			<header className="app-header">
@@ -254,7 +262,14 @@ class Header extends Component {
 						</svg>
 					</div>
 
-					<div className="search-placeholder" />
+					<div className="search-placeholder">
+						<EntitySearchForm
+							ref="mainEntitySearchForm"
+							enableReinitialize={true}
+							onSubmit={this.handleSubmit.bind(this)}
+							onChange={this.handleSubmit.bind(this)}
+						/>
+					</div>
 				</div>
 
 				<div className="header-right">
