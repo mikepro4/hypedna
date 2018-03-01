@@ -5,99 +5,35 @@ import { Form } from "redux-form";
 import { connect } from "react-redux";
 import update from "immutability-helper";
 import { Button, Intent } from "@blueprintjs/core";
-import { DropTarget, DragDropContext } from "react-dnd";
-import HTML5Backend from "react-dnd-html5-backend";
 
 import {
-	removeCustomProperty,
-	showPropertyCreator,
-	updateAllCustomProperties,
 	searchEntities,
-	validateUrlName
+	getEntityType
 } from "../../../redux/actions/pageOntologyActions";
 
-import Input from "../../components/common/form/Input";
-import RenderField from "../../components/common/form/RenderField";
-import DraggableField from "./DraggableField";
+import { validateUrlName } from "../../../redux/actions/pageEntityActions";
 
-@DragDropContext(HTML5Backend)
-class OntologyAddEntityForm extends React.Component {
-	state = {
-		dragging: false
-	};
+import RenderField from "../../components/common/form/RenderField";
+
+class EntityPropertiesEditorForm extends React.Component {
+	state = {};
 
 	renderProperty = property => {
 		if (property) {
 			return (
 				<div key={property._id} className="single-form-row">
 					{<RenderField property={property} />}
-					<a
-						className="anchor-button"
-						onClick={() => this.props.showPropertyCreator(property)}
-					>
-						<span className="pt-icon-standard pt-icon-edit" />
-					</a>
-					<a
-						className="anchor-button"
-						onClick={() => this.removeCustomProperty(property._id)}
-					>
-						<span className="pt-icon-standard pt-icon-trash" />
-					</a>
 				</div>
 			);
 		} else return {};
 	};
 
-	removeCustomProperty = propertyId => {
-		this.props.removeCustomProperty(
-			this.props.selectedEntityTypeId,
-			propertyId
-		);
-	};
-
-	moveField = (dragIndex, hoverIndex) => {
-		const { fields } = this.state;
-		const dragField = fields[dragIndex];
-
-		this.setState(
-			update(this.state, {
-				fields: {
-					$splice: [[dragIndex, 1], [hoverIndex, 0, dragField]]
-				}
-			})
-		);
-	};
-
-	dragStart = () => {
-		this.setState({
-			dragging: true,
-			fields: this.props.customProperties
-		});
-	};
-
-	dragEnd = () => {
-		this.props.updateAllCustomProperties(
-			this.props.selectedEntityTypeId,
-			this.state.fields,
-			() => {
-				this.setState({
-					dragging: false,
-					fields: []
-				});
-			}
-		);
-	};
-
 	render() {
 		const { handleSubmit } = this.props;
 
-		let fields;
-
-		if (this.state.dragging) {
-			fields = this.state.fields;
-		} else {
-			fields = this.props.customProperties;
-		}
+		let fields = this.props.getEntityType(
+			this.props.entity.associatedEntityTypes[0].entityTypeId
+		).customProperties;
 
 		return (
 			<div>
@@ -150,29 +86,16 @@ class OntologyAddEntityForm extends React.Component {
 						<h1 className="form-headline">Custom Properties</h1>
 
 						{fields.map((property, i) => {
-							return (
-								<DraggableField
-									key={property._id}
-									id={property._id}
-									moveField={this.moveField}
-									index={i}
-									dragStart={this.dragStart}
-									dragEnd={this.dragEnd}
-								>
-									{this.renderProperty(property)}
-								</DraggableField>
-							);
+							return this.renderProperty(property);
 						})}
 					</div>
 
 					<div className="form-footer">
-						<Button text="Clear Values" onClick={this.props.reset} />
-
 						<Button
 							intent={Intent.SUCCESS}
 							disabled={this.props.pristine}
 							type="submit"
-							text="Create New Entity"
+							text="Update Entity"
 						/>
 					</div>
 				</Form>
@@ -202,21 +125,19 @@ const validate = values => {
 	return errors;
 };
 
-OntologyAddEntityForm = reduxForm({
-	form: "addEntityForm",
+EntityPropertiesEditorForm = reduxForm({
+	form: "editEntityForm",
 	validate,
 	asyncValidate: validateUrlName,
 	asyncBlurFields: ["entityUrlName"]
-})(OntologyAddEntityForm);
+})(EntityPropertiesEditorForm);
 
 const mapStateToProps = state => ({
-	selectedEntityTypeId: state.pageOntology.selectedEntityTypeId,
-	selectedProperty: state.pageOntology.selectedProperty
+	entity: state.pageEntity.entity,
+	allEntityTypes: state.pageOntology.allEntityTypes
 });
 
 export default connect(mapStateToProps, {
-	removeCustomProperty,
-	showPropertyCreator,
-	updateAllCustomProperties,
-	searchEntities
-})(OntologyAddEntityForm);
+	searchEntities,
+	getEntityType
+})(EntityPropertiesEditorForm);

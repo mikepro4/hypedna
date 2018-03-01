@@ -10,6 +10,26 @@ import {
 
 /////////////////////////////////////////////////
 
+export const validateUrlName = (values, dispatch, props, field) => {
+	if (props.entity.properties.entityUrlName == values.entityUrlName) {
+		return Promise.resolve();
+	} else {
+		return axios
+			.post("/api/validate_entity_url_name", {
+				entityUrlName: values.entityUrlName
+			})
+			.then(response => {
+				if (response.status === 200) {
+				}
+			})
+			.catch(error => {
+				throw { entityUrlName: "Already Exists" };
+			});
+	}
+};
+
+/////////////////////////////////////////////////
+
 export const updateEntity = (id, newEntity, success) => async (
 	dispatch,
 	getState,
@@ -24,6 +44,9 @@ export const updateEntity = (id, newEntity, success) => async (
 			type: LOAD_ENTITY_DETAILS_SUCCESS,
 			payload: response.data
 		});
+		if (success) {
+			success();
+		}
 	}
 };
 

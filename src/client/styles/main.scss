@@ -54,6 +54,7 @@ $break1: 1100px;
 @import "../react/components/navigation/NavigationSidebar";
 @import "../react/components/common/player/Player";
 @import "../react/components/common/filter/Filters";
+@import "../react/components/common/avatar/Avatar";
 
 //pages
 @import "../react/pages/search/SearchSidebar";
@@ -75,6 +76,7 @@ $break1: 1100px;
 @import "../react/pages/ontology/EntityResult";
 
 @import "../react/pages/entity/Entity";
+@import "../react/pages/entity/EntityProperties";
 
 @font-face {
 	font-family: "Icons16";

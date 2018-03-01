@@ -27,8 +27,11 @@ import {
 	updateEntityType,
 	deleteEntityType,
 	loadAllEntityTypes,
-	selectEntityType
+	selectEntityType,
+	getEntityType
 } from "../../../redux/actions/pageOntologyActions";
+
+import Avatar from "../../components/common/avatar/Avatar";
 
 const styles = theme => ({});
 
@@ -53,16 +56,23 @@ class OntologyEditor extends Component {
 	};
 
 	handleFormSubmit = () => {
-		let entityType = _.filter(this.props.allEntityTypes, entityType => {
-			return entityType._id == this.props.selectedEntityTypeId;
-		});
-
-		let newEntityType = _.assign({}, entityType[0], {
-			genericProperties: {
+		let newGenericProperties = _.assign(
+			{},
+			this.props.getEntityType(this.props.selectedEntityTypeId)
+				.genericProperties,
+			{
 				displayName: this.state.title,
 				description: this.state.description
 			}
-		});
+		);
+
+		let newEntityType = _.assign(
+			{},
+			this.props.getEntityType(this.props.selectedEntityTypeId),
+			{
+				genericProperties: newGenericProperties
+			}
+		);
 
 		this.props.updateEntityType(
 			this.props.selectedEntityTypeId,
@@ -145,6 +155,33 @@ class OntologyEditor extends Component {
 		this.props.updateSelectedEntityType("");
 	};
 
+	submitAvatar = imageUrl => {
+		let newGenericProperties = _.assign(
+			{},
+			this.props.getEntityType(this.props.selectedEntityTypeId)
+				.genericProperties,
+			{
+				imageUrl: imageUrl
+			}
+		);
+
+		let newEntityType = _.assign(
+			{},
+			this.props.getEntityType(this.props.selectedEntityTypeId),
+			{
+				genericProperties: newGenericProperties
+			}
+		);
+
+		this.props.updateEntityType(
+			this.props.selectedEntityTypeId,
+			newEntityType,
+			() => {
+				this.props.loadAllEntityTypes();
+			}
+		);
+	};
+
 	render() {
 		if (!this.props.selectedEntityTypeId) {
 			return (
@@ -164,10 +201,18 @@ class OntologyEditor extends Component {
 				<div className="ontology-editor-header">
 					<div className="header-left">
 						<div className="entity-type-avatar">
-							<img src="http://via.placeholder.com/200x200" />
+							<Avatar
+								imageUrl={
+									this.props.getEntityType(this.props.selectedEntityTypeId)
+										.genericProperties.imageUrl
+								}
+								onSuccess={this.submitAvatar}
+								canUpload={true}
+							/>
 						</div>
 						<div className="entity-type-info">
 							<div className="entity-type-info-element">
+								<div className="entity-type-label">Selected Entity Type:</div>
 								<div>
 									<EditableText
 										intent={Intent.DEFAULT}
@@ -267,7 +312,8 @@ export default withStyles(styles)(
 			loadAllEntityTypes,
 			updateEntityType,
 			deleteEntityType,
-			updateQueryString
+			updateQueryString,
+			getEntityType
 		})(OntologyEditor)
 	)
 );

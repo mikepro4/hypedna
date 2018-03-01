@@ -166,14 +166,22 @@ class OntologyBrowser extends Component {
 			childNodes,
 			hasCaret: entityChildren.length > 0,
 			id: entity._id,
-			iconName: entityChildren.length > 0 ? "folder-close" : "document",
 			isExpanded: this.checkExpanded(entity._id),
 			isSelected: this.checkSelected(entity._id),
 			label: (
-				<div>
-					{entity.genericProperties.displayName} ({
-						entity.childEntityTypes.length
-					})
+				<div className="label-container">
+					{entity.genericProperties.imageUrl ? (
+						<span className="entity-type-icon">
+							<img src={entity.genericProperties.imageUrl} />
+						</span>
+					) : (
+						""
+					)}
+					<span className="enti-type-label">
+						{entity.genericProperties.displayName} ({
+							entity.childEntityTypes.length
+						})
+					</span>
 				</div>
 			),
 			secondaryLabel: (
@@ -340,7 +348,7 @@ class OntologyBrowser extends Component {
 		return (
 			<div className="ontology-browser-content">
 				<div className="browser-header">
-					<h1 className="section-title">Ontology Manager</h1>
+					<h1 className="section-title">Select Entity Type</h1>
 					<div className="browser-reset">
 						<a className="anchor-button" onClick={() => this.resetTree()}>
 							Reset

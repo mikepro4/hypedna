@@ -1,0 +1,14 @@
+.entity-properties-container {
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	background: $white;
+	overflow-y: scroll;
+	@include webkit-scrollbar-light();
+	width: 700px;
+	max-height: calc(100% - 20px);
+
+	.properties-section {
+		margin: 20px;
+	}
+}

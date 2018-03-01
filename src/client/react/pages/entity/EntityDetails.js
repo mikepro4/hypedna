@@ -5,9 +5,6 @@ import { Helmet } from "react-helmet";
 import qs from "qs";
 import * as _ from "lodash";
 
-import Dropzone from "react-dropzone";
-import axios from "axios";
-
 import {
 	Button,
 	Classes,
@@ -28,11 +25,12 @@ import {
 	updateEntity
 } from "../../../redux/actions/pageEntityActions";
 
+import Avatar from "../../components/common/avatar/Avatar";
+import EntityProperties from "./EntityProperties";
+
 class EntityDetails extends Component {
 	state = {
 		entityTitle: "",
-		imageUrl: "",
-		editedAvatar: false,
 		edited: false,
 		selectedTabId: "1"
 	};
@@ -42,6 +40,22 @@ class EntityDetails extends Component {
 			this.setState({
 				entityTitle: this.props.entity.properties.displayName
 			});
+		}
+
+		if (
+			prevProps.entity.properties.displayName !==
+			this.props.entity.properties.displayName
+		) {
+			this.setState({
+				entityTitle: this.props.entity.properties.displayName
+			});
+		}
+
+		if (
+			prevProps.entity.properties.entityUrlName !==
+			this.props.entity.properties.entityUrlName
+		) {
+			this.props.history.push(`/${this.props.entity.properties.entityUrlName}`);
 		}
 
 		if (prevState.selectedTabId !== this.getQueryParams().selectedTabId) {
@@ -87,8 +101,7 @@ class EntityDetails extends Component {
 
 	handleFormSubmit = () => {
 		let newEntityProperties = _.assign({}, this.props.entity.properties, {
-			displayName: this.state.entityTitle,
-			imageUrl: this.state.imageUrl
+			displayName: this.state.entityTitle
 		});
 
 		let newEntity = _.assign({}, this.props.entity, {
@@ -98,51 +111,16 @@ class EntityDetails extends Component {
 		this.props.updateEntity(this.props.entity._id, newEntity);
 	};
 
-	handleDrop = files => {
-		const uploaders = files.map(file => {
-			// Progress
-			var config = {
-				onUploadProgress: function(progressEvent) {
-					let percentCompleted = Math.round(
-						progressEvent.loaded * 100 / progressEvent.total
-					);
-					console.log(
-						"onUploadProgress called with",
-						arguments,
-						"Percent Completed:" + percentCompleted
-					);
-				}
-			};
-			// Initial FormData
-			const formData = new FormData();
-			formData.append("file", file);
-			formData.append("tags", `jamdna`);
-			formData.append("upload_preset", "iidugxde"); // Replace the preset name with your own
-			formData.append("api_key", "DhgKXiXYQqQj0nEB74w_70HfPWI"); // Replace API key with your own Cloudinary key
-			formData.append("timestamp", (Date.now() / 1000) | 0);
-
-			// Make an AJAX upload request using Axios (replace Cloudinary URL below with your own)
-			return axios
-				.post(
-					"https://api.cloudinary.com/v1_1/dcdnt/image/upload",
-					formData,
-					config
-				)
-				.then(response => {
-					const data = response.data;
-					const fileURL = data.secure_url; // You should store this URL for future references in your app
-					this.setState({
-						imageUrl: data.secure_url,
-						editedAvatar: false
-					});
-				});
+	submitAvatar = imageUrl => {
+		let newEntityProperties = _.assign({}, this.props.entity.properties, {
+			imageUrl: imageUrl
 		});
 
-		// Once all the files are uploaded
-		axios.all(uploaders).then(() => {
-			this.handleFormSubmit();
-			// ... perform after upload is successful operation
+		let newEntity = _.assign({}, this.props.entity, {
+			properties: newEntityProperties
 		});
+
+		this.props.updateEntity(this.props.entity._id, newEntity);
 	};
 
 	render() {
@@ -152,20 +130,16 @@ class EntityDetails extends Component {
 					<div className="header-left">
 						<div className="header-left">
 							<div className="entity-avatar">
-								<Dropzone
-									onDrop={this.handleDrop}
-									multiple
-									accept="image/*"
-									style={{ width: "50px", height: "50px", background: "red" }}
-								>
-									<img
-										src={
-											this.state.editedAvatar
-												? this.state.imageUrl
-												: this.props.entity.properties.imageUrl
-										}
+								{this.props.match.params.entityUrlName ==
+								this.props.entity.properties.entityUrlName ? (
+									<Avatar
+										imageUrl={this.props.entity.properties.imageUrl}
+										onSuccess={this.submitAvatar}
+										canUpload={true}
 									/>
-								</Dropzone>
+								) : (
+									"loading"
+								)}
 							</div>
 							<div className="entity-info">
 								<div className="entity-info-element">
@@ -224,7 +198,7 @@ class EntityDetails extends Component {
 						>
 							<Tab2 id="1" title="Timeline" panel={<div>Timeline</div>} />
 
-							<Tab2 id="2" title="Properties" panel={<div>Properties</div>} />
+							<Tab2 id="2" title="Properties" panel={<EntityProperties />} />
 							<Tab2 id="3" title="Relations" panel={<div>Relations</div>} />
 						</Tabs2>
 					</div>

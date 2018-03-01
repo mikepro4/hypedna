@@ -14,6 +14,8 @@ import {
 	removeEntity
 } from "../../../redux/actions/pageOntologyActions";
 
+import Avatar from "../../components/common/avatar/Avatar";
+
 class EntityResult extends Component {
 	state = {
 		deleted: false
@@ -27,13 +29,7 @@ class EntityResult extends Component {
 				<div className="entity-result-container">
 					<div className="entity-result-left">
 						<div className="entity-avatar">
-							<img
-								src={
-									this.props.entity.properties.imageUrl
-										? this.props.entity.properties.imageUrl
-										: "http://via.placeholder.com/88x88"
-								}
-							/>
+							<Avatar imageUrl={this.props.entity.properties.imageUrl} />
 						</div>
 
 						<div className="entity-result-description">
