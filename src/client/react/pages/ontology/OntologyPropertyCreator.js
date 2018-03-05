@@ -29,12 +29,21 @@ class OntologyPropertyCreator extends Component {
 	};
 
 	handleSubmit = values => {
+		let newValues;
+
+		if (values.fieldType == "entitySelector") {
+			newValues = _.assign({}, values, { propertyName: values.entityType });
+		} else {
+			newValues = values;
+		}
+		console.log(newValues);
+
 		this.onClose();
 		if (this.props.selectedProperty && this.props.selectedProperty._id) {
 			this.props.updateCustomProperty(
 				this.props.selectedEntityTypeId,
 				this.props.selectedProperty._id,
-				values
+				newValues
 			);
 		} else {
 			this.props.addCustomProperty(this.props.selectedEntityTypeId, values);

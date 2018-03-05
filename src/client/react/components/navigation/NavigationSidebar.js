@@ -20,7 +20,7 @@ let sharedLinkStyle = {
 
 const styles = theme => ({
 	linkItem: _.assign({ "&:hover": { color: "#000000" } }, sharedLinkStyle),
-	linkItemActive: _.assign({ color: "#ff2018" }, sharedLinkStyle),
+	linkItemActive: _.assign({ color: "#4580e6" }, sharedLinkStyle),
 	linkLabel: {
 		fontSize: "10px",
 		fontWeight: 400
@@ -67,22 +67,6 @@ class NavigationSidebar extends Component {
 					<li className="single-sidebar-link">
 						<IconButton
 							className={
-								this.props.location.pathname == "/entityType"
-									? this.props.classes.linkItemActive
-									: this.props.classes.linkItem
-							}
-							aria-label="Tags"
-							component={Link}
-							to="/entityType"
-						>
-							<DescriptionIcon />
-							<div className={this.props.classes.linkLabel}>Entity Types</div>
-						</IconButton>
-					</li>
-
-					<li className="single-sidebar-link">
-						<IconButton
-							className={
 								this.props.location.pathname == "/ontology"
 									? this.props.classes.linkItemActive
 									: this.props.classes.linkItem
@@ -93,22 +77,6 @@ class NavigationSidebar extends Component {
 						>
 							<DescriptionIcon />
 							<div className={this.props.classes.linkLabel}>Ontology</div>
-						</IconButton>
-					</li>
-
-					<li className="single-sidebar-link">
-						<IconButton
-							className={
-								this.props.location.pathname == "/collections"
-									? this.props.classes.linkItemActive
-									: this.props.classes.linkItem
-							}
-							aria-label="Tags"
-							component={Link}
-							to="/collections"
-						>
-							<SubscriptionsIcon />
-							<div className={this.props.classes.linkLabel}>Collections</div>
 						</IconButton>
 					</li>
 

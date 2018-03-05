@@ -37,7 +37,8 @@ const ReactSelect = ({
 					onChange={value => input.onChange(value)}
 					onBlur={() => input.onBlur(input.value)}
 					loadOptions={loadOptions}
-					autoload={false}
+					autoload={true}
+					placeholder={placeholder}
 					simpleValue
 					clearable
 					searchable

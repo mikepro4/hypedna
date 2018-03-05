@@ -16,7 +16,11 @@ import {
 
 import { Tab2, Tabs2, NonIdealState } from "@blueprintjs/core";
 
-import { getEntityType } from "../../../redux/actions/pageOntologyActions";
+import {
+	getEntityType,
+	selectEntityType,
+	updateTreeSelection
+} from "../../../redux/actions/pageOntologyActions";
 
 import { updateQueryString } from "../../../redux/actions/";
 
@@ -146,14 +150,16 @@ class EntityDetails extends Component {
 									<div>
 										<a
 											className="entity-type-link anchor-button"
-											onClick={() =>
+											onClick={() => {
+												this.props.selectEntityType("");
+												this.props.updateTreeSelection([{}], [{}]);
 												this.props.history.push(
 													`/ontology?selectedTabId=2&selectedEntityTypeId=${
 														this.props.entity.associatedEntityTypes[0]
 															.entityTypeId
 													}`
-												)
-											}
+												);
+											}}
 										>
 											{this.props.getEntityType(
 												this.props.entity.associatedEntityTypes[0].entityTypeId
@@ -218,6 +224,8 @@ export default withRouter(
 		loadEntityDetails,
 		updateQueryString,
 		getEntityType,
-		updateEntity
+		updateEntity,
+		selectEntityType,
+		updateTreeSelection
 	})(EntityDetails)
 );

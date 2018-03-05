@@ -5,7 +5,8 @@
 	background: $white;
 	overflow-y: scroll;
 	@include webkit-scrollbar-light();
-	width: 700px;
+	max-width: 700px;
+	width: 100%;
 	max-height: calc(100% - 20px);
 
 	.properties-section {

@@ -29,6 +29,14 @@ class EntityPropertiesEditorForm extends React.Component {
 	};
 
 	render() {
+		if (
+			!this.props.getEntityType(
+				this.props.entity.associatedEntityTypes[0].entityTypeId
+			)
+		) {
+			return "";
+		}
+
 		const { handleSubmit } = this.props;
 
 		let fields = this.props.getEntityType(

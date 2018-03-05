@@ -41,7 +41,7 @@ class EntitySearchForm extends React.Component {
 					name="entityUrlName"
 					component={ReactSelectAsync}
 					loadOptions={(input, callback) => this.getOptions(input, callback)}
-					placeholder="Search bla.."
+					placeholder="Search people, sounds, instruments and other entities..."
 					ref="entitySearch"
 				/>
 			</Form>

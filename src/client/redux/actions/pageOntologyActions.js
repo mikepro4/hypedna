@@ -280,10 +280,17 @@ export const updateCustomProperty = (id, propertyId, values, success) => async (
 	getState,
 	api
 ) => {
+	let entityType = _.filter(
+		getState().pageOntology.allEntityTypes,
+		entityType => {
+			return entityType._id == id;
+		}
+	);
 	const response = await api.post("/update_custom_property", {
 		id: id,
 		propertyId: propertyId,
-		newValues: values
+		newValues: values,
+		originalCustomProperties: entityType[0].customProperties
 	});
 	dispatch({
 		type: LOAD_ALL_ENTITY_TYPES

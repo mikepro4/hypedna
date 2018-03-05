@@ -86,13 +86,17 @@ class PropertyEditorForm extends React.Component {
 					ref="displayName"
 				/>
 
-				<Field
-					name="propertyName"
-					component={Input}
-					label="Property Name:"
-					placeholder="Enter property name..."
-					ref="propertyName"
-				/>
+				{this.props.fieldTypeValue != "entitySelector" ? (
+					<Field
+						name="propertyName"
+						component={Input}
+						label="Property Name:"
+						placeholder="Enter property name..."
+						ref="propertyName"
+					/>
+				) : (
+					""
+				)}
 
 				<Field
 					name="description"
