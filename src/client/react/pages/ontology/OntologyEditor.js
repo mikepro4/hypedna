@@ -13,6 +13,7 @@ import { updateQueryString } from "../../../redux/actions/";
 import OntologyEditorRelations from "./OntologyEditorRelations";
 import OntologyEditorProperties from "./OntologyEditorProperties";
 import OntologyEditorEntities from "./OntologyEditorEntities";
+import OntologySettings from "./OntologySettings";
 
 import {
 	Button,
@@ -266,25 +267,14 @@ class OntologyEditor extends Component {
 						large={true}
 					>
 						<Tab2
-							id="1"
-							title="Properties"
+							id="4"
+							title="Settings"
 							panel={
 								<div>
-									<OntologyEditorProperties />
+									<OntologySettings />
 								</div>
 							}
 						/>
-
-						<Tab2
-							id="2"
-							title="Entities"
-							panel={
-								<div>
-									<OntologyEditorEntities />
-								</div>
-							}
-						/>
-
 						<Tab2
 							id="3"
 							title="Relations"
@@ -294,6 +284,36 @@ class OntologyEditor extends Component {
 								</div>
 							}
 						/>
+
+						{this.props.getEntityType(this.props.selectedEntityTypeId)
+							.genericProperties.canContainEntities ? (
+							<Tab2
+								id="1"
+								title="Entity Schema"
+								panel={
+									<div>
+										<OntologyEditorProperties />
+									</div>
+								}
+							/>
+						) : (
+							""
+						)}
+
+						{this.props.getEntityType(this.props.selectedEntityTypeId)
+							.genericProperties.canContainEntities ? (
+							<Tab2
+								id="2"
+								title="Entities"
+								panel={
+									<div>
+										<OntologyEditorEntities />
+									</div>
+								}
+							/>
+						) : (
+							""
+						)}
 					</Tabs2>
 				</div>
 			</div>

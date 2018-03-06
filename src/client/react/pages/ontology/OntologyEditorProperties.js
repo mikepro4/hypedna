@@ -85,8 +85,6 @@ class OntologyEditorProperties extends Component {
 			});
 		}
 
-		console.log(entityType);
-
 		return initialObject;
 	};
 
