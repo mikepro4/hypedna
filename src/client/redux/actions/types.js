@@ -1,5 +1,7 @@
 /////////////////////////////////////////////////
 
+export const LOAD_USER_INFO = "app/LOAD_USER_INFO";
+
 // Page: Entity
 
 export const LOAD_ENTITY_DETAILS = "app/LOAD_ENTITY_DETAILS";

@@ -70,7 +70,7 @@ export const deleteTrack = (googleId, trackId) => async (
 	}
 };
 
-export const updateTrack = (googleId, trackId, newTrack) => async (
+export const updateTrack = (googleId, trackId, newTrack, success) => async (
 	dispatch,
 	getState,
 	api
@@ -89,6 +89,10 @@ export const updateTrack = (googleId, trackId, newTrack) => async (
 			type: UPDATE_VIDEO_TRACK,
 			payload: track.data
 		});
+
+		if (success) {
+			success();
+		}
 		console.log("updated video");
 	} else {
 		console.log("error");

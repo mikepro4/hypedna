@@ -24,6 +24,8 @@ import {
 } from "../../../redux/actions/appActions";
 import ClipsTimeline from "./ClipsTimeline";
 
+import TrackDetails from "./TrackDetails";
+
 import * as _ from "lodash";
 
 const styles = theme => ({
@@ -76,8 +78,6 @@ class VideoContent extends Component {
 		this.setState({ trackMenuOpen: false, activeTrackId: null });
 	};
 
-	// cancel editing here
-
 	componentDidMount() {
 		window.addEventListener("mouseup", this.mouseRelease, false);
 		console.log("mounted");
@@ -101,8 +101,15 @@ class VideoContent extends Component {
 							this.handleTrackMenuOpen(event, track._id);
 						}}
 					>
-						<div className="entity-avatar" />
-						<div className="enitity-display-name">{track.category}</div>
+						{track.imageUrl ? (
+							<div className="entity-avatar">
+								<img src={track.imageUrl} />
+							</div>
+						) : (
+							""
+						)}
+
+						<div className="enitity-display-name">{track.title}</div>
 					</ButtonBase>
 					<div className="track-play-button">
 						<IconButton className={this.props.classes.iconClass}>
@@ -172,6 +179,15 @@ class VideoContent extends Component {
 		}
 	};
 
+	getTrack = id => {
+		let filteredTracks = _.filter(this.props.video.tracks, track => {
+			return track._id == id;
+		});
+		if (filteredTracks[0]) {
+			return filteredTracks[0];
+		}
+	};
+
 	render() {
 		const { classes } = this.props;
 		const { anchorEl, popperOpen, activeTrackId } = this.state;
@@ -182,35 +198,16 @@ class VideoContent extends Component {
 					anchorEl={this.state.anchorEl}
 					onClose={this.handleTrackMenuClose}
 					anchorOrigin={{
-						vertical: "top",
-						horizontal: "right"
+						vertical: "bottom",
+						horizontal: "center"
 					}}
 				>
-					<div className="track-popover-container">
-						<button
-							onClick={() => {
-								this.props.deleteTrack(
-									this.props.video.googleId,
-									this.state.activeTrackId
-								);
-								this.handleTrackMenuClose();
-							}}
-						>
-							delete
-						</button>
-						<button
-							onClick={() => {
-								this.props.updateTrack(
-									this.props.video.googleId,
-									this.state.activeTrackId,
-									"updated category"
-								);
-								this.handleTrackMenuClose();
-							}}
-						>
-							update category
-						</button>
-					</div>
+					<TrackDetails
+						track={this.getTrack(this.state.activeTrackId)}
+						handleClose={() => {
+							this.handleTrackMenuClose();
+						}}
+					/>
 				</Popover>
 				<div className="video-timeline-container">
 					{this.props.video.contentDetails && this.props.player ? (

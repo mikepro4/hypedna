@@ -2,7 +2,11 @@ import * as _ from "lodash";
 import axios from "axios";
 import { reset, submit } from "redux-form";
 
-import { LOAD_ALL_ENTITY_TYPES, LOAD_ALL_ENTITY_TYPES_SUCCESS } from "./types";
+import {
+	LOAD_ALL_ENTITY_TYPES,
+	LOAD_ALL_ENTITY_TYPES_SUCCESS,
+	LOAD_USER_INFO
+} from "./types";
 
 /////////////////////////////////////////////////
 
@@ -12,6 +16,21 @@ export const resetForm = formName => dispatch => {
 
 export const submitForm = formName => dispatch => {
 	dispatch(submit(formName));
+};
+
+/////////////////////////////////////////////////
+
+export const getUserInfo = (id, success) => async (dispatch, getState, api) => {
+	const response = await api.post("/get_user", { id });
+
+	dispatch({
+		type: LOAD_USER_INFO,
+		payload: response.data
+	});
+
+	if (success) {
+		success(response.data);
+	}
 };
 
 /////////////////////////////////////////////////

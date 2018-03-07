@@ -95,6 +95,7 @@ export default (
 				<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
 				<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 				<link href="https://fonts.googleapis.com/css?family=Roboto:100,100i,300,300i,400,400i,500,500i,700,700i,900&subset=cyrillic,cyrillic-ext" rel="stylesheet">
+				<link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600,700&amp;subset=cyrillic,cyrillic-ext" rel="stylesheet">
       </head>
       <body>
         <div id="app">${content}</div>
