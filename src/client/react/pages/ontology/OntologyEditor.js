@@ -41,7 +41,7 @@ class OntologyEditor extends Component {
 		title: "",
 		description: "",
 		edited: false,
-		selectedTabId: "1"
+		selectedTabId: "4"
 	};
 
 	handleTitleChange = title => {

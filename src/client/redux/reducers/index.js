@@ -10,6 +10,7 @@ import { currentVideo } from "./currentVideo";
 import playerReducer from "./playerReducer";
 import { reducer as formReducer } from "redux-form";
 import { routerReducer } from "react-router-redux";
+import { appReducer } from "./appReducer";
 
 const REDUCERS_OBJECT = {
 	auth: authReducer,
@@ -22,7 +23,8 @@ const REDUCERS_OBJECT = {
 	pageEntityType: pageEntityTypeReducer,
 	pageOntology: pageOntologyReducer,
 	pageEntity: pageEntityReducer,
-	router: routerReducer
+	router: routerReducer,
+	app: appReducer
 };
 
 export default combineReducers(REDUCERS_OBJECT);

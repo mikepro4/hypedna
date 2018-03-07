@@ -1,0 +1,129 @@
+@import "../../../styles/imports/colors";
+
+.video-single-track-clips {
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	padding: 0 10px 0 0px;
+	user-select: none;
+
+	.track-clips-timeline {
+		display: flex;
+		background: $white;
+		height: 25px;
+		flex-grow: 1;
+		transition: all 0.1s;
+		cursor: pointer;
+		position: relative;
+
+		&:hover {
+			background: $grey;
+		}
+	}
+}
+
+.ghost-clip {
+	display: block;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 0;
+	background: $yellow;
+}
+
+.timeline-cursor {
+	display: block;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 0;
+
+	.cursor {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 1px;
+		background: $black;
+		left: 0;
+	}
+
+	.cursor-time-container {
+		width: 50px;
+		margin-left: -25px;
+		text-align: center;
+
+		position: absolute;
+		top: -22px;
+		left: 0;
+		z-index: 100;
+
+		.cursor-time {
+			background: $black;
+			color: $white;
+			font-size: 11px;
+			padding: 3px 7px;
+			box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.2);
+		}
+	}
+}
+
+.cursor-range {
+	display: block;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 0;
+
+	.cursor {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		width: 1px;
+		background: $black;
+		z-index: 2;
+	}
+
+	.range-container {
+		width: 200px;
+		position: absolute;
+		text-align: center;
+		margin-left: -100px;
+		top: -22px;
+		z-index: 100;
+		z-index: 1;
+
+		.range {
+			background: $black;
+			color: $white;
+			font-size: 11px;
+			padding: 3px 7px;
+			box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.2);
+		}
+
+		.duration-container {
+			opacity: 0.5;
+		}
+	}
+
+	&.range-right {
+		.cursor {
+			right: 0;
+		}
+		.range-container {
+			text-align: right;
+			right: 0;
+			margin-left: 0;
+		}
+	}
+
+	&.range-left {
+		.cursor {
+			left: 0;
+		}
+		.range-container {
+			margin-left: 0;
+			text-align: left;
+			left: 0;
+		}
+	}
+}

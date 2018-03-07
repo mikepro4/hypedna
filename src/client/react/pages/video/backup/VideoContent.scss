@@ -1,0 +1,134 @@
+@import "../../../styles/imports/colors";
+
+.video-content-container {
+	display: flex;
+	flex-grow: 1;
+	position: relative;
+
+	.video-timeline-container {
+		display: block;
+		width: 100%;
+		top: 0;
+		left: 0;
+		height: 45px;
+		padding-right: 35px;
+		box-shadow: inset 0 -1px 0 0 $grey;
+	}
+
+	.video-tracks-container {
+		position: absolute;
+		top: 45px;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		background: $grey;
+		overflow-y: scroll;
+		@include webkit-scrollbar-light();
+
+		.video-track-groups {
+			margin: 20px 10px 100px 20px;
+
+			.video-track-single-group {
+				h1 {
+					font-size: 22px;
+					font-weight: 600;
+					margin: 0 0 10px 0;
+				}
+				.video-track-list {
+					background: $white;
+
+					.video-tracks {
+						.video-single-track {
+							display: flex;
+							height: 45px;
+							box-shadow: inset 0 -1px 0 0 $grey;
+
+							.video-single-track-info {
+								flex-grow: 0;
+								width: 230px;
+								box-shadow: inset -1px 0 0 0 $grey;
+								margin: 0 10px 0 0;
+								// padding: 0 35px 0 0;
+								align-items: center;
+								font-size: 12px;
+								display: flex;
+								position: relative;
+
+								.entity-avatar {
+									width: 30px;
+									height: 30px;
+									display: block;
+									background: $grey;
+									border-radius: 100px;
+									margin: 0 10px 0 10px;
+									flex-shrink: 0;
+								}
+								.enitity-display-name {
+									position: relative;
+									top: -1px;
+								}
+
+								.track-play-button {
+									position: absolute;
+									right: 9px;
+									top: 8px;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	.video-progress-elements {
+		display: flex;
+		height: 45px;
+
+		.video-progress-time {
+			flex-grow: 0;
+			width: 230px;
+			margin: 0 10px 0 20px;
+			align-items: center;
+			display: flex;
+			box-shadow: inset -1px 0 0 0 $grey;
+			position: relative;
+
+			.time-wrapper {
+				position: relative;
+				top: -1px;
+				display: flex;
+				font-size: 18px;
+
+				.time-current-time {
+					font-weight: 400;
+				}
+
+				.time-divider {
+					opacity: 0.25;
+					margin: 0 5px 0 5px;
+					font-weight: 300;
+				}
+
+				.time-duration {
+					opacity: 0.25;
+					font-weight: 300;
+				}
+			}
+			.track-global-play-controls {
+				position: absolute;
+				top: 7px;
+				right: 9px;
+			}
+		}
+
+		.progress-bar-player-container {
+			flex-grow: 1;
+		}
+	}
+}
+
+.track-popover-container {
+	padding: 30px;
+	width: 200px;
+}

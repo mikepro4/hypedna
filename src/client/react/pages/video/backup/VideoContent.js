@@ -18,13 +18,7 @@ import {
 import { formatTime } from "../../../utils/timeFormatter";
 import ProgressBar from "../../components/common/player/ProgressBar";
 import { updateCurrentVideo } from "../../../redux/actions/";
-import {
-	loadAllEntityTypes,
-	getEntityType
-} from "../../../redux/actions/appActions";
 import ClipsTimeline from "./ClipsTimeline";
-
-import * as _ from "lodash";
 
 const styles = theme => ({
 	iconClass: {
@@ -80,96 +74,23 @@ class VideoContent extends Component {
 
 	componentDidMount() {
 		window.addEventListener("mouseup", this.mouseRelease, false);
-		console.log("mounted");
-		this.props.loadAllEntityTypes();
 	}
 
 	componentWillUnmount() {
 		window.removeEventListener("mouseup", this.mouseRelease, false);
 	}
 
-	renderTrack = track => {
-		return (
-			<div className="video-single-track" key={track._id}>
-				<div className="video-single-track-info">
-					<ButtonBase
-						className={classNames(
-							this.props.classes.button,
-							this.props.classes.root
-						)}
-						onClick={event => {
-							this.handleTrackMenuOpen(event, track._id);
-						}}
-					>
-						<div className="entity-avatar" />
-						<div className="enitity-display-name">{track.category}</div>
-					</ButtonBase>
-					<div className="track-play-button">
-						<IconButton className={this.props.classes.iconClass}>
-							<PlayCircleOutline />
-						</IconButton>
-					</div>
-				</div>
-
-				<ClipsTimeline
-					onMouseDown={this.mouseDownHandler}
-					onMouseUp={this.mouseUpHandler}
-					track={track}
-				/>
-			</div>
-		);
+	mouseRelease = event => {
+		// console.log(event);
+		// console.log("this.mouseIsDownOnClips: ", this.mouseIsDownOnClips);
 	};
 
-	renderSingleGroup = entityType => {
-		let tracks = _.filter(this.props.video.tracks, track => {
-			if (track.references) {
-				return track.references.rootEntityType == entityType._id;
-			} else return false;
-		});
-		return (
-			<div className="video-track-single-group" key={entityType._id}>
-				<h1>{entityType.genericProperties.displayName}</h1>
-
-				<div className="video-track-list">
-					<div className="video-tracks">
-						{tracks.map(track => {
-							return this.renderTrack(track);
-						})}
-					</div>
-				</div>
-				<button
-					onClick={() => {
-						this.props.addTrack(this.props.video.googleId, {
-							references: {
-								rootEntityType: entityType._id
-							}
-						});
-					}}
-				>
-					add track
-				</button>
-			</div>
-		);
+	mouseDownHandler = () => {
+		// this.mouseIsDownOnClips = false;
 	};
 
-	renderRootGroups = () => {
-		if (this.props.allEntityTypes) {
-			let rootEntityTypes = _.filter(this.props.allEntityTypes, entityType => {
-				return entityType.genericProperties.root == true;
-			});
-
-			let rootGroups = rootEntityTypes.map(entityType => {
-				return this.renderSingleGroup(entityType);
-			});
-
-			let groups = this.props.video.tracks.map(track => {
-				return this.renderTrack(track);
-			});
-
-			return rootGroups;
-		} else {
-			return "";
-		}
+	mouseUpHandler = () => {
+		// this.mouseIsDownOnClips = true;
 	};
 
 	render() {
@@ -275,7 +196,59 @@ class VideoContent extends Component {
 				</div>
 				<div className="video-tracks-container">
 					<div className="video-track-groups">
-						{this.props.video.tracks ? this.renderRootGroups() : "nothing"}
+						<div className="video-track-single-group">
+							<h1>Group 1</h1>
+							<div className="video-track-list">
+								{this.props.video.tracks ? (
+									<div className="video-tracks">
+										{this.props.video.tracks.map(track => (
+											<div className="video-single-track" key={track._id}>
+												<div className="video-single-track-info">
+													<ButtonBase
+														className={classNames(
+															this.props.classes.button,
+															this.props.classes.root
+														)}
+														onClick={event => {
+															this.handleTrackMenuOpen(event, track._id);
+														}}
+													>
+														<div className="entity-avatar" />
+														<div className="enitity-display-name">
+															{track.category}
+														</div>
+													</ButtonBase>
+													<div className="track-play-button">
+														<IconButton
+															className={this.props.classes.iconClass}
+														>
+															<PlayCircleOutline />
+														</IconButton>
+													</div>
+												</div>
+
+												<ClipsTimeline
+													onMouseDown={this.mouseDownHandler}
+													onMouseUp={this.mouseUpHandler}
+													track={track}
+												/>
+											</div>
+										))}
+									</div>
+								) : (
+									"no tracks"
+								)}
+							</div>
+							<button
+								onClick={() => {
+									this.props.addTrack(this.props.video.googleId, {
+										category: "created by user _id from backend"
+									});
+								}}
+							>
+								add track
+							</button>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -288,8 +261,7 @@ const mapStateToProps = state => ({
 	player: state.player,
 	video: state.pageVideo.singleVideo,
 	isFetching: state.pageVideo.isFetching,
-	currentVideo: state.currentVideo,
-	allEntityTypes: state.app.allEntityTypes
+	currentVideo: state.currentVideo
 });
 
 export default withStyles(styles)(
@@ -298,9 +270,7 @@ export default withStyles(styles)(
 			addTrack,
 			deleteTrack,
 			updateTrack,
-			updateCurrentVideo,
-			loadAllEntityTypes,
-			getEntityType
+			updateCurrentVideo
 		})(VideoContent)
 	)
 );
