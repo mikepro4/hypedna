@@ -1,12 +1,36 @@
 import * as _ from "lodash";
 import axios from "axios";
 import { reset, submit } from "redux-form";
+import update from "immutability-helper";
 
 import {
 	LOAD_ALL_ENTITY_TYPES,
 	LOAD_ALL_ENTITY_TYPES_SUCCESS,
 	LOAD_USER_INFO
 } from "./types";
+
+export const getChildEntityType = entityType => dispatch => {
+	let children = [];
+
+	const getChildren = processingEntityType => {
+		let childrenEntityTypes = [];
+		if (processingEntityType.childEntityTypes) {
+			childrenEntityTypes = processingEntityType.childEntityTypes;
+		}
+
+		if (childrenEntityTypes) {
+			const childNodes = childrenEntityTypes.map(entityChild => {
+				let child = dispatch(getEntityType(entityChild.entityTypeId));
+				children = update(children, { $push: [child] });
+				if (!_.isEmpty(child)) {
+					return getChildren(child);
+				}
+			});
+		}
+	};
+	getChildren(entityType);
+	return children;
+};
 
 /////////////////////////////////////////////////
 

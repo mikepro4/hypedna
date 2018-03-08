@@ -69,10 +69,19 @@ class OntologySettingsForm extends React.Component {
 						/>
 
 						<RenderField
-							key="hasByOfRefs"
+							key="hasByRefs"
 							property={{
-								displayName: "Has By/Off references",
-								propertyName: "hasByOfRefs",
+								displayName: "Has By references",
+								propertyName: "hasByRefs",
+								fieldType: "checkbox"
+							}}
+						/>
+
+						<RenderField
+							key="hasOfRefs"
+							property={{
+								displayName: "Has Of references",
+								propertyName: "hasOfRefs",
 								fieldType: "checkbox"
 							}}
 						/>

@@ -147,6 +147,7 @@ class VideoContent extends Component {
 				<button
 					onClick={() => {
 						this.props.addTrack(this.props.video.googleId, {
+							title: `Untitled ${entityType.genericProperties.displayName}`,
 							references: {
 								rootEntityType: entityType._id
 							}
@@ -193,22 +194,19 @@ class VideoContent extends Component {
 		const { anchorEl, popperOpen, activeTrackId } = this.state;
 		return (
 			<div className="video-content-container">
-				<Popover
-					open={this.state.trackMenuOpen}
-					anchorEl={this.state.anchorEl}
-					onClose={this.handleTrackMenuClose}
-					anchorOrigin={{
-						vertical: "bottom",
-						horizontal: "center"
-					}}
-				>
+				{this.getTrack(this.state.activeTrackId) ? (
 					<TrackDetails
 						track={this.getTrack(this.state.activeTrackId)}
+						open={this.state.trackMenuOpen}
+						anchorEl={this.state.anchorEl}
 						handleClose={() => {
 							this.handleTrackMenuClose();
 						}}
 					/>
-				</Popover>
+				) : (
+					""
+				)}
+
 				<div className="video-timeline-container">
 					{this.props.video.contentDetails && this.props.player ? (
 						<div className="video-progress-elements">
@@ -286,7 +284,8 @@ const mapStateToProps = state => ({
 	video: state.pageVideo.singleVideo,
 	isFetching: state.pageVideo.isFetching,
 	currentVideo: state.currentVideo,
-	allEntityTypes: state.app.allEntityTypes
+	allEntityTypes: state.app.allEntityTypes,
+	loadedUsers: state.app.loadedUsers
 });
 
 export default withStyles(styles)(

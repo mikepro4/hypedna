@@ -55,6 +55,7 @@ $break1: 1100px;
 @import "../react/components/common/player/Player";
 @import "../react/components/common/filter/Filters";
 @import "../react/components/common/avatar/Avatar";
+@import "../react/components/common/user/User";
 
 //pages
 @import "../react/pages/search/SearchSidebar";
@@ -172,6 +173,10 @@ button {
 	.button-label {
 		margin: 0 0 0 3px;
 	}
+}
+
+.pt-editable-placeholder > .pt-editable-content {
+	color: #cdcdcd;
 }
 
 .pt-non-ideal-state-title {

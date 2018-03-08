@@ -5,13 +5,24 @@ import { withRouter } from "react-router-dom";
 import update from "immutability-helper";
 import qs from "qs";
 import classNames from "classnames";
+import { formatTime } from "../../../utils/timeFormatter";
+import Select from "react-select";
+import { withStyles } from "material-ui/styles";
+
+import moment from "moment";
 import {
 	addTrack,
 	deleteTrack,
 	updateTrack
 } from "../../../redux/actions/objectVideoActions";
 
-import { getUserInfo } from "../../../redux/actions/appActions";
+import { searchEntities } from "../../../redux/actions/pageOntologyActions";
+
+import {
+	getUserInfo,
+	getEntityType,
+	getChildEntityType
+} from "../../../redux/actions/appActions";
 
 import {
 	Classes,
@@ -22,6 +33,15 @@ import {
 } from "@blueprintjs/core";
 
 import Avatar from "../../components/common/avatar/Avatar";
+import User from "../../components/common/user/User";
+import Popover from "material-ui/Popover";
+
+const styles = theme => ({
+	paper: {
+		"overflow-x": "visible",
+		"overflow-y": "visible"
+	}
+});
 
 class TrackDetails extends Component {
 	state = {
@@ -47,13 +67,76 @@ class TrackDetails extends Component {
 			trackDescription: this.props.track.description
 		});
 
-		let loadedUsers = _.filter(this.props.loadedUsers, user => {
-			return user._id == this.props.track.createdBy;
-		});
+		if (
+			this.props.getEntityType(this.props.track.references.rootEntityType)
+				.genericProperties.hasByRefs
+		) {
+			let byRef = _.filter(this.props.allEntityTypes, entityType => {
+				let entityTypeParents = entityType.parentEntityTypes;
 
-		if (loadedUsers == 0) {
-			this.props.getUserInfo(this.props.track.createdBy);
+				let containsRootAsParent = _.filter(entityTypeParents, entityType => {
+					return (
+						entityType.entityTypeId ==
+						this.props.track.references.rootEntityType
+					);
+				});
+
+				if (containsRootAsParent.length > 0) {
+					return (
+						entityType.genericProperties.isRef == true &&
+						entityType.genericProperties.isByRef == true
+					);
+				}
+			});
+
+			let byChildEntityTypes = this.props.getChildEntityType(byRef[0]);
+			let byMappedChildEntities = _.map(byChildEntityTypes, entityType => {
+				return entityType._id;
+			});
+			console.log("BY: ", byMappedChildEntities);
+			if (!_.isEqual(byMappedChildEntities, this.state.byRefs)) {
+				this.setState({
+					byRefs: byMappedChildEntities
+				});
+			}
 		}
+
+		if (this.props.getEntityType(
+			this.props.track.references.rootEntityType
+		).genericProperties.hasOfRefs) {
+			let ofRef = _.filter(this.props.allEntityTypes, entityType => {
+				let entityTypeParents = entityType.parentEntityTypes;
+
+				let containsRootAsParent = _.filter(entityTypeParents, entityType => {
+					return (
+						entityType.entityTypeId ==
+						this.props.track.references.rootEntityType
+					);
+				});
+
+				if (containsRootAsParent.length > 0) {
+					return (
+						entityType.genericProperties.isRef == true &&
+						entityType.genericProperties.isOfRef == true
+					);
+				}
+			});
+			let ofChildEntityTypes = this.props.getChildEntityType(ofRef[0]);
+			let ofMappedChildEntities = _.map(ofChildEntityTypes, entityType => {
+				return entityType._id;
+			});
+			console.log("OF: ", ofMappedChildEntities);
+
+			if (!_.isEqual(ofMappedChildEntities, this.state.ofRefs)) {
+				this.setState({
+					ofRefs: ofMappedChildEntities
+				});
+			}
+		}
+
+		setTimeout(() => {
+			window.dispatchEvent(new Event("resize"));
+		}, 100);
 	};
 
 	deleteTrack = () => {
@@ -76,6 +159,7 @@ class TrackDetails extends Component {
 	};
 
 	handleDescriptionChange = description => {
+		window.dispatchEvent(new Event("resize"));
 		this.setState({
 			trackDescription: description
 		});
@@ -98,6 +182,83 @@ class TrackDetails extends Component {
 		});
 	};
 
+	getTotalClipLength = () => {
+		let seconds = 0;
+
+		_.each(this.props.track.clips, clip => {
+			let clipDuration = clip.end - clip.start;
+			seconds = seconds + clipDuration;
+		});
+		return formatTime(seconds);
+	};
+
+	getOptions = (input, callback, refType) => {
+		this.props.searchEntities(
+			{
+				displayName: input,
+				entityTypes: refType == "by" ? this.state.byRefs : this.state.ofRefs
+			},
+			"displayName",
+			0,
+			20,
+			data => {
+				let options = data.all.map(entity => ({
+					value: entity._id,
+					label: entity.properties.displayName
+				}));
+
+				let filteredOptions = _.filter(options, option => {
+					return !_.isEmpty(option.label);
+				});
+
+				callback(null, {
+					options: _.uniqBy(filteredOptions, "label"),
+					complete: true
+				});
+			}
+		);
+	};
+
+	selectByRef = value => {
+		console.log(value);
+	};
+
+	renderBySelector = () => {
+		return (
+			<div>
+				By:
+				<Select.Async
+					onChange={value => this.selectByRef(value)}
+					onBlur={() => {}}
+					loadOptions={(input, callback) =>
+						this.getOptions(input, callback, "by")
+					}
+					clearable
+					searchable
+					multi
+				/>
+			</div>
+		);
+	};
+
+	renderOfSelector = () => {
+		return (
+			<div>
+				of:
+				<Select.Async
+					onChange={value => this.selectByRef(value)}
+					onBlur={() => {}}
+					loadOptions={(input, callback) =>
+						this.getOptions(input, callback, "of")
+					}
+					clearable
+					searchable
+					multi
+				/>
+			</div>
+		);
+	};
+
 	render() {
 		let userInfo;
 
@@ -108,103 +269,180 @@ class TrackDetails extends Component {
 		}
 
 		return (
-			<div className="track-details-container">
-				<Toaster position={Position.BOTTOM_RIGHT} ref="toaster" />
-				<div className="track-details-header">
-					<div className="header-left">
-						<h1 className="popover-header">Track Details</h1>
-					</div>
-					<div className="header-right">
-						<ul className="header-actions">
-							<li className="header-single-action">
-								<a
-									className="anchor-button"
-									onClick={() => this.props.handleClose()}
-								>
-									<span className="pt-icon-standard pt-icon-flag" />
-								</a>
-							</li>
-							<li className="header-single-action">
-								<a
-									className="anchor-button"
-									onClick={() => this.props.handleClose()}
-								>
-									<span className="pt-icon-standard pt-icon-cross" />
-								</a>
-							</li>
-							<li className="header-single-action">
-								<a className="anchor-button">
-									<span className="pt-icon-standard pt-icon-edit" />
-								</a>
-							</li>
-						</ul>
-					</div>
-				</div>
+			<Popover
+				open={this.props.open}
+				anchorEl={this.props.anchorEl}
+				onClose={this.props.handleClose}
+				anchorOrigin={{
+					vertical: "bottom",
+					horizontal: "center"
+				}}
+				classes={{
+					paper: this.props.classes.paper
+				}}
+			>
+				<div className="track-details-container">
+					<Toaster position={Position.BOTTOM_RIGHT} ref="toaster" />
+					<div className="track-details-header">
+						<div className="header-left">
+							<h1 className="popover-title">Track Details</h1>
+						</div>
+						<div className="header-right">
+							<ul className="header-actions">
+								<li className="header-single-action">
+									<a className="anchor-button">
+										<span className="pt-icon-standard pt-icon-flag" />
+									</a>
+								</li>
 
-				<div className="track-details-content">
-					<div className="track-avatar">
-						<Avatar
-							imageUrl={
-								this.props.track && this.props.track.imageUrl
-									? this.props.track.imageUrl
-									: ""
-							}
-							onSuccess={this.submitAvatar}
-							canUpload={true}
+								<li className="header-single-action">
+									<a
+										className="anchor-button"
+										onClick={() => this.deleteTrack()}
+									>
+										<span className="pt-icon-standard pt-icon-trash" />
+									</a>
+								</li>
+
+								<li className="header-single-action">
+									<a
+										className="anchor-button"
+										onClick={() => this.props.handleClose()}
+									>
+										<span className="pt-icon-standard pt-icon-cross" />
+									</a>
+								</li>
+							</ul>
+						</div>
+					</div>
+
+					<div className="track-details-content">
+						<div className="track-avatar">
+							<Avatar
+								imageUrl={
+									this.props.track && this.props.track.imageUrl
+										? this.props.track.imageUrl
+										: ""
+								}
+								onSuccess={this.submitAvatar}
+								canUpload={true}
+							/>
+						</div>
+						<div className="track-title-container">
+							<div className="title-inputs">
+								<div className="title-label">
+									{
+										this.props.getEntityType(
+											this.props.track.references.rootEntityType
+										).genericProperties.displayName
+									}{" "}
+									Title
+								</div>
+								<EditableText
+									intent={Intent.DEFAULT}
+									maxLength="45"
+									multiline
+									minLines={1}
+									maxLines={2}
+									placeholder={`Edit ${
+										this.props.getEntityType(
+											this.props.track.references.rootEntityType
+										).genericProperties.displayName
+									} Title...`}
+									className="track-title"
+									selectAllOnFocus={true}
+									value={this.state.trackTitle}
+									confirmOnEnterKey="true"
+									onChange={this.handleTitleChange}
+									onConfirm={this.handleFormSubmit}
+								/>
+							</div>
+						</div>
+					</div>
+
+					{this.props.getEntityType(this.props.track.references.rootEntityType)
+						.genericProperties.hasOfRefs
+						? this.renderOfSelector()
+						: ""}
+
+					{this.props.getEntityType(this.props.track.references.rootEntityType)
+						.genericProperties.hasByRefs
+						? this.renderBySelector()
+						: ""}
+
+					<div className="track-details-description">
+						<EditableText
+							multiline
+							minLines={2}
+							maxLines={12}
+							intent={Intent.DEFAULT}
+							maxLength="500"
+							placeholder={`Edit ${
+								this.props.getEntityType(
+									this.props.track.references.rootEntityType
+								).genericProperties.displayName
+							} Description...`}
+							className="track-description"
+							selectAllOnFocus={true}
+							value={this.state.trackDescription}
+							confirmOnEnterKey="true"
+							onChange={this.handleDescriptionChange}
+							onConfirm={this.handleFormSubmit}
 						/>
 					</div>
-					<div className="track-title-container">
-						<div>
-							<EditableText
-								intent={Intent.DEFAULT}
-								maxLength="500"
-								placeholder="Edit Track Title..."
-								className="track-title"
-								selectAllOnFocus={true}
-								value={this.state.trackTitle}
-								confirmOnEnterKey="true"
-								onChange={this.handleTitleChange}
-								onConfirm={this.handleFormSubmit}
-							/>
 
-							<EditableText
-								multiline
-								minLines={1}
-								maxLines={12}
-								intent={Intent.DEFAULT}
-								maxLength="500"
-								placeholder="Edit Track Description..."
-								className="track-description"
-								selectAllOnFocus={true}
-								value={this.state.trackDescription}
-								confirmOnEnterKey="true"
-								onChange={this.handleDescriptionChange}
-								onConfirm={this.handleFormSubmit}
-							/>
+					<div className="track-detail-footer">
+						<div className="footer-left">
+							<User userId={this.props.track.createdBy} />{" "}
+							<span className="date-container">
+								tagged {moment(this.props.track.createdAt).fromNow()}
+							</span>
+						</div>
+
+						<div className="footer-right">
+							{this.props.track.clips.length > 0 ? (
+								<div className="clips-count-container">
+									<div className="clips-count">
+										{this.props.track.clips.length} clip{this.props.track.clips
+											.length > 1
+											? "s"
+											: ""}
+									</div>
+
+									<div className="duration-count" title="Total clips duration">
+										{this.getTotalClipLength()}
+									</div>
+								</div>
+							) : (
+								<div className="clips-count-container empty">
+									<div className="clips-count">No Clips</div>
+
+									<div className="duration-count" title="Total clips duration">
+										{this.getTotalClipLength()}
+									</div>
+								</div>
+							)}
 						</div>
 					</div>
 				</div>
-
-				<div className="track-detail-footer">
-					{this.props.track && userInfo[0] ? (
-						<img src={userInfo[0].profile.photos[0].value} />
-					) : (
-						""
-					)}
-				</div>
-			</div>
+			</Popover>
 		);
 	}
 }
 
 const mapStateToProps = state => ({
 	video: state.pageVideo.singleVideo,
-	allEntityTypes: state.app.allEntityTypes,
-	loadedUsers: state.app.loadedUsers
+	allEntityTypes: state.app.allEntityTypes
 });
 
-export default withRouter(
-	connect(mapStateToProps, { deleteTrack, updateTrack, getUserInfo })(
-		TrackDetails
+export default withStyles(styles)(
+	withRouter(
+		connect(mapStateToProps, {
+			deleteTrack,
+			updateTrack,
+			getEntityType,
+			getChildEntityType,
+			searchEntities
+		})(TrackDetails)
 	)
 );

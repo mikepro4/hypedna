@@ -4,6 +4,7 @@ import { withRouter } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import qs from "qs";
 import * as _ from "lodash";
+import classNames from "classnames";
 
 import Dropzone from "react-dropzone";
 import axios from "axios";
@@ -63,9 +64,15 @@ class Avatar extends Component {
 					multiple
 					accept="image/*"
 					className="avatar-container"
+					className={classNames({
+						"avatar-container": true,
+						"empty-avatar": !this.state.editedAvatar && !this.props.imageUrl
+					})}
 				>
 					{!this.state.editedAvatar && !this.props.imageUrl ? (
-						"no image"
+						<div className="empty-avatar-container">
+							<span className="pt-icon-standard pt-icon-cloud-upload" />
+						</div>
 					) : (
 						<img
 							src={
