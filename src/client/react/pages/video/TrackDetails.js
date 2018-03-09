@@ -29,7 +29,8 @@ import {
 	EditableText,
 	Intent,
 	Position,
-	Toaster
+	Toaster,
+	Button
 } from "@blueprintjs/core";
 
 import Avatar from "../../components/common/avatar/Avatar";
@@ -93,7 +94,6 @@ class TrackDetails extends Component {
 			let byMappedChildEntities = _.map(byChildEntityTypes, entityType => {
 				return entityType._id;
 			});
-			console.log("BY: ", byMappedChildEntities);
 			if (!_.isEqual(byMappedChildEntities, this.state.byRefs)) {
 				this.setState({
 					byRefs: byMappedChildEntities
@@ -101,9 +101,10 @@ class TrackDetails extends Component {
 			}
 		}
 
-		if (this.props.getEntityType(
-			this.props.track.references.rootEntityType
-		).genericProperties.hasOfRefs) {
+		if (
+			this.props.getEntityType(this.props.track.references.rootEntityType)
+				.genericProperties.hasOfRefs
+		) {
 			let ofRef = _.filter(this.props.allEntityTypes, entityType => {
 				let entityTypeParents = entityType.parentEntityTypes;
 
@@ -125,7 +126,6 @@ class TrackDetails extends Component {
 			let ofMappedChildEntities = _.map(ofChildEntityTypes, entityType => {
 				return entityType._id;
 			});
-			console.log("OF: ", ofMappedChildEntities);
 
 			if (!_.isEqual(ofMappedChildEntities, this.state.ofRefs)) {
 				this.setState({
@@ -223,38 +223,60 @@ class TrackDetails extends Component {
 		console.log(value);
 	};
 
+	selectOfRef = value => {
+		console.log(value);
+	};
+
 	renderBySelector = () => {
 		return (
-			<div>
-				By:
-				<Select.Async
-					onChange={value => this.selectByRef(value)}
-					onBlur={() => {}}
-					loadOptions={(input, callback) =>
-						this.getOptions(input, callback, "by")
-					}
-					clearable
-					searchable
-					multi
-				/>
+			<div className="reference-container reference-by">
+				<div className="reference-label">BY</div>
+				<div className="reference-selector">
+					<div className="reference-select-container">
+						<Select.Async
+							onChange={value => this.selectByRef(value)}
+							onBlur={() => {}}
+							loadOptions={(input, callback) =>
+								this.getOptions(input, callback, "by")
+							}
+							clearable
+							searchable
+						/>
+						<Button text="New" onClick={() => {}} />
+					</div>
+				</div>
 			</div>
 		);
 	};
 
 	renderOfSelector = () => {
+		// let childEntityTypes = this.props.getEntityType(
+		// 	this.props.track.references.rootEntityType
+		// ).childEntityTypes;
+		//
+		// let options = childEntityTypes.map(entityType => ({
+		// 	value: entityType._id,
+		// 	label: this.props.getEntityType(entityType._id).genericProperties
+		// 		.displayName
+		// }));
+
 		return (
-			<div>
-				of:
-				<Select.Async
-					onChange={value => this.selectByRef(value)}
-					onBlur={() => {}}
-					loadOptions={(input, callback) =>
-						this.getOptions(input, callback, "of")
-					}
-					clearable
-					searchable
-					multi
-				/>
+			<div className="reference-container reference-of">
+				<div className="reference-label">OF</div>
+				<div className="reference-selector">
+					<div className="reference-select-container">
+						<Select.Async
+							onChange={value => this.selectOfRef(value)}
+							onBlur={() => {}}
+							loadOptions={(input, callback) =>
+								this.getOptions(input, callback, "of")
+							}
+							clearable
+							searchable
+						/>
+						<Button text="New" onClick={() => {}} />
+					</div>
+				</div>
 			</div>
 		);
 	};
@@ -285,7 +307,13 @@ class TrackDetails extends Component {
 					<Toaster position={Position.BOTTOM_RIGHT} ref="toaster" />
 					<div className="track-details-header">
 						<div className="header-left">
-							<h1 className="popover-title">Track Details</h1>
+							<h1 className="popover-title">
+								{
+									this.props.getEntityType(
+										this.props.track.references.rootEntityType
+									).genericProperties.displayName
+								}
+							</h1>
 						</div>
 						<div className="header-right">
 							<ul className="header-actions">
@@ -316,49 +344,54 @@ class TrackDetails extends Component {
 						</div>
 					</div>
 
-					<div className="track-details-content">
-						<div className="track-avatar">
-							<Avatar
-								imageUrl={
-									this.props.track && this.props.track.imageUrl
-										? this.props.track.imageUrl
-										: ""
-								}
-								onSuccess={this.submitAvatar}
-								canUpload={true}
-							/>
-						</div>
-						<div className="track-title-container">
-							<div className="title-inputs">
-								<div className="title-label">
-									{
-										this.props.getEntityType(
-											this.props.track.references.rootEntityType
-										).genericProperties.displayName
-									}{" "}
-									Title
-								</div>
-								<EditableText
-									intent={Intent.DEFAULT}
-									maxLength="45"
-									multiline
-									minLines={1}
-									maxLines={2}
-									placeholder={`Edit ${
-										this.props.getEntityType(
-											this.props.track.references.rootEntityType
-										).genericProperties.displayName
-									} Title...`}
-									className="track-title"
-									selectAllOnFocus={true}
-									value={this.state.trackTitle}
-									confirmOnEnterKey="true"
-									onChange={this.handleTitleChange}
-									onConfirm={this.handleFormSubmit}
+					{!this.props.getEntityType(this.props.track.references.rootEntityType)
+						.genericProperties.hasOfRefs ? (
+						<div className="track-details-content">
+							<div className="track-avatar">
+								<Avatar
+									imageUrl={
+										this.props.track && this.props.track.imageUrl
+											? this.props.track.imageUrl
+											: ""
+									}
+									onSuccess={this.submitAvatar}
+									canUpload={true}
 								/>
 							</div>
+							<div className="track-title-container">
+								<div className="title-inputs">
+									<div className="title-label">
+										{
+											this.props.getEntityType(
+												this.props.track.references.rootEntityType
+											).genericProperties.displayName
+										}{" "}
+										Title
+									</div>
+									<EditableText
+										intent={Intent.DEFAULT}
+										maxLength="45"
+										multiline
+										minLines={1}
+										maxLines={2}
+										placeholder={`Edit ${
+											this.props.getEntityType(
+												this.props.track.references.rootEntityType
+											).genericProperties.displayName
+										} Title...`}
+										className="track-title"
+										selectAllOnFocus={true}
+										value={this.state.trackTitle}
+										confirmOnEnterKey="true"
+										onChange={this.handleTitleChange}
+										onConfirm={this.handleFormSubmit}
+									/>
+								</div>
+							</div>
 						</div>
-					</div>
+					) : (
+						""
+					)}
 
 					{this.props.getEntityType(this.props.track.references.rootEntityType)
 						.genericProperties.hasOfRefs

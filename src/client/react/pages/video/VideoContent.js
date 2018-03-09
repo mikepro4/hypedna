@@ -135,7 +135,15 @@ class VideoContent extends Component {
 		});
 		return (
 			<div className="video-track-single-group" key={entityType._id}>
-				<h1>{entityType.genericProperties.displayName}</h1>
+				<h1
+					onClick={() =>
+						this.props.history.push(
+							`/ontology?selectedTabId=4&selectedEntityTypeId=${entityType._id}`
+						)
+					}
+				>
+					{entityType.genericProperties.displayName}
+				</h1>
 
 				<div className="video-track-list">
 					<div className="video-tracks">

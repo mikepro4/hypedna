@@ -35,6 +35,12 @@
 					font-size: 22px;
 					font-weight: 600;
 					margin: 0 0 10px 0;
+
+					&:hover {
+						text-decoration: underline;
+						cursor: pointer;
+						color: $cobalt4;
+					}
 				}
 				.video-track-list {
 					background: $white;

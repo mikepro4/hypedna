@@ -9,6 +9,8 @@ import {
 	LOAD_USER_INFO
 } from "./types";
 
+/////////////////////////////////////////////////
+
 export const getChildEntityType = entityType => dispatch => {
 	let children = [];
 

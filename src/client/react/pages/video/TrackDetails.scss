@@ -70,6 +70,81 @@
 		}
 	}
 
+	.reference-container {
+		background: $grey;
+		padding: 10px;
+		border-radius: 3px;
+		display: flex;
+		height: 50px;
+		align-items: center;
+		margin: 15px 0 0 0;
+
+		.reference-label {
+			width: 70px;
+			text-align: center;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 18px;
+			font-family: "Montserrat", sans-serif;
+			letter-spacing: 1px;
+			font-weight: 600;
+			margin-left: -10px;
+			flex-shrink: 0;
+			color: $cobalt4;
+		}
+
+		.reference-selector {
+			flex-grow: 1;
+
+			.reference-select-container {
+				display: flex;
+
+				.Select {
+					flex-grow: 1;
+					margin: 0 10px 0 0;
+				}
+
+				.pt-button {
+					background: $cobalt4;
+					color: $white;
+				}
+			}
+		}
+
+		&.reference-by {
+			.reference-label {
+				color: $rose4;
+			}
+			.Select {
+				&.is-focused:not(.is-open) > .Select-control {
+					border-color: $rose4;
+				}
+
+				.Select-option {
+					&.is-selected {
+						background-color: $rose4;
+					}
+
+					&.is-focused {
+						background-color: $rose4;
+					}
+				}
+			}
+
+			.reference-selector {
+				flex-grow: 1;
+
+				.reference-select-container {
+					.pt-button {
+						background: $rose4;
+						color: $white;
+					}
+				}
+			}
+		}
+	}
+
 	.track-details-description {
 		margin: 15px 0 15px 0;
 		min-height: 36px;
