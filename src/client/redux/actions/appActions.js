@@ -11,6 +11,19 @@ import {
 
 /////////////////////////////////////////////////
 
+export const getSingleEntity = (id, success) => async (
+	dispatch,
+	getState,
+	api
+) => {
+	const response = await api.post("/get_single_entity", { id });
+	if (success) {
+		success(response.data);
+	}
+};
+
+/////////////////////////////////////////////////
+
 export const getChildEntityType = entityType => dispatch => {
 	let children = [];
 
@@ -94,3 +107,28 @@ export const getEntityType = id => (dispatch, getState, api) => {
 };
 
 /////////////////////////////////////////////////
+
+export const getRef = (entityTypeId, refType) => (dispatch, getState, api) => {
+	let ref = _.filter(getState().app.allEntityTypes, entityType => {
+		let entityTypeParents = entityType.parentEntityTypes;
+
+		let containsRootAsParent = _.filter(entityTypeParents, entityType => {
+			return entityType.entityTypeId == entityTypeId;
+		});
+
+		if (containsRootAsParent.length > 0) {
+			if (refType == "of") {
+				return (
+					entityType.genericProperties.isRef == true &&
+					entityType.genericProperties.isOfRef == true
+				);
+			} else if (refType == "by") {
+				return (
+					entityType.genericProperties.isRef == true &&
+					entityType.genericProperties.isByRef == true
+				);
+			}
+		}
+	});
+	return ref[0];
+};
