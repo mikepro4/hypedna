@@ -75,7 +75,7 @@
 		padding: 10px;
 		border-radius: 3px;
 		display: flex;
-		height: 50px;
+		min-height: 50px;
 		align-items: center;
 		margin: 15px 0 0 0;
 
@@ -99,6 +99,12 @@
 
 			.reference-select-container {
 				display: flex;
+				flex-direction: column;
+
+				.single-reference-selector {
+					width: 100%;
+					flex-grow: 1;
+				}
 
 				.Select {
 					flex-grow: 1;

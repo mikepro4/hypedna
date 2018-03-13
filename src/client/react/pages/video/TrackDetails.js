@@ -47,7 +47,15 @@ const styles = theme => ({
 class TrackDetails extends Component {
 	state = {
 		trackTitle: "",
-		trackDescription: ""
+		trackDescription: "",
+		ofRefs: {
+			activeEntityTypes: [],
+			activeEntityId: null
+		},
+		byRefs: {
+			activeEntityTypes: [],
+			activeEntityId: null
+		}
 	};
 
 	updateTrack = newTrack => {
@@ -63,6 +71,20 @@ class TrackDetails extends Component {
 	};
 
 	componentDidMount = () => {
+		// if (!_.isEmpty(this.props.track.references.entity)) {
+		// 	let mapped = _.map(
+		// 		this.props.track.references.entityTypeIds,
+		// 		entityType => {
+		// 			return this.props.getEntityType(entityType.entityTypeId);
+		// 		}
+		// 	);
+		//
+		// 	this.setState({
+		// 		ofRefs: {
+		// 			activeEntityId: this.props.track.references.entity.id
+		// 		}
+		// 	});
+		// }
 		this.setState({
 			trackTitle: this.props.track.title,
 			trackDescription: this.props.track.description
@@ -101,38 +123,99 @@ class TrackDetails extends Component {
 			}
 		}
 
-		if (
-			this.props.getEntityType(this.props.track.references.rootEntityType)
-				.genericProperties.hasOfRefs
-		) {
-			let ofRef = _.filter(this.props.allEntityTypes, entityType => {
-				let entityTypeParents = entityType.parentEntityTypes;
+		let ofRef = _.filter(this.props.allEntityTypes, entityType => {
+			let entityTypeParents = entityType.parentEntityTypes;
 
-				let containsRootAsParent = _.filter(entityTypeParents, entityType => {
-					return (
-						entityType.entityTypeId ==
-						this.props.track.references.rootEntityType
-					);
+			let containsRootAsParent = _.filter(entityTypeParents, entityType => {
+				return (
+					entityType.entityTypeId == this.props.track.references.rootEntityType
+				);
+			});
+
+			if (containsRootAsParent.length > 0) {
+				return (
+					entityType.genericProperties.isRef == true &&
+					entityType.genericProperties.isOfRef == true
+				);
+			}
+		});
+
+		if (ofRef[0]) {
+			if (!_.isEmpty(this.props.track.references.entityTypeIds)) {
+				let mapped = _.map(
+					this.props.track.references.entityTypeIds,
+					entityType => {
+						return this.props.getEntityType(entityType.entityTypeId);
+					}
+				);
+				console.log(mapped);
+
+				let updatedRefs = _.assign({}, this.state.ofRefs, {
+					activeEntityTypes: mapped,
+					activeEntityId: this.props.track.references.entity.id
 				});
 
-				if (containsRootAsParent.length > 0) {
-					return (
-						entityType.genericProperties.isRef == true &&
-						entityType.genericProperties.isOfRef == true
-					);
-				}
-			});
-			let ofChildEntityTypes = this.props.getChildEntityType(ofRef[0]);
-			let ofMappedChildEntities = _.map(ofChildEntityTypes, entityType => {
-				return entityType._id;
-			});
-
-			if (!_.isEqual(ofMappedChildEntities, this.state.ofRefs)) {
 				this.setState({
-					ofRefs: ofMappedChildEntities
+					ofRefs: updatedRefs
+				});
+			} else {
+				let newActiveEntities = update(this.state.ofRefs.activeEntityTypes, {
+					$push: [this.props.getEntityType(ofRef[0]._id)]
+				});
+
+				// let updatedRefs = _.assign({}, this.state.ofRefs, {
+				// 	activeEntityTypes: newActiveEntities
+				// });
+
+				this.setState({
+					ofRefs: _.assign({}, this.state.ofRefs, {
+						activeEntityTypes: newActiveEntities
+					})
 				});
 			}
+
+			// if (!_.isEmpty(this.props.track.references.entity)) {
+			// 	let updatedRefs = _.assign({}, this.state.ofRefs, {
+			// 		activeEntityId: this.props.track.references.entity.id
+			// 	});
+			// 	this.setState({
+			// 		ofRefs: updatedRefs
+			// 	});
+			// }
 		}
+
+		// if (
+		// 	this.props.getEntityType(this.props.track.references.rootEntityType)
+		// 		.genericProperties.hasOfRefs
+		// ) {
+		// 	let ofRef = _.filter(this.props.allEntityTypes, entityType => {
+		// 		let entityTypeParents = entityType.parentEntityTypes;
+		//
+		// 		let containsRootAsParent = _.filter(entityTypeParents, entityType => {
+		// 			return (
+		// 				entityType.entityTypeId ==
+		// 				this.props.track.references.rootEntityType
+		// 			);
+		// 		});
+		//
+		// 		if (containsRootAsParent.length > 0) {
+		// 			return (
+		// 				entityType.genericProperties.isRef == true &&
+		// 				entityType.genericProperties.isOfRef == true
+		// 			);
+		// 		}
+		// 	});
+		// 	let ofChildEntityTypes = this.props.getChildEntityType(ofRef[0]);
+		// 	let ofMappedChildEntities = _.map(ofChildEntityTypes, entityType => {
+		// 		return entityType._id;
+		// 	});
+		//
+		// 	if (!_.isEqual(ofMappedChildEntities, this.state.ofRefs)) {
+		// 		this.setState({
+		// 			ofRefs: ofMappedChildEntities
+		// 		});
+		// 	}
+		// }
 
 		setTimeout(() => {
 			window.dispatchEvent(new Event("resize"));
@@ -192,11 +275,11 @@ class TrackDetails extends Component {
 		return formatTime(seconds);
 	};
 
-	getOptions = (input, callback, refType) => {
+	getOptions = (input, callback, entityTypeId) => {
 		this.props.searchEntities(
 			{
 				displayName: input,
-				entityTypes: refType == "by" ? this.state.byRefs : this.state.ofRefs
+				entityType: entityTypeId
 			},
 			"displayName",
 			0,
@@ -223,10 +306,6 @@ class TrackDetails extends Component {
 		console.log(value);
 	};
 
-	selectOfRef = value => {
-		console.log(value);
-	};
-
 	renderBySelector = () => {
 		return (
 			<div className="reference-container reference-by">
@@ -250,35 +329,240 @@ class TrackDetails extends Component {
 	};
 
 	renderOfSelector = () => {
-		// let childEntityTypes = this.props.getEntityType(
-		// 	this.props.track.references.rootEntityType
-		// ).childEntityTypes;
-		//
-		// let options = childEntityTypes.map(entityType => ({
-		// 	value: entityType._id,
-		// 	label: this.props.getEntityType(entityType._id).genericProperties
-		// 		.displayName
-		// }));
-
 		return (
 			<div className="reference-container reference-of">
 				<div className="reference-label">OF</div>
 				<div className="reference-selector">
 					<div className="reference-select-container">
-						<Select.Async
-							onChange={value => this.selectOfRef(value)}
-							onBlur={() => {}}
-							loadOptions={(input, callback) =>
-								this.getOptions(input, callback, "of")
-							}
-							clearable
-							searchable
-						/>
-						<Button text="New" onClick={() => {}} />
+						{this.renderOfReferences("of")}
 					</div>
 				</div>
 			</div>
 		);
+	};
+
+	selectOfRef = (value, selectorPosition) => {
+		let realSelectorPosition = selectorPosition + 1;
+		if (!_.isEmpty(value)) {
+			if (this.state.ofRefs.activeEntityTypes.length > realSelectorPosition) {
+				let diff =
+					this.state.ofRefs.activeEntityTypes.length - realSelectorPosition;
+				let trimmedActiveEntities = this.state.ofRefs.activeEntityTypes.slice(
+					0,
+					-diff
+				);
+				let newActiveEntities = update(trimmedActiveEntities, {
+					$push: [this.props.getEntityType(value.value)]
+				});
+				this.setState({
+					ofRefs: _.assign({}, this.state.ofRefs, {
+						activeEntityTypes: newActiveEntities
+					})
+				});
+			} else {
+				let newActiveEntities = update(this.state.ofRefs.activeEntityTypes, {
+					$push: [this.props.getEntityType(value.value)]
+				});
+
+				this.setState({
+					ofRefs: _.assign({}, this.state.ofRefs, {
+						activeEntityTypes: newActiveEntities
+					})
+				});
+			}
+		}
+
+		window.dispatchEvent(new Event("resize"));
+
+		// if (!_.isEmpty(value)) {
+		// 	let containsIndex = _.findIndex(this.state.ofRefs.activeEntityTypes, {
+		// 		_id: value.value
+		// 	});
+		//
+		// 	if (selectorPosition == "initial") {
+		// 		if (containsIndex == 0) {
+		// 			if (this.state.ofRefs.activeEntityTypes.length == 1) {
+		// 				let newActiveEntities = update(
+		// 					this.state.ofRefs.activeEntityTypes,
+		// 					{
+		// 						$splice: [
+		// 							[containsIndex, 1, this.props.getEntityType(value.value)]
+		// 						]
+		// 					}
+		// 				);
+		//
+		// 				this.setState({
+		// 					ofRefs: _.assign({}, this.state.ofRefs, {
+		// 						activeEntityTypes: newActiveEntities
+		// 					})
+		// 				});
+		// 			} else if (this.state.ofRefs.activeEntityTypes.length > 1) {
+		// 				console.log("trim the rest and update first activeEntityType ");
+		// 			}
+		// 		} else {
+		// 			if (this.state.ofRefs.activeEntityTypes.length == 0) {
+		// 				let newActiveEntities = update(
+		// 					this.state.ofRefs.activeEntityTypes,
+		// 					{
+		// 						$push: [this.props.getEntityType(value.value)]
+		// 					}
+		// 				);
+		//
+		// 				this.setState({
+		// 					ofRefs: _.assign({}, this.state.ofRefs, {
+		// 						activeEntityTypes: newActiveEntities
+		// 					})
+		// 				});
+		// 			} else {
+		// 				let newActiveEntities = update(
+		// 					this.state.ofRefs.activeEntityTypes,
+		// 					{
+		// 						$splice: [[0, 1, this.props.getEntityType(value.value)]]
+		// 					}
+		// 				);
+		//
+		// 				this.setState({
+		// 					ofRefs: _.assign({}, this.state.ofRefs, {
+		// 						activeEntityTypes: newActiveEntities
+		// 					})
+		// 				});
+		// 			}
+		// 		}
+		// 	}
+		// }
+		// if (this.state.ofRefs.activeEntityTypes.length > containsIndex + 1) {
+		// 	console.log("trim the others after containsIndex first");
+		// } else if (this.state.ofRefs.activeEntityTypes.length == contains+1) {
+		// 	console.log('replace currently editing')
+		// }
+		// let newActiveEntities;
+		// if (containsIndex >= 0) {
+		// 	newActiveEntities = update(this.state.ofRefs.activeEntityTypes, {
+		// 		$splice: [[containsIndex, 1, this.props.getEntityType(value.value)]]
+		// 	});
+		//
+		// 	this.setState({
+		// 		ofRefs: {
+		// 			activeEntityTypes: newActiveEntities
+		// 		}
+		// 	});
+		// } else {
+		// 	newActiveEntities = update(this.state.ofRefs.activeEntityTypes, {
+		// 		$push: [this.props.getEntityType(value.value)]
+		// 	});
+		//
+		// 	this.setState({
+		// 		ofRefs: {
+		// 			activeEntityTypes: newActiveEntities
+		// 		}
+		// 	});
+		// }
+	};
+
+	selectOfRefEntity = value => {
+		console.log(value);
+		if (!_.isEmpty(value)) {
+			this.setState({
+				ofRefs: _.assign({}, this.state.ofRefs, {
+					activeEntityId: value.value
+				})
+			});
+
+			let mapped = _.map(this.state.ofRefs.activeEntityTypes, entityType => {
+				return { entityTypeId: entityType._id };
+			});
+
+			let newReferences = _.assign({}, this.props.track.references, {
+				entityTypeIds: mapped,
+				entity: {
+					id: value.value,
+					displayName: value.label
+				}
+			});
+
+			let newTrack = _.assign({}, this.props.track, {
+				references: newReferences
+			});
+
+			this.updateTrack(newTrack);
+		} else {
+			this.setState({
+				ofRefs: _.assign({}, this.state.ofRefs, {
+					activeEntityId: null
+				})
+			});
+		}
+	};
+
+	renderEntityTypeSelector = (entityType, position, refType) => {
+		let options = _.map(
+			this.state.ofRefs.activeEntityTypes[position].childEntityTypes,
+			entityType => {
+				return {
+					value: entityType.entityTypeId,
+					label: this.props.getEntityType(entityType.entityTypeId)
+						.genericProperties.displayName
+				};
+			}
+		);
+
+		return (
+			<Select
+				onChange={value => {
+					if (refType == "of") {
+						this.selectOfRef(value, position);
+					} else if (refType == "by") {
+						this.selectByRef(value, position);
+					}
+				}}
+				onBlur={() => {}}
+				options={options}
+				clearable={false}
+				searchable
+				value={
+					this.state.ofRefs.activeEntityTypes[position + 1]
+						? this.state.ofRefs.activeEntityTypes[position + 1]._id
+						: ""
+				}
+			/>
+		);
+	};
+
+	renderEntitySelector = (entityType, position, refType) => {
+		console.log("render async entity selector: ", entityType);
+		return (
+			<Select.Async
+				onChange={value => {
+					if (refType == "of") {
+						this.selectOfRefEntity(value, position);
+					} else if (refType == "by") {
+						this.selectByRefEntity(value, position);
+					}
+				}}
+				value={this.state.ofRefs.activeEntityId}
+				onBlur={() => {}}
+				loadOptions={(input, callback) =>
+					this.getOptions(input, callback, entityType._id)
+				}
+				clearable
+				searchable
+			/>
+		);
+	};
+
+	renderOfReferences = refType => {
+		if (this.state.ofRefs.activeEntityTypes) {
+			console.log(this.state.ofRefs.activeEntityTypes);
+			return this.state.ofRefs.activeEntityTypes.map((entityType, i) => {
+				return (
+					<div className="single-reference-selector" key={i}>
+						{entityType.genericProperties.canContainEntities
+							? this.renderEntitySelector(entityType, i, refType)
+							: this.renderEntityTypeSelector(entityType, i, refType)}
+					</div>
+				);
+			});
+		}
 	};
 
 	render() {
