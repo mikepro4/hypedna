@@ -88,6 +88,57 @@ class VideoContent extends Component {
 		window.removeEventListener("mouseup", this.mouseRelease, false);
 	}
 
+	renderTrackInfo = track => {
+		if (
+			track.references.rootEntityType &&
+			this.props.getEntityType(track.references.rootEntityType) &&
+			this.props.getEntityType(track.references.rootEntityType)
+				.genericProperties.hasOfRefs
+		) {
+			if (!_.isEmpty(track.references.ofRefs.entity)) {
+				return (
+					<div className="video-single-track-info-content">
+						{track.references.ofRefs.entity.imageUrl ? (
+							<div className="entity-avatar">
+								<img src={track.references.ofRefs.entity.imageUrl} />
+							</div>
+						) : (
+							""
+						)}
+						<div>
+							<div className="enitity-display-name single-line first-line">
+								{track.references.ofRefs.entity.displayName}
+							</div>
+							{!_.isEmpty(track.references.byRefs.entity) ? (
+								<div className="enitity-display-name single-line second-line">
+									By: {track.references.byRefs.entity.displayName}
+								</div>
+							) : (
+								""
+							)}
+						</div>
+					</div>
+				);
+			} else {
+				return <div className="empty-entity">Select entity...</div>;
+			}
+		} else {
+			return (
+				<div className="video-single-track-info-content">
+					{track.imageUrl ? (
+						<div className="entity-avatar">
+							<img src={track.imageUrl} />
+						</div>
+					) : (
+						""
+					)}
+
+					<div className="enitity-display-name">{track.title}</div>
+				</div>
+			);
+		}
+	};
+
 	renderTrack = track => {
 		return (
 			<div className="video-single-track" key={track._id}>
@@ -101,15 +152,7 @@ class VideoContent extends Component {
 							this.handleTrackMenuOpen(event, track._id);
 						}}
 					>
-						{track.imageUrl ? (
-							<div className="entity-avatar">
-								<img src={track.imageUrl} />
-							</div>
-						) : (
-							""
-						)}
-
-						<div className="enitity-display-name">{track.title}</div>
+						{this.renderTrackInfo(track)}
 					</ButtonBase>
 					<div className="track-play-button">
 						<IconButton className={this.props.classes.iconClass}>

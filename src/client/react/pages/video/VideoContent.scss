@@ -52,15 +52,24 @@
 							box-shadow: inset 0 -1px 0 0 $grey;
 
 							.video-single-track-info {
-								flex-grow: 0;
 								width: 230px;
 								box-shadow: inset -1px 0 0 0 $grey;
 								margin: 0 10px 0 0;
-								// padding: 0 35px 0 0;
-								align-items: center;
 								font-size: 12px;
-								display: flex;
 								position: relative;
+
+								.video-single-track-info-content {
+									flex-grow: 0;
+									width: 230px;
+									display: flex;
+									align-items: center;
+								}
+
+								.empty-entity {
+									margin: 0 0 0 10px;
+									font-weight: 400;
+									opacity: 0.5;
+								}
 
 								.entity-avatar {
 									width: 30px;
@@ -93,6 +102,17 @@
 										overflow: hidden;
 										text-overflow: ellipsis;
 										white-space: nowrap;
+									}
+
+									&.first-line {
+										font-size: 13px;
+										font-weight: 500;
+									}
+
+									&.second-line {
+										font-size: 11px;
+										opacity: 0.5;
+										margin-top: 2px;
 									}
 								}
 
