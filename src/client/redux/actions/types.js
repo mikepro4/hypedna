@@ -40,6 +40,7 @@ export const SEARCH_TRACKS = "app/SEARCH_TRACKS";
 export const SEARCH_TRACKS_SUCCESS = "app/SEARCH_TRACKS_SUCCESS";
 export const CLEAR_SEARCH_TRACKS = "app/CLEAR_SEARCH_TRACKS";
 export const DELETE_LOADED_TRACK = "app/DELETE_LOADED_TRACK";
+export const UPDATE_LOADED_TRACK = "app/UPDATE_LOADED_TRACK";
 
 /////////////////////////////////////////////////
 
