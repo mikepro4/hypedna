@@ -706,7 +706,6 @@ class TrackDetails extends Component {
 											? "s"
 											: ""}
 									</div>
-
 									<div className="duration-count" title="Total clips duration">
 										{this.getTotalClipLength()}
 									</div>

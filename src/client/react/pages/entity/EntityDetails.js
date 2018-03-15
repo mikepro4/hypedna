@@ -142,7 +142,7 @@ class EntityDetails extends Component {
 										canUpload={true}
 									/>
 								) : (
-									"loading"
+									"loading..."
 								)}
 							</div>
 							<div className="entity-info">
