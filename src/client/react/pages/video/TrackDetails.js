@@ -11,10 +11,11 @@ import { withStyles } from "material-ui/styles";
 
 import moment from "moment";
 import {
-	addTrack,
 	deleteTrack,
-	updateTrack
-} from "../../../redux/actions/objectVideoActions";
+	updateTrack,
+	searchTracks,
+	optimisticTrackDelete
+} from "../../../redux/actions/objectTrackActions";
 
 import { searchEntities } from "../../../redux/actions/pageOntologyActions";
 
@@ -68,8 +69,8 @@ class TrackDetails extends Component {
 
 	componentDidMount = () => {
 		this.setState({
-			trackTitle: this.props.track.title,
-			trackDescription: this.props.track.description
+			trackTitle: this.props.track.metadata.customOfInfo.title,
+			trackDescription: this.props.track.metadata.customOfInfo.description
 		});
 
 		let entityType = this.props.getEntityType(
@@ -159,15 +160,25 @@ class TrackDetails extends Component {
 		}
 	};
 
-	updateTrack = newTrack => {
-		this.props.updateTrack(
-			this.props.video.googleId,
-			this.props.track._id,
-			newTrack,
+	searchTracks = () => {
+		this.props.searchTracks(
+			{ videoId: this.props.video.googleId },
+			"createdAt",
+			0,
+			0,
 			() => {
-				this.showSuccessToast("updated track");
+				this.setState({
+					notLoadedTracks: false
+				});
 			}
 		);
+	};
+
+	updateTrack = newTrack => {
+		this.props.updateTrack(this.props.track._id, newTrack, () => {
+			this.searchTracks();
+			this.showSuccessToast("updated track");
+		});
 	};
 
 	showSuccessToast = (message, id) => {
@@ -179,7 +190,10 @@ class TrackDetails extends Component {
 	};
 
 	deleteTrack = () => {
-		this.props.deleteTrack(this.props.video.googleId, this.props.track._id);
+		this.props.optimisticTrackDelete(this.props.track._id);
+		this.props.deleteTrack(this.props.track._id, () => {
+			// this.searchTracks();
+		});
 		this.props.handleClose();
 	};
 
@@ -199,8 +213,10 @@ class TrackDetails extends Component {
 				<div className="track-avatar">
 					<Avatar
 						imageUrl={
-							this.props.track && this.props.track.imageUrl
-								? this.props.track.imageUrl
+							this.props.track &&
+							this.props.track.metadata &&
+							this.props.track.metadata.customOfInfo.imageUrl
+								? this.props.track.metadata.customOfInfo.imageUrl
 								: ""
 						}
 						onSuccess={this.submitAvatar}
@@ -235,8 +251,14 @@ class TrackDetails extends Component {
 	};
 
 	submitAvatar = imageUrl => {
-		let newTrack = _.assign({}, this.props.track, {
+		let customOfInfo = _.assign({}, this.props.track.metadata.customOfInfo, {
 			imageUrl: imageUrl
+		});
+		let metadata = _.assign({}, this.props.track.metadata, {
+			customOfInfo: customOfInfo
+		});
+		let newTrack = _.assign({}, this.props.track, {
+			metadata: metadata
 		});
 
 		this.updateTrack(newTrack);
@@ -256,9 +278,15 @@ class TrackDetails extends Component {
 	};
 
 	handleFormSubmit = () => {
-		let newTrack = _.assign({}, this.props.track, {
+		let customOfInfo = _.assign({}, this.props.track.metadata.customOfInfo, {
 			title: this.state.trackTitle,
 			description: this.state.trackDescription
+		});
+		let metadata = _.assign({}, this.props.track.metadata, {
+			customOfInfo: customOfInfo
+		});
+		let newTrack = _.assign({}, this.props.track, {
+			metadata: metadata
 		});
 
 		this.updateTrack(newTrack);
@@ -663,9 +691,9 @@ class TrackDetails extends Component {
 
 					<div className="track-detail-footer">
 						<div className="footer-left">
-							<User userId={this.props.track.createdBy} />{" "}
+							<User userId={this.props.track.metadata.createdBy} />{" "}
 							<span className="date-container">
-								tagged {moment(this.props.track.createdAt).fromNow()}
+								tagged {moment(this.props.track.metadata.createdAt).fromNow()}
 							</span>
 						</div>
 
@@ -714,7 +742,9 @@ export default withStyles(styles)(
 			getEntityType,
 			getChildEntityType,
 			searchEntities,
-			getSingleEntity
+			getSingleEntity,
+			searchTracks,
+			optimisticTrackDelete
 		})(TrackDetails)
 	)
 );

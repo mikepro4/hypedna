@@ -8,11 +8,12 @@ import update from "immutability-helper";
 import * as _ from "lodash";
 import { formatTime } from "../../../utils/timeFormatter";
 import Clip from "./Clip";
+
 import {
+	selectClip,
 	updateTrackClips,
-	optimisticTrackUpdate,
-	selectClip
-} from "../../../redux/actions/objectVideoActions";
+	optimisticTrackUpdate
+} from "../../../redux/actions/objectTrackActions";
 
 class ClipsTimeline extends Component {
 	loadInitialState = () => {
@@ -306,10 +307,11 @@ class ClipsTimeline extends Component {
 				_.assign({}, this.props.track, { clips: this.state.updatedClips })
 			);
 			this.props.updateTrackClips(
-				this.props.video.googleId,
 				this.props.track._id,
 				this.state.updatedClips,
-				track => {}
+				track => {
+					this.props.optimisticTrackUpdate(track.data);
+				}
 			);
 			// refresh clip that's selected to updated start / end
 			this.props.selectClip(this.state.updatedSingleClip);
@@ -389,17 +391,13 @@ class ClipsTimeline extends Component {
 		);
 
 		// Send request and update in DB
-		this.props.updateTrackClips(
-			this.props.video.googleId,
-			this.props.track._id,
-			newClipsArray,
-			track => {
-				let filteredClip = _.filter(track.clips, clip => {
-					return clip.end == newClip.end && clip.start == newClip.start;
-				});
-				this.props.selectClip(filteredClip[0]);
-			}
-		);
+		this.props.updateTrackClips(this.props.track._id, newClipsArray, track => {
+			let filteredClip = _.filter(track.data.clips, clip => {
+				return clip.end == newClip.end && clip.start == newClip.start;
+			});
+			this.props.optimisticTrackUpdate(track.data);
+			this.props.selectClip(filteredClip[0]);
+		});
 	};
 
 	checkIfCanAddClip = () => {
@@ -767,9 +765,16 @@ class ClipsTimeline extends Component {
 }
 
 function mapStateToProps(state) {
-	const videoDuration = moment
-		.duration(state.pageVideo.singleVideo.contentDetails.duration)
-		.asSeconds();
+	let videoDuration = 0;
+	if (
+		state.pageVideo.singleVideo &&
+		state.pageVideo.singleVideo.contentDetails
+	) {
+		videoDuration = moment
+			.duration(state.pageVideo.singleVideo.contentDetails.duration)
+			.asSeconds();
+	}
+
 	return {
 		currentVideo: state.currentVideo,
 		video: state.pageVideo.singleVideo,

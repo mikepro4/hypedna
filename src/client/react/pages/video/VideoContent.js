@@ -10,14 +10,14 @@ import classNames from "classnames";
 import IconButton from "material-ui/IconButton";
 import Menu, { MenuItem, MenuList } from "material-ui/Menu";
 import Popover from "material-ui/Popover";
-import {
-	addTrack,
-	deleteTrack,
-	updateTrack
-} from "../../../redux/actions/objectVideoActions";
 import { formatTime } from "../../../utils/timeFormatter";
 import ProgressBar from "../../components/common/player/ProgressBar";
 import { updateCurrentVideo } from "../../../redux/actions/";
+import {
+	searchTracks,
+	addTrack,
+	clearLoadedTracks
+} from "../../../redux/actions/objectTrackActions";
 import {
 	loadAllEntityTypes,
 	getEntityType
@@ -63,7 +63,8 @@ class VideoContent extends Component {
 	state = {
 		trackMenuOpen: false,
 		anchorEl: null,
-		activeTrackId: null
+		activeTrackId: null,
+		notLoadedTracks: true
 	};
 
 	handleTrackMenuOpen = (event, activeTrackId) => {
@@ -80,12 +81,37 @@ class VideoContent extends Component {
 
 	componentDidMount() {
 		window.addEventListener("mouseup", this.mouseRelease, false);
-		console.log("mounted");
 		this.props.loadAllEntityTypes();
+		if (this.state.notLoadedTracks && !_.isEmpty(this.props.video._id)) {
+			this.searchTracks();
+		}
 	}
+
+	componentDidUpdate = prevProps => {
+		if (prevProps.video._id !== this.props.video._id) {
+			if (!_.isEmpty(this.props.video._id)) {
+				this.searchTracks();
+			}
+		}
+	};
+
+	searchTracks = () => {
+		this.props.searchTracks(
+			{ videoId: this.props.video.googleId },
+			"createdAt",
+			0,
+			0,
+			() => {
+				this.setState({
+					notLoadedTracks: false
+				});
+			}
+		);
+	};
 
 	componentWillUnmount() {
 		window.removeEventListener("mouseup", this.mouseRelease, false);
+		this.props.clearLoadedTracks();
 	}
 
 	renderTrackInfo = track => {
@@ -125,15 +151,17 @@ class VideoContent extends Component {
 		} else {
 			return (
 				<div className="video-single-track-info-content">
-					{track.imageUrl ? (
+					{track.metadata.customOfInfo.imageUrl ? (
 						<div className="entity-avatar">
-							<img src={track.imageUrl} />
+							<img src={track.metadata.customOfInfo.imageUrl} />
 						</div>
 					) : (
 						""
 					)}
 
-					<div className="enitity-display-name">{track.title}</div>
+					<div className="enitity-display-name">
+						{track.metadata.customOfInfo.title}
+					</div>
 				</div>
 			);
 		}
@@ -161,20 +189,20 @@ class VideoContent extends Component {
 					</div>
 				</div>
 
-				<ClipsTimeline
-					onMouseDown={this.mouseDownHandler}
-					onMouseUp={this.mouseUpHandler}
-					track={track}
-				/>
+				<ClipsTimeline track={track} />
 			</div>
 		);
 	};
 
 	renderSingleGroup = entityType => {
-		let tracks = _.filter(this.props.video.tracks, track => {
+		let tracks = _.filter(this.props.tracks, track => {
 			if (track.references) {
 				return track.references.rootEntityType == entityType._id;
 			} else return false;
+		});
+
+		let sortedTracks = _.sortBy(tracks, track => {
+			return new Date(track.metadata.createdAt);
 		});
 		return (
 			<div className="video-track-single-group" key={entityType._id}>
@@ -187,22 +215,42 @@ class VideoContent extends Component {
 				>
 					{entityType.genericProperties.displayName}
 				</h1>
-
-				<div className="video-track-list">
-					<div className="video-tracks">
-						{tracks.map(track => {
-							return this.renderTrack(track);
-						})}
+				{tracks.length && tracks.length > 0 ? (
+					<div className="video-track-list">
+						<div className="video-tracks">
+							{sortedTracks.map(track => {
+								return this.renderTrack(track);
+							})}
+						</div>
 					</div>
-				</div>
+				) : (
+					"no tracks"
+				)}
 				<button
 					onClick={() => {
-						this.props.addTrack(this.props.video.googleId, {
-							title: `Untitled ${entityType.genericProperties.displayName}`,
-							references: {
-								rootEntityType: entityType._id
+						this.props.addTrack(
+							{
+								metadata: {
+									customOfInfo: {
+										title: `Untitled ${
+											entityType.genericProperties.displayName
+										}`
+									},
+									video: {
+										videoId: this.props.video.googleId,
+										channelId: this.props.video.snippet.channelId,
+										channelTitle: this.props.video.snippet.channelTitle,
+										thumbnails: this.props.video.snippet.thumbnails
+									}
+								},
+								references: {
+									rootEntityType: entityType._id
+								}
+							},
+							() => {
+								this.searchTracks();
 							}
-						});
+						);
 					}}
 				>
 					add track
@@ -221,10 +269,6 @@ class VideoContent extends Component {
 				return this.renderSingleGroup(entityType);
 			});
 
-			let groups = this.props.video.tracks.map(track => {
-				return this.renderTrack(track);
-			});
-
 			return rootGroups;
 		} else {
 			return "";
@@ -232,7 +276,7 @@ class VideoContent extends Component {
 	};
 
 	getTrack = id => {
-		let filteredTracks = _.filter(this.props.video.tracks, track => {
+		let filteredTracks = _.filter(this.props.tracks, track => {
 			return track._id == id;
 		});
 		if (filteredTracks[0]) {
@@ -320,9 +364,11 @@ class VideoContent extends Component {
 					)}
 				</div>
 				<div className="video-tracks-container">
-					<div className="video-track-groups">
-						{this.props.video.tracks ? this.renderRootGroups() : "nothing"}
-					</div>
+					{this.state.notLoadedTracks ? (
+						"loading tracks..."
+					) : (
+						<div className="video-track-groups">{this.renderRootGroups()}</div>
+					)}
 				</div>
 			</div>
 		);
@@ -336,18 +382,20 @@ const mapStateToProps = state => ({
 	isFetching: state.pageVideo.isFetching,
 	currentVideo: state.currentVideo,
 	allEntityTypes: state.app.allEntityTypes,
-	loadedUsers: state.app.loadedUsers
+	loadedUsers: state.app.loadedUsers,
+	tracks: state.pageVideo.tracks,
+	isFetchingTracks: state.pageVideo.isFetchingTracks
 });
 
 export default withStyles(styles)(
 	withRouter(
 		connect(mapStateToProps, {
-			addTrack,
-			deleteTrack,
-			updateTrack,
 			updateCurrentVideo,
 			loadAllEntityTypes,
-			getEntityType
+			getEntityType,
+			searchTracks,
+			addTrack,
+			clearLoadedTracks
 		})(VideoContent)
 	)
 );

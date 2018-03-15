@@ -36,6 +36,10 @@ export const LOAD_HYPEDNA_VIDEO_DETAILS_SUCCESS =
 export const CLEAR_LOADED_HYPEDNA_VIDEO = "app/CLEAR_LOADED_HYPEDNA_VIDEO";
 export const UPDATE_VIDEO_TRACK = "app/UPDATE_VIDEO_TRACK";
 export const SELECT_CLIP = "app/SELECT_CLIP";
+export const SEARCH_TRACKS = "app/SEARCH_TRACKS";
+export const SEARCH_TRACKS_SUCCESS = "app/SEARCH_TRACKS_SUCCESS";
+export const CLEAR_SEARCH_TRACKS = "app/CLEAR_SEARCH_TRACKS";
+export const DELETE_LOADED_TRACK = "app/DELETE_LOADED_TRACK";
 
 /////////////////////////////////////////////////
 

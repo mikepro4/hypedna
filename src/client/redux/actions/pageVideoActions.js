@@ -17,6 +17,7 @@ export const loadHypednaVideoDetails = googleId => async (
 	const response = await api.post("/hypedna_video_details", {
 		googleId
 	});
+
 	dispatch({
 		type: LOAD_HYPEDNA_VIDEO_DETAILS_SUCCESS,
 		payload: response.data

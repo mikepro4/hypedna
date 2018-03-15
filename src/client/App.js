@@ -6,7 +6,7 @@ import { withRouter } from "react-router-dom";
 import NavigationSidebar from "./react/components/navigation/NavigationSidebar";
 import keydown from "react-keydown";
 import { fetchCurrentUser } from "./redux/actions";
-import { selectClip, deleteClip } from "./redux/actions/objectVideoActions";
+import { selectClip, deleteClip } from "./redux/actions/objectTrackActions";
 import { FocusStyleManager } from "@blueprintjs/core";
 
 FocusStyleManager.onlyShowFocusOnTabs();
