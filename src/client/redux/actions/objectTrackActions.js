@@ -78,12 +78,16 @@ export const updateTrackClips = (trackId, clips, success) => async (
 	}
 };
 
+// =============================================================================
+
 export const optimisticTrackUpdate = track => dispatch => {
 	dispatch({
 		type: UPDATE_LOADED_TRACK,
 		payload: track
 	});
 };
+
+// =============================================================================
 
 export const optimisticTrackDelete = trackId => dispatch => {
 	dispatch({

@@ -8,7 +8,7 @@ export const searchVideos = (
 	criteria,
 	sortProperty,
 	offset = 0,
-	limit = 0
+	limit = 1000
 ) => async (dispatch, getState, api) => {
 	dispatch({
 		type: LOAD_SEARCH_VIDEO

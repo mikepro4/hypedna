@@ -34,22 +34,3 @@ export const clearLoadedHypednaVideo = () => dispatch => {
 		type: CLEAR_LOADED_HYPEDNA_VIDEO
 	});
 };
-
-// track actions
-
-export const deleteTrack = (googleId, trackId) => async (
-	dispatch,
-	getState,
-	api
-) => {
-	const response = await api.post("/video_track_delete", {
-		googleId,
-		trackId
-	});
-	if (response.status === 200) {
-		dispatch(loadHypednaVideoDetails(googleId));
-		console.log("updated video");
-	} else {
-		console.log("error");
-	}
-};
