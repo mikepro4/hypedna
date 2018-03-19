@@ -7,6 +7,7 @@ import { updateCurrentVideo } from "../../../../redux/actions/";
 import { formatTime } from "../../../../utils/timeFormatter";
 import Timeline from "./Timeline";
 import { updateHoverTime } from "../../../../redux/actions/pageVideoActions";
+import { updatePlaylist } from "../../../../redux/actions/player";
 
 class ProgressBar extends React.Component {
 	constructor(props) {
@@ -18,6 +19,7 @@ class ProgressBar extends React.Component {
 	}
 
 	handlePorgressBarClick(event) {
+		this.props.updatePlaylist({});
 		const relX =
 			event.pageX -
 			(this.refs.progress_bar_container.offsetLeft +
@@ -130,5 +132,6 @@ function mapStateToProps(state) {
 
 export default connect(mapStateToProps, {
 	updateCurrentVideo,
-	updateHoverTime
+	updateHoverTime,
+	updatePlaylist
 })(ProgressBar);
