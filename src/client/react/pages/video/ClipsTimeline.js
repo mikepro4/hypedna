@@ -352,12 +352,27 @@ class ClipsTimeline extends Component {
 		}
 	};
 
+	getClipName = () => {
+		if (
+			this.props.track.references.ofRefs.entity &&
+			this.props.track.references.ofRefs.entity.displayName
+		) {
+			return this.props.track.references.ofRefs.entity.displayName;
+		}
+
+		if (this.props.track.metadata.customOfInfo.title) {
+			return this.props.track.metadata.customOfInfo.title;
+		}
+
+		return "Untitled Clip";
+	};
+
 	addActualSizeClip = (start, end) => {
 		if (this.checkIfCanAddClip()) {
 			const newClip = {
 				start: start,
 				end: end,
-				name: "Clip Name 2"
+				name: this.getClipName()
 			};
 
 			let newClipsArray = this.state.updatedClips;
@@ -370,7 +385,7 @@ class ClipsTimeline extends Component {
 		const newClip = {
 			start: this.calculateSecondsFromPercent(this.state.startPercent),
 			end: this.calculateSecondsFromPercent(this.state.startPercent + 1),
-			name: "Clip Name 2"
+			name: this.getClipName()
 		};
 		let newClipsArray = this.state.originalClips;
 
@@ -754,6 +769,8 @@ class ClipsTimeline extends Component {
 										key={i}
 										resizeLeft={this.resizeLeft.bind(this)}
 										resizeRight={this.resizeRight.bind(this)}
+										track={this.props.track}
+										video={this.props.video}
 									/>
 								);
 							})

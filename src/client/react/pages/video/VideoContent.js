@@ -13,6 +13,7 @@ import Popover from "material-ui/Popover";
 import { formatTime } from "../../../utils/timeFormatter";
 import ProgressBar from "../../components/common/player/ProgressBar";
 import { updateCurrentVideo } from "../../../redux/actions/";
+import { updatePlaylist } from "../../../redux/actions/player";
 import {
 	searchTracks,
 	addTrack,
@@ -167,6 +168,42 @@ class VideoContent extends Component {
 		}
 	};
 
+	playTrack = track => {
+		let sortedClips = _.sortBy(track.clips, clip => {
+			return clip.start;
+		});
+
+		this.props.updatePlaylist({
+			current: {}
+		});
+
+		let current;
+
+		current = {
+			video: this.props.video,
+			track: track,
+			clip: sortedClips[0]
+		};
+
+		if (!_.isEmpty(this.props.selectedClip)) {
+			let filteredClips = _.filter(sortedClips, clip => {
+				return clip._id == this.props.selectedClip._id;
+			});
+
+			if (filteredClips && filteredClips.length > 0) {
+				current = {
+					video: this.props.video,
+					track: track,
+					clip: filteredClips[0]
+				};
+			}
+		}
+
+		setTimeout(() => {
+			this.props.updatePlaylist(current);
+		}, 1);
+	};
+
 	renderTrack = track => {
 		return (
 			<div className="video-single-track" key={track._id}>
@@ -183,7 +220,12 @@ class VideoContent extends Component {
 						{this.renderTrackInfo(track)}
 					</ButtonBase>
 					<div className="track-play-button">
-						<IconButton className={this.props.classes.iconClass}>
+						<IconButton
+							className={this.props.classes.iconClass}
+							onClick={() => {
+								this.playTrack(track);
+							}}
+						>
 							<PlayCircleOutline />
 						</IconButton>
 					</div>
@@ -378,6 +420,7 @@ class VideoContent extends Component {
 const mapStateToProps = state => ({
 	user: state.auth,
 	player: state.player,
+	selectedClip: state.pageVideo.selectedClip,
 	video: state.pageVideo.singleVideo,
 	isFetching: state.pageVideo.isFetching,
 	currentVideo: state.currentVideo,
@@ -395,7 +438,8 @@ export default withStyles(styles)(
 			getEntityType,
 			searchTracks,
 			addTrack,
-			clearLoadedTracks
+			clearLoadedTracks,
+			updatePlaylist
 		})(VideoContent)
 	)
 );

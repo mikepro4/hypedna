@@ -5,6 +5,7 @@ import { withRouter } from "react-router-dom";
 import moment from "moment";
 import classNames from "classnames";
 import { selectClip } from "../../../redux/actions/objectVideoActions";
+import { updatePlaylist } from "../../../redux/actions/player";
 
 const styles = theme => ({});
 
@@ -42,7 +43,27 @@ class Clip extends Component {
 	};
 
 	onDoubleClick = event => {
-		console.log("start playing clip");
+		this.props.updatePlaylist({
+			current: {}
+		});
+
+		let current = {
+			video: this.props.video,
+			track: this.props.track,
+			clip: this.props.clip
+		};
+
+		setTimeout(() => {
+			this.props.updatePlaylist(current);
+		}, 1);
+	};
+
+	getPlayedLength = () => {
+		let playedLength = this.props.player.currentTime - this.props.clip.start;
+		let clipLength = this.props.clip.end - this.props.clip.start;
+		let percent = playedLength * 100 / clipLength;
+
+		return percent;
 	};
 
 	render() {
@@ -51,8 +72,20 @@ class Clip extends Component {
 			width: this.calculateClipWidth(this.props.clip.start, this.props.clip.end)
 		};
 
+		let playing = false;
+
+		if (
+			this.props.playlist &&
+			this.props.playlist.current &&
+			this.props.playlist.current.clip &&
+			this.props.playlist.current.clip._id == this.props.clip._id
+		) {
+			playing = true;
+		}
+
 		let clipClasses = classNames({
 			clip: true,
+			playing: playing,
 			"selected-clip":
 				this.props.selectedClip && this.props.selectedClip._id
 					? this.props.clip._id === this.props.selectedClip._id
@@ -72,6 +105,15 @@ class Clip extends Component {
 					<span className="clip-name">{this.props.clip.name}</span>
 				) : (
 					"saving..."
+				)}
+
+				{this.props.clip._id && playing ? (
+					<div
+						className="played-time"
+						style={{ width: `${this.getPlayedLength()}%` }}
+					/>
+				) : (
+					""
 				)}
 
 				{this.props.clip._id ? (
@@ -101,11 +143,13 @@ function mapStateToProps(state) {
 		.asSeconds();
 	return {
 		video: state.pageVideo.singleVideo,
+		player: state.player,
+		playlist: state.player.playlist,
 		videoDuration: videoDuration,
 		selectedClip: state.pageVideo.selectedClip
 	};
 }
 
-export default connect(mapStateToProps, { selectClip })(
+export default connect(mapStateToProps, { selectClip, updatePlaylist })(
 	withStyles(styles)(withRouter(Clip))
 );

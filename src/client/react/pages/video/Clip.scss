@@ -7,11 +7,26 @@
 	top: 0;
 	width: 0;
 	left: 0;
-	background: rgba($black, 0.1);
-	border: 1px solid $black;
+	background: $grey7;
+	border-left: 1px solid $white;
+	border-right: 1px solid $white;
 	user-select: none;
-	cursor: move;
+	transition: background-color 0.1s;
+	cursor: pointer;
 	z-index: 1;
+
+	&:hover {
+		background: $grey12;
+	}
+
+	&.playing {
+		background: $grey20;
+		color: $white;
+
+		&:hover {
+			background: $grey25;
+		}
+	}
 
 	.resize-left {
 		display: none;
@@ -42,11 +57,28 @@
 		cursor: col-resize;
 	}
 
+	.played-time {
+		display: block;
+		position: absolute;
+		top: 0px;
+		left: 0px;
+		bottom: 0;
+		background: $grey30;
+		z-index: 1;
+	}
+
 	&.selected-clip {
-		background: $black;
+		background: $blue1;
 		color: $white;
-		box-shadow: 0px 4px 20px 0px rgba($black, 0.2);
 		z-index: 100;
+
+		&:hover {
+			background: $blue1;
+		}
+
+		.played-time {
+			background: $blue10;
+		}
 
 		.resize-left,
 		.resize-right {
@@ -55,23 +87,24 @@
 			transition: all 0.1s;
 		}
 
-		&:hover {
-			.resize-left,
-			.resize-right {
-				opacity: 1;
-			}
-		}
+		// &:hover {
+		// 	.resize-left,
+		// 	.resize-right {
+		// 		opacity: 1;
+		// 	}
+		// }
 	}
 
 	.clip-name {
 		display: block;
 		position: absolute;
-		top: 5px;
+		top: 6px;
 		left: 5px;
 		right: 5px;
 		text-overflow: ellipsis;
 		font-size: 10px;
 		white-space: nowrap;
 		overflow: hidden;
+		z-index: 10;
 	}
 }

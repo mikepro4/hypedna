@@ -3,8 +3,41 @@ import {
 	UPDATE_TIME,
 	UPDATE_PLAYER_VIDEO_ID,
 	RESET_VIDEO,
-	SEEK_TO_TIME
+	SEEK_TO_TIME,
+	UPDATE_PLAYLIST,
+	CURRENT_VIDEO_UPDATE,
+	UPDATE_CURRENT_TIME
 } from "./types";
+
+import update from "immutability-helper";
+import * as _ from "lodash";
+
+// =============================================================================
+
+export const updateCurrentVideo = (id, action, seconds) => dispatch => {
+	dispatch({
+		type: CURRENT_VIDEO_UPDATE,
+		payload: id,
+		playerAction: action,
+		seconds
+	});
+};
+
+// =============================================================================
+
+export const updatePlaylist = (current, next, previous) => dispatch => {
+	dispatch(updateCurrentTime(0));
+	dispatch({
+		type: UPDATE_PLAYLIST,
+		payload: {
+			current,
+			next,
+			previous
+		}
+	});
+};
+
+// =============================================================================
 
 export function updatePlayerStatus(status) {
 	return {
@@ -12,6 +45,17 @@ export function updatePlayerStatus(status) {
 		status: status
 	};
 }
+
+// =============================================================================
+
+export function updateCurrentTime(currentTime) {
+	return {
+		type: UPDATE_CURRENT_TIME,
+		currentTime
+	};
+}
+
+// =============================================================================
 
 export function updateTime(duration, currentTime) {
 	return {
@@ -21,11 +65,15 @@ export function updateTime(duration, currentTime) {
 	};
 }
 
+// =============================================================================
+
 export function resetVideo() {
 	return {
 		type: RESET_VIDEO
 	};
 }
+
+// =============================================================================
 
 export function seekToTime(seconds) {
 	return {

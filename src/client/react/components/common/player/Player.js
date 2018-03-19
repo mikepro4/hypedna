@@ -2,11 +2,14 @@ import React, { PropTypes } from "react";
 import YouTube from "react-youtube";
 import classnames from "classnames";
 import moment from "moment";
+import * as _ from "lodash";
 import { connect } from "react-redux";
 import {
 	updatePlayerStatus,
-	updateTime
+	updateTime,
+	updatePlaylist
 } from "../../../../redux/actions/player";
+import { selectClip } from "../../../../redux/actions/objectTrackActions";
 import { updateCurrentVideo } from "../../../../redux/actions/";
 
 class YoutubePlayer extends React.Component {
@@ -32,7 +35,15 @@ class YoutubePlayer extends React.Component {
 		}
 	}
 
-	componentDidUpdate(event) {
+	componentDidUpdate(prevProps) {
+		if (
+			!_.isEqual(
+				prevProps.player.playlist.current,
+				this.props.player.playlist.current
+			)
+		) {
+			this.playCurrent();
+		}
 		switch (this.props.currentVideo.playerAction) {
 			case "play":
 				return this.playVideo();
@@ -43,7 +54,71 @@ class YoutubePlayer extends React.Component {
 			case "seek":
 				return this.seekVideo();
 		}
+
+		if (
+			this.props.playlist &&
+			this.props.playlist.current &&
+			this.props.playlist.current.clip &&
+			this.props.player.currentTime >= this.props.playlist.current.clip.end
+		) {
+			this.playNextClip();
+		}
 	}
+
+	playNextClip = () => {
+		let sortedClips = _.sortBy(
+			this.props.playlist.current.track.clips,
+			clip => {
+				return clip.start;
+			}
+		);
+
+		this.launchNextClip(sortedClips);
+	};
+
+	launchNextClip = clips => {
+		let currentIndex = _.findIndex(clips, {
+			_id: this.props.playlist.current.clip._id
+		});
+
+		let newIndex = currentIndex + 1;
+
+		if (newIndex >= clips.length) {
+			this.state.player.stopVideo();
+		} else if (newIndex < clips.length) {
+			let current = {
+				video: this.props.video,
+				track: this.props.playlist.current.track,
+				clip: clips[newIndex]
+			};
+			// this.props.selectClip(clips[newIndex]);
+
+			this.props.updatePlaylist(current);
+
+			setTimeout(() => {
+				this.state.player.seekTo(this.props.playlist.current.clip.start);
+			}, 1);
+		}
+	};
+
+	playCurrent = () => {
+		if (
+			this.props.player.playlist &&
+			this.props.player.playlist.current &&
+			this.props.player.playlist.current.clip
+		) {
+			const clip = this.props.player.playlist.current.clip;
+			if (!_.isEmpty(clip)) {
+				this.playVideo();
+				// this.props.selectClip(this.props.player.playlist.current.clip);
+
+				// fake delay needed for the video switch/seek
+				setTimeout(() => {
+					this.state.player.seekTo(clip.start);
+				}, 2);
+			}
+		}
+	};
 
 	playPauseSwitch() {
 		switch (this.props.currentVideo.playerAction) {
@@ -190,10 +265,16 @@ class YoutubePlayer extends React.Component {
 }
 
 function mapStateToProps(state) {
-	return { player: state.player, currentVideo: state.currentVideo };
+	return {
+		player: state.player,
+		playlist: state.player.playlist,
+		currentVideo: state.currentVideo
+	};
 }
 
 export default connect(mapStateToProps, {
 	updateCurrentVideo,
-	updateTime
+	updateTime,
+	updatePlaylist,
+	selectClip
 })(YoutubePlayer);
