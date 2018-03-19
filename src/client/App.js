@@ -37,10 +37,13 @@ class App extends Component {
 	@keydown("enter")
 	playClip() {
 		if (this.props.selectedClip && this.props.selectedTrack) {
-			this.props.updatePlaylist({
-				video: this.props.video,
-				track: this.props.selectedTrack,
-				clip: this.props.selectedClip
+			this.props.updatePlaylist({});
+			setTimeout(() => {
+				this.props.updatePlaylist({
+					video: this.props.video,
+					track: this.props.selectedTrack,
+					clip: this.props.selectedClip
+				});
 			});
 		}
 	}
