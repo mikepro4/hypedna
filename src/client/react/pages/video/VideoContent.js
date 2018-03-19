@@ -273,7 +273,7 @@ class VideoContent extends Component {
 					<div className="empty-track">No tracks added...</div>
 				)}
 				<button
-					className="button white-button square-button"
+					className="button white-button squared-button"
 					onClick={() => {
 						this.props.addTrack(
 							{
