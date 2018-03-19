@@ -1,0 +1,71 @@
+.button {
+	font-size: 13px;
+	font-family: "Roboto", sans-serif;
+	font-weight: 400;
+	display: flex;
+	align-items: center;
+	line-height: 1em;
+	position: relative;
+	color: $blue1;
+	transition: all 0.1s ease-in-out;
+	white-space: nowrap;
+	cursor: pointer;
+	border: none;
+	outline: none;
+	text-align: center;
+	justify-content: center;
+	user-select: none;
+	background: transparent;
+	user-select: none;
+	background: $grey2;
+	box-shadow: none;
+	padding: 8px 13px;
+	border-radius: 3px;
+
+	.pt-icon-standard {
+		margin: 0 5px 0 0;
+
+		&:last-child {
+			margin: 0;
+		}
+	}
+
+	&:hover {
+		color: $blue10;
+	}
+
+	&:active {
+		color: $blue1;
+	}
+
+	&.white-button {
+		background: $white;
+
+		&:hover {
+			background: $white;
+		}
+
+		&:active {
+			background: $white;
+		}
+	}
+
+	&.blue-button {
+		background: $blue5;
+		color: $white;
+
+		&:hover {
+			background: $blue10;
+			color: $white;
+		}
+
+		&:active {
+			background: $blue1;
+			color: $white;
+		}
+	}
+
+	&.squared-button {
+		border-radius: 0;
+	}
+}

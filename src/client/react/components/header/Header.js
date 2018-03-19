@@ -16,7 +16,7 @@ import ButtonBase from "material-ui/ButtonBase";
 import Tooltip from "material-ui/Tooltip";
 import NotificationsIcon from "material-ui-icons/Notifications";
 import AddCircleIcon from "material-ui-icons/AddCircle";
-import { withRouter } from "react-router-dom";
+import { withRouter, Link } from "react-router-dom";
 import { ListItemIcon, ListItemText } from "material-ui/List";
 
 import EntitySearchForm from "./EntitySearchForm";
@@ -102,6 +102,12 @@ class Header extends Component {
 	renderAuthButton() {
 		return this.props.auth ? (
 			<ul className="header-actions">
+				<li>
+					<Link to="/create/video" className="button blue-button">
+						<span className="pt-icon-standard pt-icon-add" />
+						<span className="button-label">Add New Video</span>
+					</Link>
+				</li>
 				<li>
 					<Tooltip id="tooltip-usermenu" title="User Menu" placement="bottom">
 						<ButtonBase

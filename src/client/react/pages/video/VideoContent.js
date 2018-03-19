@@ -39,11 +39,11 @@ const styles = theme => ({
 
 		"&:hover": {
 			color: "#000000",
-			background: "rgba(0,0,0,0.02)"
+			background: "rgba(50,50,51,0.03)"
 		},
 
 		"&:active": {
-			color: "#ccc"
+			color: "#323233"
 		}
 	},
 	button: {
@@ -248,14 +248,18 @@ class VideoContent extends Component {
 		});
 		return (
 			<div className="video-track-single-group" key={entityType._id}>
-				<h1
-					onClick={() =>
-						this.props.history.push(
-							`/ontology?selectedTabId=4&selectedEntityTypeId=${entityType._id}`
-						)
-					}
-				>
-					{entityType.genericProperties.displayName}
+				<h1>
+					<span
+						onClick={() =>
+							this.props.history.push(
+								`/ontology?selectedTabId=4&selectedEntityTypeId=${
+									entityType._id
+								}`
+							)
+						}
+					>
+						{entityType.genericProperties.displayName}
+					</span>
 				</h1>
 				{tracks.length && tracks.length > 0 ? (
 					<div className="video-track-list">
@@ -266,9 +270,10 @@ class VideoContent extends Component {
 						</div>
 					</div>
 				) : (
-					"no tracks"
+					<div className="empty-track">No tracks added...</div>
 				)}
 				<button
+					className="button white-button square-button"
 					onClick={() => {
 						this.props.addTrack(
 							{
@@ -295,7 +300,8 @@ class VideoContent extends Component {
 						);
 					}}
 				>
-					add track
+					<span className="pt-icon-standard pt-icon-add" />
+					<span className="button-label">Add Track</span>
 				</button>
 			</div>
 		);

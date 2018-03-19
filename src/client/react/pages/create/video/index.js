@@ -76,8 +76,11 @@ class CreateVideoPage extends Component {
 										</h2>
 									</div>
 								</div>
-								<button onClick={this.handleAddVideo}>
-									{this.props.newVideo ? "add video" : "go to video"}
+								<button
+									className="button blue-button"
+									onClick={this.handleAddVideo}
+								>
+									{this.props.newVideo ? "Add video" : "Go to video"}
 								</button>
 							</div>
 						) : (

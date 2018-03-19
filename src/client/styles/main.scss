@@ -46,8 +46,10 @@ $break1: 1100px;
 @import "./imports/reset";
 @import "./imports/scrollbars";
 @import "./imports/select/components";
+@import "./imports/button";
 
 //components
+
 @import "../react/components/common/button/Button";
 @import "../react/components/common/form/InputGroup";
 @import "../react/components/header/Header";
@@ -124,20 +126,20 @@ h6 {
 
 a {
 	// color: $blue2;
-	color: $cobalt4;
+	color: $blue1;
 	text-decoration: none;
 	transition: color 0.15s ease-in-out;
 }
 
 a:hover {
 	// color: $blue4;
-	color: $cobalt3;
+	color: $blue5;
 	text-decoration: none;
 }
 
 a:active {
 	// color: $blue5;
-	color: $cobalt5;
+	color: $blue10;
 	text-decoration: none;
 }
 
@@ -170,9 +172,9 @@ button {
 	user-select: none;
 	background: transparent;
 
-	.button-label {
-		margin: 0 0 0 3px;
-	}
+	// .button-label {
+	// 	margin: 0 0 0 3px;
+	// }
 }
 
 .pt-editable-placeholder > .pt-editable-content {
