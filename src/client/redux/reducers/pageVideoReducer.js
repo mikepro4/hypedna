@@ -72,7 +72,8 @@ export const pageVideoReducer = (state = initialState, action) => {
 		}
 		case SELECT_CLIP:
 			return assign({}, state, {
-				selectedClip: action.clip
+				selectedClip: action.clip,
+				selectedTrack: action.track
 			});
 		case CLEAR_LOADED_HYPEDNA_VIDEO:
 			return assign({}, state, { singleVideo: {}, isFetching: false });

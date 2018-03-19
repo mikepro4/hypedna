@@ -7,6 +7,7 @@ import NavigationSidebar from "./react/components/navigation/NavigationSidebar";
 import keydown from "react-keydown";
 import { fetchCurrentUser } from "./redux/actions";
 import { selectClip, deleteClip } from "./redux/actions/objectTrackActions";
+import { updatePlaylist } from "./redux/actions/player";
 import { FocusStyleManager } from "@blueprintjs/core";
 
 FocusStyleManager.onlyShowFocusOnTabs();
@@ -33,6 +34,17 @@ class App extends Component {
 		}
 	}
 
+	@keydown("enter")
+	playClip() {
+		if (this.props.selectedClip && this.props.selectedTrack) {
+			this.props.updatePlaylist({
+				video: this.props.video,
+				track: this.props.selectedTrack,
+				clip: this.props.selectedClip
+			});
+		}
+	}
+
 	render() {
 		return (
 			<div className="app-container">
@@ -51,13 +63,18 @@ class App extends Component {
 }
 
 function mapStateToProps(state) {
-	return { selectedClip: state.pageVideo.selectedClip };
+	return {
+		selectedClip: state.pageVideo.selectedClip,
+		selectedTrack: state.pageVideo.selectedTrack,
+		video: state.pageVideo.singleVideo
+	};
 }
 
 export default {
 	component: connect(mapStateToProps, {
 		fetchCurrentUser,
 		selectClip,
-		deleteClip
+		deleteClip,
+		updatePlaylist
 	})(withRouter(App))
 };

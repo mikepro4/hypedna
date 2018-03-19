@@ -63,6 +63,8 @@ class Clip extends Component {
 		let clipLength = this.props.clip.end - this.props.clip.start;
 		let percent = playedLength * 100 / clipLength;
 
+		if (percent > 100) return 100;
+
 		return percent;
 	};
 

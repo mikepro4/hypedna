@@ -65,7 +65,7 @@ class ClipsTimeline extends Component {
 		const clickedClip = this.getClickedClip(event);
 
 		if (clickedClip) {
-			this.props.selectClip(clickedClip);
+			this.props.selectClip(clickedClip, this.props.track);
 
 			if (
 				event.target.className !== "resize-left" &&
@@ -314,7 +314,7 @@ class ClipsTimeline extends Component {
 				}
 			);
 			// refresh clip that's selected to updated start / end
-			this.props.selectClip(this.state.updatedSingleClip);
+			this.props.selectClip(this.state.updatedSingleClip, this.props.track);
 		}
 	};
 
@@ -411,7 +411,7 @@ class ClipsTimeline extends Component {
 				return clip.end == newClip.end && clip.start == newClip.start;
 			});
 			this.props.optimisticTrackUpdate(track.data);
-			this.props.selectClip(filteredClip[0]);
+			this.props.selectClip(filteredClip[0], this.props.track);
 		});
 	};
 

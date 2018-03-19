@@ -143,10 +143,11 @@ export const deleteClip = selectedClip => async (dispatch, getState, api) => {
 
 // =============================================================================
 
-export const selectClip = clip => dispatch => {
+export const selectClip = (clip, track) => dispatch => {
 	dispatch({
 		type: SELECT_CLIP,
-		clip
+		clip,
+		track
 	});
 };
 
