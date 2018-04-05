@@ -51,8 +51,12 @@ class YoutubePlayer extends React.Component {
 				return this.pauseVideo();
 			case "stop":
 				return this.stopVideo();
-			case "seek":
-				return this.seekVideo();
+		}
+
+		if (this.props.player && this.props.player.status == "seek") {
+			if (this.props.player.seekToTime !== prevProps.player.seekToTime) {
+				this.seekVideo();
+			}
 		}
 
 		if (
@@ -138,6 +142,12 @@ class YoutubePlayer extends React.Component {
 	seekToClip() {}
 
 	playVideo() {
+		if (this.props.player.initial) {
+			this.state.player.mute();
+		} else {
+			this.state.player.unMute();
+		}
+
 		console.log("play video");
 		clearInterval(this.state.timeInterval);
 		this.props.updateCurrentVideo(this.props.currentVideo.videoId, "waiting");
@@ -163,16 +173,20 @@ class YoutubePlayer extends React.Component {
 
 	seekVideo() {
 		console.log("seek to");
-		if (this.state.player) {
-			clearInterval(this.state.timeInterval);
-			const seekToSeconds = this.props.currentVideo.seconds;
-			this.playVideo();
+		this.pauseVideo();
+		clearInterval(this.state.timeInterval);
+		const seekToSeconds = this.props.player.seekToTime;
+		this.state.player.mute();
 
-			// fake delay needed for the video switch/seek
-			setTimeout(() => {
-				this.state.player.seekTo(seekToSeconds);
-			}, 2);
-		}
+		// fake delay needed for the video switch/seek
+		setTimeout(() => {
+			this.state.player.seekTo(seekToSeconds);
+			// this.state.unMute();
+			// setTimeout(() => {
+			// 	this.pauseVideo();
+			// }, 10);
+		}, 2);
+		// }
 	}
 
 	onEnd() {

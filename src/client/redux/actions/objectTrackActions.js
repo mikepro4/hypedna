@@ -153,6 +153,24 @@ export const selectClip = (clip, track) => dispatch => {
 
 // =============================================================================
 
+export const resizeClipRight = track => dispatch => {
+	console.log("resize right");
+};
+
+export const resizeClipLeft = track => dispatch => {
+	console.log("resize left");
+};
+
+export const moveClipRight = track => dispatch => {
+	console.log("move right");
+};
+
+export const moveClipLeft = track => dispatch => {
+	console.log("move left");
+};
+
+// =============================================================================
+
 export const clearLoadedTracks = () => dispatch => {
 	dispatch({
 		type: CLEAR_SEARCH_TRACKS

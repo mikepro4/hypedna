@@ -12,7 +12,7 @@ import Menu, { MenuItem, MenuList } from "material-ui/Menu";
 import Popover from "material-ui/Popover";
 import { formatTime } from "../../../utils/timeFormatter";
 import ProgressBar from "../../components/common/player/ProgressBar";
-import { updateCurrentVideo } from "../../../redux/actions/";
+import { updateCurrentVideo, resetInitial } from "../../../redux/actions/";
 import { updatePlaylist } from "../../../redux/actions/player";
 import {
 	searchTracks,
@@ -86,12 +86,31 @@ class VideoContent extends Component {
 		if (this.state.notLoadedTracks && !_.isEmpty(this.props.video._id)) {
 			this.searchTracks();
 		}
+		this.initialVideoLoad();
 	}
 
-	componentDidUpdate = prevProps => {
+	initialVideoLoad = () => {
+		this.props.updateCurrentVideo(this.props.video.googleId, "play", true);
+		this.setState({
+			initialLoad: true
+		});
+	};
+
+	componentDidUpdate = (prevProps, prevState) => {
 		if (prevProps.video._id !== this.props.video._id) {
 			if (!_.isEmpty(this.props.video._id)) {
 				this.searchTracks();
+				this.initialVideoLoad();
+			}
+		}
+
+		if (this.state.initialLoad) {
+			if (prevProps.player.currentVideo.playerAction == "playing") {
+				this.props.updateCurrentVideo(this.props.video.googleId, "pause");
+				this.props.resetInitial();
+				this.setState({
+					initialLoad: false
+				});
 			}
 		}
 	};
@@ -445,7 +464,8 @@ export default withStyles(styles)(
 			searchTracks,
 			addTrack,
 			clearLoadedTracks,
-			updatePlaylist
+			updatePlaylist,
+			resetInitial
 		})(VideoContent)
 	)
 );

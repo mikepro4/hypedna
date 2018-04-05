@@ -7,7 +7,8 @@ import {
 	SEEK_TO_TIME,
 	UPDATE_PLAYLIST,
 	CURRENT_VIDEO_UPDATE,
-	UPDATE_CURRENT_TIME
+	UPDATE_CURRENT_TIME,
+	RESET_INITIAL
 } from "../actions/types";
 
 const initialPlayerState = {
@@ -15,6 +16,7 @@ const initialPlayerState = {
 	currentTime: 0,
 	status: null,
 	seekToTime: null,
+	initial: false,
 	currentVideo: {
 		videoId: null,
 		playerAction: null,
@@ -52,9 +54,13 @@ export default (state = initialPlayerState, action) => {
 			return assign({}, state, {
 				currentVideo: {
 					videoId: action.payload,
-					playerAction: action.playerAction,
-					seconds: action.seconds
-				}
+					playerAction: action.playerAction
+				},
+				initial: action.initial
+			});
+		case RESET_INITIAL:
+			return assign({}, state, {
+				initial: false
 			});
 		case UPDATE_STATUS:
 			return assign({}, state, {

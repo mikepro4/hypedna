@@ -5,7 +5,7 @@ import { withRouter } from "react-router-dom";
 import moment from "moment";
 import classNames from "classnames";
 import { selectClip } from "../../../redux/actions/objectVideoActions";
-import { updatePlaylist } from "../../../redux/actions/player";
+import { updatePlaylist, seekToTime } from "../../../redux/actions/player";
 
 const styles = theme => ({});
 
@@ -28,6 +28,7 @@ class Clip extends Component {
 		this.setState({
 			mousePressed: true
 		});
+		this.props.seekToTime(this.props.clip.start);
 	};
 
 	onMouseUp = () => {
@@ -152,6 +153,8 @@ function mapStateToProps(state) {
 	};
 }
 
-export default connect(mapStateToProps, { selectClip, updatePlaylist })(
-	withStyles(styles)(withRouter(Clip))
-);
+export default connect(mapStateToProps, {
+	selectClip,
+	updatePlaylist,
+	seekToTime
+})(withStyles(styles)(withRouter(Clip)));

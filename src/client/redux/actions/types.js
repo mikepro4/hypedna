@@ -27,6 +27,7 @@ export const RESET_VIDEO = "app/RESET_VIDEO";
 export const SEEK_TO_TIME = "app/SEEK_TO_TIME";
 export const CURRENT_VIDEO_UPDATE = "app/CURRENT_VIDEO_UPDATE";
 export const UPDATE_PLAYLIST = "app/UPDATE_PLAYLIST";
+export const RESET_INITIAL = "app/RESET_INITIAL";
 
 /////////////////////////////////////////////////
 

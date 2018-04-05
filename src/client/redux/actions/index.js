@@ -1,4 +1,4 @@
-import { FETCH_AUTH, CURRENT_VIDEO_UPDATE } from "./types";
+import { FETCH_AUTH, CURRENT_VIDEO_UPDATE, RESET_INITIAL } from "./types";
 import moment from "moment";
 import * as _ from "lodash";
 import qs from "qs";
@@ -12,12 +12,19 @@ export const fetchCurrentUser = () => async (dispatch, getState, api) => {
 	});
 };
 
-export const updateCurrentVideo = (id, action, seconds) => dispatch => {
+export const updateCurrentVideo = (id, action, initial) => dispatch => {
 	dispatch({
 		type: CURRENT_VIDEO_UPDATE,
 		payload: id,
 		playerAction: action,
-		seconds
+		initial: initial
+	});
+};
+
+export const resetInitial = () => dispatch => {
+	dispatch({
+		type: RESET_INITIAL,
+		initial: false
 	});
 };
 

@@ -7,7 +7,7 @@ export const currentVideo = (state = {}, action) => {
 				...state,
 				videoId: action.payload,
 				playerAction: action.playerAction,
-				seconds: action.seconds
+				initial: action.initial
 			};
 		default:
 			return state;
