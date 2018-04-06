@@ -46,7 +46,7 @@ class OntologyEditorEntities extends Component {
 			{
 				entityType: this.props.selectedEntityTypeId
 			},
-			"displayName",
+			"created",
 			0,
 			20
 		);
@@ -60,7 +60,7 @@ class OntologyEditorEntities extends Component {
 		});
 		this.props.searchEntityResults(
 			newValues,
-			"displayName",
+			"created",
 			0,
 			20,
 			this.props.getEntityType(this.props.selectedEntityTypeId).customProperties
@@ -73,7 +73,7 @@ class OntologyEditorEntities extends Component {
 		});
 		this.props.loadMoreEntityResults(
 			formValues,
-			"displayName",
+			"created",
 			this.props.entitySearchResults.offset + 20,
 			this.props.entitySearchResults.limit + 20,
 			this.props.getEntityType(this.props.selectedEntityTypeId).customProperties

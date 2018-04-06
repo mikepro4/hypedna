@@ -61,7 +61,7 @@ class EntityResult extends Component {
 
 								<li className="entity-single-metadata-option">
 									Added{" "}
-									{moment(this.props.entity.properties.createdAt).fromNow()}
+									{moment(this.props.entity.created).fromNow()}
 								</li>
 							</ul>
 						</div>
