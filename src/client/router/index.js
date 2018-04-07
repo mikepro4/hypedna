@@ -14,6 +14,8 @@ import OntologyPage from "../react/pages/ontology";
 
 import EntityPage from "../react/pages/entity";
 
+import UIKitPage from "../react/pages/uikit";
+
 export default [
 	{
 		...App,
@@ -80,6 +82,14 @@ export default [
 				path: "/ontology",
 				params: {
 					name: "ontology"
+				}
+			},
+			{
+				...UIKitPage,
+				path: "/ui_kit",
+				exact: true,
+				params: {
+					name: "ui_kit"
 				}
 			},
 			{

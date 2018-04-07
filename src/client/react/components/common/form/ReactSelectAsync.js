@@ -1,6 +1,7 @@
 import React, { PropTypes } from "react";
 import classnames from "classnames";
 import Select from "react-select";
+import * as _ from 'lodash'
 
 const ReactSelect = ({
 	input,
@@ -36,7 +37,7 @@ const ReactSelect = ({
 					{...input}
 					onChange={value => input.onChange(value)}
 					onBlur={() => input.onBlur(input.value)}
-					loadOptions={loadOptions}
+					loadOptions={_.throttle(loadOptions, 500)}
 					autoload={true}
 					placeholder={placeholder}
 					simpleValue

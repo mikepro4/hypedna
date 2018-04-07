@@ -58,7 +58,11 @@ class TrackDetails extends Component {
 		byRefs: {
 			activeEntityTypes: [],
 			activeEntityId: null
-		}
+		},
+		ofRefEntityValue: null,
+		byRefEntityValue: null,
+		loadedOfEntity: false,
+		loadedByEntity: false
 	};
 
 	resetPopover = () => {
@@ -298,7 +302,7 @@ class TrackDetails extends Component {
 				displayName: input,
 				entityType: entityTypeId
 			},
-			"displayName",
+			"created",
 			0,
 			20,
 			data => {
@@ -396,22 +400,56 @@ class TrackDetails extends Component {
 
 	renderEntitySelector = (entityType, position, refType) => {
 		let value;
+		let id;
 
 		if (refType == "of") {
-			value = this.state.ofRefs.activeEntityId;
+			id = this.state.ofRefs.activeEntityId;
 		} else if (refType == "by") {
-			value = this.state.byRefs.activeEntityId;
+			id = this.state.byRefs.activeEntityId;
+		}
+
+		if (!this.state.loadedOfEntity || !this.state.loadedByEntity) {
+			this.props.getSingleEntity(id, data => {
+				console.log(data);
+				value = {
+					label: data.properties.displayName,
+					value: data._id
+				};
+				if (refType == "of") {
+					this.setState({
+						ofRefEntityValue: value,
+						loadedOfEntity: true
+					});
+				} else if (refType == "by") {
+					this.setState({
+						byRefEntityValue: value,
+						loadedByEntity: true
+					});
+				}
+			});
 		}
 
 		return (
 			<Select.Async
 				key={entityType._id}
-				onChange={value => this.selectEntity(value, position, refType)}
-				value={value}
-				onBlur={() => {}}
-				loadOptions={(input, callback) =>
-					this.getOptions(input, callback, entityType._id)
+				onInputKeyDown={event => {
+					this.setState({ ofRefEntityValue: null, byRefEntityValue: null });
+				}}
+				onChange={value => {
+					this.selectEntity(value, position, refType);
+				}}
+				value={
+					refType == "of" &&
+					this.state.ofRefEntityValue &&
+					this.state.byRefEntityValue
+						? this.state.ofRefEntityValue
+						: this.state.byRefEntityValue
 				}
+				onBlur={() => {}}
+				loadOptions={_.debounce(
+					(input, callback) => this.getOptions(input, callback, entityType._id),
+					1000
+				)}
 				clearable
 				searchable
 			/>

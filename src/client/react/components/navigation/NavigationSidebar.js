@@ -8,6 +8,7 @@ import LabelIcon from "material-ui-icons/Label";
 import DescriptionIcon from "material-ui-icons/Description";
 import PersonIcon from "material-ui-icons/Person";
 import SubscriptionsIcon from "material-ui-icons/Subscriptions";
+import FormatShapesIcon from "material-ui-icons/FormatShapes";
 import { Link } from "react-router-dom";
 import * as _ from "lodash";
 
@@ -23,7 +24,8 @@ const styles = theme => ({
 	linkItemActive: _.assign({ color: "#4580e6" }, sharedLinkStyle),
 	linkLabel: {
 		fontSize: "10px",
-		fontWeight: 400
+		fontWeight: 400,
+		marginTop: "5px"
 	}
 });
 
@@ -93,6 +95,22 @@ class NavigationSidebar extends Component {
 						>
 							<PersonIcon />
 							<div className={this.props.classes.linkLabel}>My Profile</div>
+						</IconButton>
+					</li>
+
+					<li className="single-sidebar-link">
+						<IconButton
+							className={
+								this.props.location.pathname == "/ui_kit"
+									? this.props.classes.linkItemActive
+									: this.props.classes.linkItem
+							}
+							aria-label="UI Kit"
+							component={Link}
+							to="/ui_kit"
+						>
+							<FormatShapesIcon />
+							<div className={this.props.classes.linkLabel}>UI Kit</div>
 						</IconButton>
 					</li>
 				</ul>
