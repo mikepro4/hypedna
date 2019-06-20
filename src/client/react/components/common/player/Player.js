@@ -51,6 +51,7 @@ class YoutubePlayer extends React.Component {
 				return this.pauseVideo();
 			case "stop":
 				return this.stopVideo();
+				
 		}
 
 		if (this.props.player && this.props.player.status == "seek") {

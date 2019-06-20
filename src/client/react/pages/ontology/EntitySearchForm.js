@@ -116,7 +116,7 @@ class EntitySearchForm extends React.Component {
 	};
 
 	render() {
-		return (<div/>)
+		// return (<div/>)
 		const { handleSubmit } = this.props;
 
 		const customProperties = this.props.getEntityType(

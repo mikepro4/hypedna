@@ -153,6 +153,7 @@ class Header extends Component {
 	}
 
 	handleSubmit = values => {
+		console.log(values)
 		if (!_.isEmpty(values.entityUrlName)) {
 			this.props.history.push(`/${values.entityUrlName}?selectedTabId=1`);
 			this.props.resetForm("mainEntitySearchForm");

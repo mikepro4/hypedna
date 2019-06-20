@@ -50,9 +50,9 @@
 		"webpack-plugin-hash-output": "^1.3.0"
 	},
 	"dependencies": {
-		"@blueprintjs/core": "^1.35.2",
-		"@blueprintjs/datetime": "^2.0.0-rc.1",
-		"@blueprintjs/labs": "^0.15.2",
+		"@blueprintjs/core": "1.35.2",
+		"@blueprintjs/datetime": "2.0.0-rc.1",
+		"@blueprintjs/labs": "0.15.2",
 		"autoprefixer": "^7.2.3",
 		"axios": "^0.17.0",
 		"babel-runtime": "^6.26.0",
@@ -73,7 +73,7 @@
 		"obj-traverse": "^1.0.0",
 		"path": "^0.12.7",
 		"postcss-loader": "^2.0.9",
-		"react": "^16.2.0",
+		"react": "16.2.0",
 		"react-addons-css-transition-group": "^15.6.2",
 		"react-dnd": "^2.5.4",
 		"react-dnd-html5-backend": "^2.5.4",

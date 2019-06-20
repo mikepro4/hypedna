@@ -7,6 +7,7 @@
 	align-items: center;
 	justify-content: space-between;
 	align-content: stretch;
+	z-index: 100000000;
 
 	.header-left {
 		display: flex;
@@ -101,6 +102,8 @@
 				cursor: pointer;
 				display: block;
 				font-size: 13px;
+				z-index: 20000;
+				position: relative;
 
 				&:last-child {
 					border-radius: 0;

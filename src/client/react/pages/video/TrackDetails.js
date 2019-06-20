@@ -410,7 +410,7 @@ class TrackDetails extends Component {
 
 		if (!this.state.loadedOfEntity || !this.state.loadedByEntity) {
 			this.props.getSingleEntity(id, data => {
-				console.log(data);
+				console.log(refType, data);
 				value = {
 					label: data.properties.displayName,
 					value: data._id
@@ -426,6 +426,7 @@ class TrackDetails extends Component {
 						loadedByEntity: true
 					});
 				}
+				
 			});
 		}
 

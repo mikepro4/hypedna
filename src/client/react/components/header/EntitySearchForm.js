@@ -23,6 +23,7 @@ class EntitySearchForm extends React.Component {
 					})),
 					complete: true
 				});
+				console.log(data.all)
 			}
 		);
 	};

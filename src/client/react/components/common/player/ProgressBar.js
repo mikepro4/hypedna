@@ -7,7 +7,7 @@ import { updateCurrentVideo } from "../../../../redux/actions/";
 import { formatTime } from "../../../../utils/timeFormatter";
 import Timeline from "./Timeline";
 import { updateHoverTime } from "../../../../redux/actions/pageVideoActions";
-import { updatePlaylist } from "../../../../redux/actions/player";
+import { updatePlaylist, seekToTime } from "../../../../redux/actions/player";
 
 class ProgressBar extends React.Component {
 	constructor(props) {
@@ -30,11 +30,15 @@ class ProgressBar extends React.Component {
 			100 /
 			this.refs.progress_bar_container.getBoundingClientRect().width;
 		const seekSeconds = progressBarPercent * this.props.duration / 100;
-		this.props.updateCurrentVideo(
-			this.props.currentVideo.videoId,
-			"seek",
-			seekSeconds
-		);
+		this.props.seekToTime(seekSeconds);
+		setTimeout(() => {
+			this.props.updateCurrentVideo(this.props.currentVideo.videoId, "play");
+		}, 500) 
+		// this.props.updateCurrentVideo(
+		// 	this.props.currentVideo.videoId,
+		// 	"seek",
+		// 	seekSeconds
+		// );
 	}
 
 	calculateWidth(event) {
@@ -133,5 +137,6 @@ function mapStateToProps(state) {
 export default connect(mapStateToProps, {
 	updateCurrentVideo,
 	updateHoverTime,
-	updatePlaylist
+	updatePlaylist,
+	seekToTime
 })(ProgressBar);
